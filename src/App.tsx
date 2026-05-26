@@ -13,11 +13,28 @@ export default function App() {
         display: "flex",
         justifyContent: "space-between"
       }}>
-        <h1>Static Holidays</h1>
-        <nav>
-          Home | Holidays | Shop | Blog | Login
-        </nav>
-      </header>
+       <div>
+  <button style={{
+    marginRight: "10px",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    border: "none",
+    cursor: "pointer"
+  }}>
+    Login
+  </button>
+
+  <button style={{
+    padding: "10px 20px",
+    background: "#3b82f6",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer"
+  }}>
+    Sign Up
+  </button>
+</div>
 
       <section style={{
         textAlign: "center",
