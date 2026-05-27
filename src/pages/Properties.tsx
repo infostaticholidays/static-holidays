@@ -1,6 +1,6 @@
-import { useListProperties } from "@workspace/api-client-react";
-import { PropertyCard } from "@/components/PropertyCard";
 import { useState } from "react";
+import { PropertyCard } from "@/components/PropertyCard";
+import { useListProperties } from "@/lib/api";
 
 export default function Properties() {
   const [search, setSearch] = useState("");
@@ -11,13 +11,15 @@ export default function Properties() {
 
   return (
     <div className="container mx-auto p-6">
+      {/* SEARCH BAR */}
       <input
-        className="border p-2 w-full mb-6"
+        className="border p-2 w-full mb-6 rounded-md"
         placeholder="Search location..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
+      {/* LOADING */}
       {isLoading ? (
         <p>Loading...</p>
       ) : (
