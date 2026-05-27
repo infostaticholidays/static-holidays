@@ -132,21 +132,11 @@ export default function App() {
                 <h2 style={{ fontSize: "40px", color: "#14532d" }}>
                   Featured Properties
                 </h2>
+
                 <p style={{ color: "#4b5563" }}>
                   Hand-picked holiday stays for unforgettable escapes.
                 </p>
               </div>
-
-              <a
-                href="/properties"
-                style={{
-                  color: "#16a34a",
-                  fontWeight: "bold",
-                  textDecoration: "none",
-                }}
-              >
-                View All →
-              </a>
             </div>
 
             <div
@@ -164,7 +154,6 @@ export default function App() {
                     borderRadius: "18px",
                     overflow: "hidden",
                     boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                    transition: "0.3s",
                   }}
                 >
                   <img
@@ -197,54 +186,12 @@ export default function App() {
                       {property.price}
                     </p>
 
-                    <button style={cardBtn}>View Property</button>
+                    <button style={cardBtn}>
+                      View Property
+                    </button>
                   </div>
                 </div>
               ))}
-            </div>
-          </section>
-
-          {/* WHY CHOOSE US */}
-          <section
-            style={{
-              background: "#dcfce7",
-              padding: "80px 40px",
-            }}
-          >
-            <div
-              style={{
-                maxWidth: "1200px",
-                margin: "0 auto",
-                textAlign: "center",
-              }}
-            >
-              <h2 style={{ fontSize: "40px", color: "#14532d" }}>
-                Why Choose Static Holidays?
-              </h2>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-                  gap: "25px",
-                  marginTop: "50px",
-                }}
-              >
-                {features.map((feature) => (
-                  <div
-                    key={feature.title}
-                    style={{
-                      background: "white",
-                      padding: "30px",
-                      borderRadius: "18px",
-                    }}
-                  >
-                    <div style={{ fontSize: "42px" }}>{feature.icon}</div>
-                    <h3 style={{ color: "#14532d" }}>{feature.title}</h3>
-                    <p style={{ color: "#6b7280" }}>{feature.text}</p>
-                  </div>
-                ))}
-              </div>
             </div>
           </section>
         </>
@@ -261,41 +208,10 @@ export default function App() {
           color: "white",
           padding: "50px 40px",
           marginTop: "50px",
+          textAlign: "center",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "30px",
-            maxWidth: "1200px",
-            margin: "0 auto",
-          }}
-        >
-          <div>
-            <h3>Static Holidays</h3>
-            <p>Luxury UK holiday homes and caravan stays.</p>
-          </div>
-
-          <div>
-            <h4>Quick Links</h4>
-            <p>Properties</p>
-            <p>Adverts</p>
-            <p>Shop</p>
-          </div>
-
-          <div>
-            <h4>Support</h4>
-            <p>Contact Us</p>
-            <p>Privacy Policy</p>
-            <p>Terms & Conditions</p>
-          </div>
-        </div>
-
-        <p style={{ textAlign: "center", marginTop: "40px" }}>
-          Static Holidays © 2025
-        </p>
+        Static Holidays © 2025
       </footer>
     </div>
   );
@@ -379,30 +295,3 @@ const featuredProperties = [
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
   },
 ];
-
-const features = [
-  {
-    icon: "🏡",
-    title: "Luxury Stays",
-    text: "Premium caravans and lodges across the UK.",
-  },
-  {
-    icon: "🌊",
-    title: "Amazing Locations",
-    text: "Coastal escapes, countryside retreats and family parks.",
-  },
-  {
-    icon: "💳",
-    title: "Secure Booking",
-    text: "Easy and safe booking experience coming soon.",
-  },
-];
-```
-
-Then commit with:
-
-```text
-Modern homepage redesign
-```
-
-This will make the website look MUCH more professional instantly.
