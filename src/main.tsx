@@ -7,15 +7,14 @@ import {
 } from "react-router-dom";
 
 import App from "./App";
-
-import Profile from "./pages/profile";
+import Adverts from "./pages/Adverts";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/adverts" element={<Adverts />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
