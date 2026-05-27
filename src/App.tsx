@@ -1,6 +1,8 @@
 import Adverts from "./pages/Adverts";
 import Bookings from "./pages/Bookings";
 import BookingDetail from "./pages/BookingDetail";
+import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
 
 export default function App() {
   const path = window.location.pathname;
@@ -14,6 +16,7 @@ export default function App() {
         margin: 0,
       }}
     >
+      {/* HEADER */}
       <header
         style={{
           display: "flex",
@@ -39,6 +42,10 @@ export default function App() {
             Bookings
           </a>
 
+          <a href="/events" style={{ color: "white", textDecoration: "none" }}>
+            Events
+          </a>
+
           <a href="/" style={{ color: "white", textDecoration: "none" }}>
             Listings
           </a>
@@ -49,13 +56,7 @@ export default function App() {
         </nav>
 
         <div style={{ display: "flex", gap: "12px" }}>
-          <button
-            style={{
-              padding: "10px 20px",
-              borderRadius: "8px",
-              border: "none",
-            }}
-          >
+          <button style={{ padding: "10px 20px", borderRadius: "8px", border: "none" }}>
             Login
           </button>
 
@@ -91,7 +92,7 @@ export default function App() {
               Discover static holiday homes, caravan parks and lodge retreats across the UK
             </p>
 
-            {/* ✅ SEARCH / CALENDAR BAR RESTORED */}
+            {/* SEARCH / CALENDAR BAR */}
             <div style={{ marginTop: "30px" }}>
               <input
                 type="text"
@@ -155,6 +156,13 @@ export default function App() {
       {/* BOOKING DETAIL PAGE */}
       {path.startsWith("/bookings/") && <BookingDetail />}
 
+      {/* EVENTS LIST PAGE */}
+      {path === "/events" && <Events />}
+
+      {/* EVENT DETAIL PAGE */}
+      {path.startsWith("/events/") && <EventDetail />}
+
+      {/* FOOTER */}
       <footer
         style={{
           textAlign: "center",
