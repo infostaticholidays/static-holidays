@@ -1,5 +1,3 @@
-import { Link } from "wouter";
-
 export default function Bookings() {
   const bookings = [
     {
@@ -33,7 +31,7 @@ export default function Bookings() {
           </p>
           <p>£{b.totalPrice}</p>
 
-          <Link href={`/bookings/${b.id}`}>View Details</Link>
+          <a href={`/bookings/${b.id}`}>View Details</a>
         </div>
       ))}
     </div>
