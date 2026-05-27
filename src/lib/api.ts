@@ -1,109 +1,155 @@
-// =========================
-// SAFE MOCK API (WORKS ON VERCEL)
-// =========================
+// src/lib/api.ts
+// MOCK API (Vercel safe - no external packages required)
 
-// -------- PROPERTIES --------
+// ================= PROPERTIES =================
 
-export const useListProperties = () => ({
-  data: {
-    total: 1,
-    properties: [
+export function useListProperties() {
+  return {
+    data: {
+      total: 1,
+      properties: [
+        {
+          id: 1,
+          title: "Cornwall Beach Cottage",
+          location: "Cornwall",
+          county: "UK",
+          pricePerNight: 120,
+          averageRating: 4.8,
+          reviewCount: 10,
+          maxGuests: 4,
+          bedrooms: 2,
+          bathrooms: 1,
+          hostName: "John",
+          hostAvatarUrl: "",
+          description: "Beautiful seaside cottage",
+          amenities: ["wifi", "kitchen"],
+          petFriendly: true,
+          images: ["/images/cottage.png"],
+        },
+      ],
+    },
+    isLoading: false,
+  };
+}
+
+export function useGetProperty(id: number) {
+  return {
+    data: {
+      id,
+      title: "Cornwall Beach Cottage",
+      location: "Cornwall",
+      county: "UK",
+      pricePerNight: 120,
+      averageRating: 4.8,
+      reviewCount: 10,
+      maxGuests: 4,
+      bedrooms: 2,
+      bathrooms: 1,
+      hostName: "John",
+      hostAvatarUrl: "",
+      description: "Beautiful seaside cottage",
+      amenities: ["wifi", "kitchen"],
+      petFriendly: true,
+      images: ["/images/cottage.png"],
+    },
+    isLoading: false,
+  };
+}
+
+export function useGetPropertyReviews() {
+  return { data: [] };
+}
+
+// ================= EVENTS =================
+
+export function useListEvents() {
+  return {
+    data: [
       {
         id: 1,
-        title: "Cornwall Cottage",
+        title: "Cornwall Festival",
+        category: "Festival",
         location: "Cornwall",
         county: "UK",
-        pricePerNight: 120,
-        averageRating: 4.8,
-        reviewCount: 10,
-        maxGuests: 4,
-        bedrooms: 2,
-        bathrooms: 1,
-        hostName: "John",
-        hostAvatarUrl: "",
-        description: "Beautiful seaside cottage",
-        amenities: ["wifi", "kitchen"],
-        petFriendly: true,
-        images: ["/images/cottage.png"],
+        date: new Date().toISOString(),
+        endDate: new Date().toISOString(),
+        organizer: "Council",
+        price: 0,
+        isFree: true,
+        imageUrl: "",
       },
     ],
-  },
-  isLoading: false,
-});
+    isLoading: false,
+  };
+}
 
-export const useGetProperty = () => ({
-  data: {
-    id: 1,
-    title: "Cornwall Cottage",
-    location: "Cornwall",
-    county: "UK",
-    pricePerNight: 120,
-    averageRating: 4.8,
-    reviewCount: 10,
-    maxGuests: 4,
-    bedrooms: 2,
-    bathrooms: 1,
-    hostName: "John",
-    hostAvatarUrl: "",
-    description: "Beautiful seaside cottage",
-    amenities: ["wifi", "kitchen"],
-    petFriendly: true,
-    images: ["/images/cottage.png"],
-  },
-  isLoading: false,
-});
+export function useGetEvent(id: number) {
+  return {
+    data: {
+      id,
+      title: "Sample Event",
+      description: "Demo event",
+      category: "Festival",
+      location: "UK",
+      county: "England",
+      date: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+      organizer: "Local",
+      price: 10,
+      isFree: false,
+      imageUrl: "",
+    },
+    isLoading: false,
+  };
+}
 
-export const useGetPropertyReviews = () => ({
-  data: [],
-  isLoading: false,
-});
+// ================= BOOKINGS =================
 
-// -------- BOOKINGS --------
+export function useListBookings() {
+  return { data: [], isLoading: false };
+}
 
-export const useCreateBooking = () => ({
-  mutate: () => {},
-  isPending: false,
-});
+export function useGetBooking() {
+  return { data: null, isLoading: false };
+}
 
-// -------- EVENTS --------
+export function useGetPaymentPlan() {
+  return { data: null };
+}
 
-export const useListEvents = () => ({
-  data: [],
-  isLoading: false,
-});
+export function usePayInstalment() {
+  return { mutate: () => {}, isPending: false };
+}
 
-export const useGetEvent = () => ({
-  data: null,
-  isLoading: false,
-});
+// ================= SHOP =================
 
-// -------- SHOP --------
+export function useListProducts() {
+  return {
+    data: [
+      {
+        id: 1,
+        name: "Holiday Candle",
+        price: 25,
+        category: "Gifts",
+        imageUrl: "",
+        stock: 10,
+      },
+    ],
+    isLoading: false,
+  };
+}
 
-export const useListProducts = () => ({
-  data: [],
-  isLoading: false,
-});
-
-export const useGetProduct = () => ({
-  data: null,
-  isLoading: false,
-});
-
-// -------- PROFILE --------
-
-export const useGetGuestTrustScore = () => ({
-  data: {
-    score: 80,
-    totalReviews: 5,
-    averageRating: 4.5,
-    badges: ["Trusted Guest"],
-    memberSince: new Date().toISOString(),
-    verifiedIdentity: true,
-  },
-  isLoading: false,
-});
-
-export const useGetGuestReviews = () => ({
-  data: [],
-  isLoading: false,
-});
+export function useGetProduct(id: number) {
+  return {
+    data: {
+      id,
+      name: "Sample Product",
+      price: 30,
+      category: "Gifts",
+      imageUrl: "",
+      stock: 5,
+      description: "Demo product",
+    },
+    isLoading: false,
+  };
+}
