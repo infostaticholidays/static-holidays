@@ -1,12 +1,14 @@
-import { useParams } from "wouter";
-
 export default function BookingDetail() {
-  const { id } = useParams();
+  const path = window.location.pathname;
+  const id = path.split("/").pop();
 
   return (
     <div style={{ padding: "40px" }}>
       <h1>Booking #{id}</h1>
-      <p>This is a demo booking page.</p>
+
+      <p>This is a demo booking detail page.</p>
+
+      <a href="/bookings">← Back to Bookings</a>
     </div>
   );
 }
