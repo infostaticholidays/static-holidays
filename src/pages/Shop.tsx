@@ -1,107 +1,103 @@
-import { Link } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ShoppingBag } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-
-// SAFE MOCK DATA (so your site works on Vercel)
-const products = [
-  {
-    id: 1,
-    name: "Holiday Candle",
-    price: 12.99,
-    category: "Gifts",
-    imageUrl: "/images/trust-badge.png",
-    featured: true,
-  },
-  {
-    id: 2,
-    name: "British Tea Set",
-    price: 24.99,
-    category: "Accessories",
-    imageUrl: "/images/trust-badge.png",
-    featured: false,
-  },
-  {
-    id: 3,
-    name: "Coastal Hoodie",
-    price: 39.99,
-    category: "Clothing",
-    imageUrl: "/images/trust-badge.png",
-    featured: true,
-  },
-];
-
 export default function Shop() {
-  const [category, setCategory] = useState("");
-
-  const categories = ["Gifts", "Experiences", "Accessories", "Clothing"];
-
-  const filteredProducts = category
-    ? products.filter((p) => p.category === category)
-    : products;
+  const products = [
+    {
+      id: 1,
+      name: "Holiday Welcome Pack",
+      price: "£24.99",
+      image:
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    },
+    {
+      id: 2,
+      name: "Luxury Caravan Essentials",
+      price: "£39.99",
+      image:
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    },
+    {
+      id: 3,
+      name: "Family Holiday Bundle",
+      price: "£59.99",
+      image:
+        "https://images.unsplash.com/photo-1493558103817-58b2924bce98",
+    },
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div
+      style={{
+        padding: "40px",
+        backgroundColor: "#f6fff8",
+        minHeight: "100vh",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h1
+        style={{
+          textAlign: "center",
+          color: "#166534",
+          marginBottom: "40px",
+        }}
+      >
+        Holiday Shop
+      </h1>
 
-      {/* TITLE */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold">The Static Holidays Shop</h1>
-        <p className="text-muted-foreground mt-2">
-          Holiday-inspired British products
-        </p>
-      </div>
-
-      {/* FILTERS */}
-      <div className="flex flex-wrap gap-2 justify-center mb-8">
-        <Button
-          onClick={() => setCategory("")}
-          variant={!category ? "default" : "outline"}
-        >
-          All
-        </Button>
-
-        {categories.map((c) => (
-          <Button
-            key={c}
-            onClick={() => setCategory(c)}
-            variant={category === c ? "default" : "outline"}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "20px",
+        }}
+      >
+        {products.map((product) => (
+          <div
+            key={product.id}
+            style={{
+              background: "white",
+              borderRadius: "12px",
+              overflow: "hidden",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            }}
           >
-            {c}
-          </Button>
-        ))}
-      </div>
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{
+                width: "100%",
+                height: "220px",
+                objectFit: "cover",
+              }}
+            />
 
-      {/* PRODUCTS */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <Link key={product.id} href={`/shop/${product.id}`}>
-            <Card className="hover:shadow-lg transition cursor-pointer">
-              <CardContent className="p-4 text-center">
+            <div style={{ padding: "20px" }}>
+              <h2 style={{ color: "#166534" }}>
+                {product.name}
+              </h2>
 
-                <img
-                  src={product.imageUrl}
-                  className="h-40 mx-auto object-contain"
-                />
+              <p
+                style={{
+                  fontWeight: "bold",
+                  color: "#16a34a",
+                }}
+              >
+                {product.price}
+              </p>
 
-                <p className="text-xs mt-2 text-muted-foreground uppercase">
-                  {product.category}
-                </p>
-
-                <h3 className="font-bold mt-1">{product.name}</h3>
-
-                <p className="font-bold mt-2">£{product.price}</p>
-
-                {product.featured && (
-                  <Badge className="mt-2">Featured</Badge>
-                )}
-
-                <ShoppingBag className="h-5 w-5 mx-auto mt-3 text-primary" />
-
-              </CardContent>
-            </Card>
-          </Link>
+              <button
+                style={{
+                  marginTop: "15px",
+                  padding: "12px 20px",
+                  backgroundColor: "#16a34a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                Buy Now
+              </button>
+            </div>
+          </div>
         ))}
       </div>
     </div>
