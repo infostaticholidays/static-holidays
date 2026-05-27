@@ -20,6 +20,13 @@ export default function App() {
       >
         <h1>Static Holidays</h1>
 
+        <nav style={{ display: "flex", gap: "20px" }}>
+          <span>Home</span>
+          <span>Listings</span>
+          <span>Blog</span>
+          <span>Contact</span>
+        </nav>
+
         <div style={{ display: "flex", gap: "12px" }}>
           <button
             style={{
@@ -69,7 +76,7 @@ export default function App() {
             color: "#14532d",
           }}
         >
-          Discover static holiday homes across the UK
+          Discover static holiday homes, caravan parks and lodge retreats across the UK
         </p>
 
         <button
@@ -86,6 +93,63 @@ export default function App() {
         >
           Search Holidays
         </button>
+      </section>
+
+      <section
+        style={{
+          padding: "60px 40px",
+        }}
+      >
+        <h2 style={{ color: "#166534" }}>
+          Featured Holiday Homes
+        </h2>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "20px",
+            marginTop: "30px",
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "20px",
+              borderRadius: "12px",
+              width: "300px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h3>Luxury Caravan Retreat</h3>
+            <p>Coastal escape with sea views.</p>
+          </div>
+
+          <div
+            style={{
+              background: "white",
+              padding: "20px",
+              borderRadius: "12px",
+              width: "300px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h3>Woodland Lodge</h3>
+            <p>Quiet countryside family retreat.</p>
+          </div>
+
+          <div
+            style={{
+              background: "white",
+              padding: "20px",
+              borderRadius: "12px",
+              width: "300px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h3>Holiday Park Stay</h3>
+            <p>Entertainment and family fun included.</p>
+          </div>
+        </div>
       </section>
 
       <footer
