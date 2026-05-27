@@ -2,21 +2,25 @@ export default function Adverts() {
   const adverts = [
     {
       id: 1,
-      businessName: "Seaside Cafe",
-      category: "Cafe",
-      description: "Relaxing seaside cafe with fresh breakfasts and coffee.",
+      title: "Summer Caravan Sale",
       location: "Cornwall",
-      phone: "01234 567890",
+      price: "From £299",
       image:
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
     },
     {
       id: 2,
-      businessName: "Holiday Park Activities",
-      category: "Activity",
-      description: "Family fun activities and entertainment.",
+      title: "Luxury Lodge Weekend",
+      location: "Lake District",
+      price: "From £399",
+      image:
+        "https://images.unsplash.com/photo-1494526585095-c41746248156",
+    },
+    {
+      id: 3,
+      title: "Family Holiday Escape",
       location: "Devon",
-      phone: "09876 543210",
+      price: "From £249",
       image:
         "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
     },
@@ -25,37 +29,35 @@ export default function Adverts() {
   return (
     <div
       style={{
-        padding: "40px",
-        backgroundColor: "#f6fff8",
-        minHeight: "100vh",
-        fontFamily: "Arial, sans-serif",
+        padding: "80px 40px",
+        maxWidth: "1400px",
+        margin: "0 auto",
       }}
     >
       <h1
         style={{
-          textAlign: "center",
-          color: "#166534",
-          marginBottom: "10px",
+          fontSize: "48px",
+          color: "#14532d",
+          marginBottom: "15px",
         }}
       >
-        Local Directory
+        Holiday Adverts
       </h1>
 
       <p
         style={{
-          textAlign: "center",
+          color: "#4b5563",
           marginBottom: "40px",
-          color: "#14532d",
         }}
       >
-        Support local businesses near your stay.
+        Discover the latest holiday park deals and special offers.
       </p>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "20px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "25px",
         }}
       >
         {adverts.map((advert) => (
@@ -63,14 +65,14 @@ export default function Adverts() {
             key={advert.id}
             style={{
               background: "white",
-              borderRadius: "12px",
+              borderRadius: "18px",
               overflow: "hidden",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
             }}
           >
             <img
               src={advert.image}
-              alt={advert.businessName}
+              alt={advert.title}
               style={{
                 width: "100%",
                 height: "220px",
@@ -78,24 +80,41 @@ export default function Adverts() {
               }}
             />
 
-            <div style={{ padding: "20px" }}>
-              <h2 style={{ color: "#166534" }}>
-                {advert.businessName}
+            <div style={{ padding: "24px" }}>
+              <h2 style={{ color: "#14532d" }}>
+                {advert.title}
               </h2>
 
-              <p>
-                <strong>Category:</strong> {advert.category}
+              <p style={{ color: "#6b7280" }}>
+                📍 {advert.location}
               </p>
 
-              <p>{advert.description}</p>
-
-              <p>
-                <strong>Location:</strong> {advert.location}
+              <p
+                style={{
+                  color: "#16a34a",
+                  fontWeight: "bold",
+                  fontSize: "24px",
+                  marginTop: "10px",
+                }}
+              >
+                {advert.price}
               </p>
 
-              <p>
-                <strong>Phone:</strong> {advert.phone}
-              </p>
+              <button
+                style={{
+                  marginTop: "20px",
+                  width: "100%",
+                  padding: "14px",
+                  background: "#16a34a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                View Deal
+              </button>
             </div>
           </div>
         ))}
