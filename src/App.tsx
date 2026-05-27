@@ -90,6 +90,54 @@ export default function App() {
             <p style={{ fontSize: "18px", color: "#14532d" }}>
               Discover static holiday homes, caravan parks and lodge retreats across the UK
             </p>
+
+            {/* ✅ SEARCH / CALENDAR BAR RESTORED */}
+            <div style={{ marginTop: "30px" }}>
+              <input
+                type="text"
+                placeholder="Search destination (e.g. Cornwall, Lakes, Wales)"
+                style={{
+                  padding: "12px",
+                  width: "260px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  marginRight: "10px",
+                }}
+              />
+
+              <input
+                type="date"
+                style={{
+                  padding: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  marginRight: "10px",
+                }}
+              />
+
+              <input
+                type="date"
+                style={{
+                  padding: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  marginRight: "10px",
+                }}
+              />
+
+              <button
+                style={{
+                  padding: "12px 20px",
+                  backgroundColor: "#16a34a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                Search
+              </button>
+            </div>
           </section>
 
           <section style={{ padding: "60px 40px" }}>
