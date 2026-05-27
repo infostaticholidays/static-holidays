@@ -1,4 +1,6 @@
 import Adverts from "./pages/Adverts";
+import Bookings from "./pages/Bookings";
+import BookingDetail from "./pages/BookingDetail";
 
 export default function App() {
   const path = window.location.pathname;
@@ -29,11 +31,12 @@ export default function App() {
             Home
           </a>
 
-          <a
-            href="/adverts"
-            style={{ color: "white", textDecoration: "none" }}
-          >
+          <a href="/adverts" style={{ color: "white", textDecoration: "none" }}>
             Adverts
+          </a>
+
+          <a href="/bookings" style={{ color: "white", textDecoration: "none" }}>
+            Bookings
           </a>
 
           <a href="/" style={{ color: "white", textDecoration: "none" }}>
@@ -70,7 +73,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* PAGE ROUTING (THIS IS THE IMPORTANT PART) */}
+      {/* HOME PAGE */}
       {path === "/" && (
         <>
           <section
@@ -85,8 +88,7 @@ export default function App() {
             </h2>
 
             <p style={{ fontSize: "18px", color: "#14532d" }}>
-              Discover static holiday homes, caravan parks and lodge retreats
-              across the UK
+              Discover static holiday homes, caravan parks and lodge retreats across the UK
             </p>
           </section>
 
@@ -96,7 +98,14 @@ export default function App() {
         </>
       )}
 
+      {/* ADVERTS PAGE */}
       {path === "/adverts" && <Adverts />}
+
+      {/* BOOKINGS LIST PAGE */}
+      {path === "/bookings" && <Bookings />}
+
+      {/* BOOKING DETAIL PAGE */}
+      {path.startsWith("/bookings/") && <BookingDetail />}
 
       <footer
         style={{
