@@ -3,7 +3,7 @@ export default function App() {
     <div
       style={{
         fontFamily: "Arial, sans-serif",
-        backgroundColor: "#f4f7fb",
+        backgroundColor: "#f6fff8",
         minHeight: "100vh",
         margin: 0,
       }}
@@ -14,7 +14,7 @@ export default function App() {
           justifyContent: "space-between",
           alignItems: "center",
           padding: "20px 40px",
-          backgroundColor: "#0f172a",
+          backgroundColor: "#166534",
           color: "white",
         }}
       >
@@ -37,7 +37,7 @@ export default function App() {
               padding: "10px 20px",
               borderRadius: "8px",
               border: "none",
-              backgroundColor: "#3b82f6",
+              backgroundColor: "#22c55e",
               color: "white",
               cursor: "pointer",
             }}
@@ -51,13 +51,24 @@ export default function App() {
         style={{
           textAlign: "center",
           padding: "100px 20px",
+          background: "linear-gradient(to bottom, #dcfce7, #f6fff8)",
         }}
       >
-        <h2 style={{ fontSize: "42px" }}>
+        <h2
+          style={{
+            fontSize: "42px",
+            color: "#166534",
+          }}
+        >
           Find Your Perfect Holiday Stay
         </h2>
 
-        <p style={{ fontSize: "18px", color: "#555" }}>
+        <p
+          style={{
+            fontSize: "18px",
+            color: "#14532d",
+          }}
+        >
           Discover static holiday homes across the UK
         </p>
 
@@ -67,7 +78,7 @@ export default function App() {
             padding: "15px 30px",
             borderRadius: "10px",
             border: "none",
-            backgroundColor: "#2563eb",
+            backgroundColor: "#16a34a",
             color: "white",
             fontSize: "16px",
             cursor: "pointer",
@@ -81,7 +92,7 @@ export default function App() {
         style={{
           textAlign: "center",
           padding: "20px",
-          backgroundColor: "#0f172a",
+          backgroundColor: "#166534",
           color: "white",
         }}
       >
