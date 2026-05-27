@@ -1,5 +1,3 @@
-import { Link } from "wouter";
-
 export default function Events() {
   const events = [
     {
@@ -26,24 +24,26 @@ export default function Events() {
     <div style={{ padding: "40px" }}>
       <h1>Events</h1>
 
-      {events.map((event) => (
-        <Link key={event.id} href={`/events/${event.id}`}>
-          <div
+      <div style={{ display: "grid", gap: "10px" }}>
+        {events.map((event) => (
+          <a
+            key={event.id}
+            href={`/events/${event.id}`}
             style={{
               border: "1px solid #ddd",
               padding: "15px",
-              marginBottom: "10px",
               borderRadius: "8px",
-              cursor: "pointer",
+              textDecoration: "none",
+              color: "black",
             }}
           >
             <h3>{event.title}</h3>
             <p>{event.location}, {event.county}</p>
             <p>{event.date}</p>
             <p>{event.isFree ? "Free" : `£${event.price}`}</p>
-          </div>
-        </Link>
-      ))}
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
