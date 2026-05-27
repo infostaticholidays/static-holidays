@@ -3,6 +3,8 @@ import Bookings from "./pages/Bookings";
 import BookingDetail from "./pages/BookingDetail";
 import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
+import Properties from "./pages/Properties";
+import PropertyDetail from "./pages/PropertyDetail";
 
 export default function App() {
   const path = window.location.pathname;
