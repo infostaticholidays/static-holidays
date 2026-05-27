@@ -1,8 +1,3 @@
-# Modern Static Holidays Upgrade
-
-Replace your current `src/App.tsx` with this modern version.
-
-```tsx
 import Adverts from "./pages/Adverts";
 import Shop from "./pages/Shop";
 import Properties from "./pages/Properties";
