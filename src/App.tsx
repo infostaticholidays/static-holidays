@@ -112,6 +112,112 @@ export default function App() {
             </div>
           </section>
 
+          {/* SUMMER HOLIDAY DEALS */}
+          <section
+            style={{
+              padding: "70px 40px",
+              background: "#fef9c3",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: "1400px",
+                margin: "0 auto",
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "40px",
+                  color: "#14532d",
+                  marginBottom: "15px",
+                }}
+              >
+                Summer Holiday Deals ☀️
+              </h2>
+
+              <p
+                style={{
+                  color: "#4b5563",
+                  marginBottom: "40px",
+                  fontSize: "18px",
+                }}
+              >
+                Discover amazing summer offers across the UK.
+              </p>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                  gap: "25px",
+                }}
+              >
+                <div
+                  style={{
+                    background: "white",
+                    padding: "30px",
+                    borderRadius: "18px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <h3 style={{ color: "#14532d" }}>
+                    Beach Escapes
+                  </h3>
+
+                  <p style={{ color: "#6b7280" }}>
+                    Save up to 30% on coastal stays.
+                  </p>
+
+                  <button style={cardBtn}>
+                    View Deals
+                  </button>
+                </div>
+
+                <div
+                  style={{
+                    background: "white",
+                    padding: "30px",
+                    borderRadius: "18px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <h3 style={{ color: "#14532d" }}>
+                    Family Packages
+                  </h3>
+
+                  <p style={{ color: "#6b7280" }}>
+                    Kids stay free at selected parks.
+                  </p>
+
+                  <button style={cardBtn}>
+                    Explore
+                  </button>
+                </div>
+
+                <div
+                  style={{
+                    background: "white",
+                    padding: "30px",
+                    borderRadius: "18px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <h3 style={{ color: "#14532d" }}>
+                    Last Minute Deals
+                  </h3>
+
+                  <p style={{ color: "#6b7280" }}>
+                    Weekend getaways from £79/night.
+                  </p>
+
+                  <button style={cardBtn}>
+                    Book Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* FEATURED PROPERTIES */}
           <section
             style={{
