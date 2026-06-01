@@ -9,6 +9,7 @@ import HolidayOwners from "./pages/HolidayOwners";
 import AddProperty from "./pages/AddProperty";
 import HostLogin from "./pages/HostLogin";
 
+
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
 
@@ -55,7 +56,7 @@ export default function App() {
       {path === "/shop" && <Shop />}
       {path === "/holidayowners" && <HolidayOwners />}
       {path === "/host-login" && <HostLogin />}
-
+      {path === "/login" && <Login />}
       {/* FOOTER */}
       <footer
         style={{
