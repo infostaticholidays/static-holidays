@@ -46,21 +46,7 @@ export default function App() {
     <button style={signupBtn}>Sign Up</button>
   </div>
 </header>
-          Static Holidays
-        </h1>
-<nav style={{ display: "flex", gap: "25px" }}>
-  <a href="/" style={navLink}>Home</a>
-  <a href="/properties" style={navLink}>Properties</a>
-  <a href="/holidayowners" style={navLink}>Holiday Owners</a>
-  <a href="/adverts" style={navLink}>Adverts</a>
-  <a href="/shop" style={navLink}>Shop</a>
-</nav>
-
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button style={loginBtn}>Login</button>
-          <button style={signupBtn}>Sign Up</button>
-        </div>
-      </header>
+    
 
       {/* HOMEPAGE */}
       {path === "/" && (
