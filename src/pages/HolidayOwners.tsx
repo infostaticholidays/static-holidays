@@ -1,20 +1,32 @@
 export default function HolidayOwners() {
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "50px 20px", fontFamily: "Arial" }}>
-
+    <div
+      style={{
+        maxWidth: "1100px",
+        margin: "0 auto",
+        padding: "50px 20px",
+        fontFamily: "Arial",
+      }}
+    >
       {/* TITLE */}
       <h1 style={{ fontSize: "40px", color: "#14532d", marginBottom: "10px" }}>
         Holiday Home Owners
       </h1>
 
       <p style={{ fontSize: "18px", color: "#4b5563", marginBottom: "30px" }}>
-        List your caravan, lodge or holiday home on Static Holidays and reach thousands of guests across the UK.
+        List your caravan, lodge or holiday home on Static Holidays and reach
+        thousands of guests across the UK.
       </p>
 
       {/* PRICING TABLE */}
       <div style={{ overflowX: "auto", marginBottom: "40px" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "700px" }}>
-
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            minWidth: "700px",
+          }}
+        >
           <thead>
             <tr style={{ background: "#14532d", color: "white" }}>
               <th style={th}>Plan</th>
@@ -36,17 +48,16 @@ export default function HolidayOwners() {
               <td style={td}><b>🏖️ Super Host</b></td>
               <td style={td}>£19.99</td>
               <td style={td}>5%</td>
-              <td style={td}>Higher ranking, featured boost, visibility</td>
+              <td style={td}>Higher ranking, featured boost</td>
             </tr>
 
             <tr>
               <td style={td}><b>👑 Elite Host</b></td>
               <td style={td}>£39.99</td>
               <td style={td}>1%</td>
-              <td style={td}>Homepage feature, ads, blog, priority support</td>
+              <td style={td}>Homepage feature, ads, priority support</td>
             </tr>
           </tbody>
-
         </table>
       </div>
 
@@ -54,7 +65,13 @@ export default function HolidayOwners() {
       <div style={{ marginBottom: "40px" }}>
         <h2 style={{ color: "#14532d" }}>Why Join Us?</h2>
 
-        <ul style={{ lineHeight: "2", fontSize: "16px", color: "#374151" }}>
+        <ul
+          style={{
+            lineHeight: "2",
+            fontSize: "16px",
+            color: "#374151",
+          }}
+        >
           <li>✔ Reach thousands of UK holidaymakers</li>
           <li>✔ Get direct bookings instantly</li>
           <li>✔ Promote your caravan or lodge easily</li>
@@ -62,8 +79,14 @@ export default function HolidayOwners() {
         </ul>
       </div>
 
-      {/* CTA BUTTON */}
-      <div style={{ textAlign: "center" }}>
+      {/* BUTTONS */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "15px",
+        }}
+      >
         <button
           onClick={() => window.location.href = "/login"}
           style={{
@@ -74,14 +97,13 @@ export default function HolidayOwners() {
             borderRadius: "10px",
             fontSize: "18px",
             cursor: "pointer",
-            marginRight: "10px"
           }}
         >
-          Login / Add Property
+          Login
         </button>
 
         <button
-          onClick={() => window.location.href = "/signup"}
+          onClick={() => window.location.href = "/host-login"}
           style={{
             background: "#14532d",
             color: "white",
@@ -89,13 +111,12 @@ export default function HolidayOwners() {
             border: "none",
             borderRadius: "10px",
             fontSize: "18px",
-            cursor: "pointer"
+            cursor: "pointer",
           }}
         >
           Become a Host
         </button>
       </div>
-
     </div>
   );
 }
