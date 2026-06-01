@@ -1,0 +1,62 @@
+import { useState } from "react";
+
+export default function AddProperty() {
+  const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
+
+  const [petFriendly, setPetFriendly] = useState(false);
+  const [pool, setPool] = useState("none");
+  const [hotTub, setHotTub] = useState(false);
+
+  function submit() {
+    console.log({
+      name,
+      location,
+      petFriendly,
+      pool,
+      hotTub,
+    });
+
+    alert("Property saved (demo)");
+  }
+
+  return (
+    <div style={{ padding: 40 }}>
+      <h1>Add Property</h1>
+
+      <input placeholder="Name" onChange={(e) => setName(e.target.value)} />
+      <br />
+
+      <input
+        placeholder="Location"
+        onChange={(e) => setLocation(e.target.value)}
+      />
+
+      <h3>Filters</h3>
+
+      <label>
+        <input type="checkbox" onChange={() => setPetFriendly(!petFriendly)} />
+        Pet Friendly
+      </label>
+
+      <br />
+
+      <select onChange={(e) => setPool(e.target.value)}>
+        <option value="none">No Pool</option>
+        <option value="shared">Shared Pool</option>
+        <option value="private">Private Pool</option>
+      </select>
+
+      <br />
+
+      <label>
+        <input type="checkbox" onChange={() => setHotTub(!hotTub)} />
+        Hot Tub
+      </label>
+
+      <br /><br />
+
+      <button onClick={submit}>Save Property</button>
+    </div>
+  );
+}
