@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import Home from "./pages/Home";
 import Adverts from "./pages/Adverts";
 import Shop from "./pages/Shop";
 import Properties from "./pages/Properties";
@@ -10,7 +11,6 @@ export default function App() {
 
   useEffect(() => {
     const onChange = () => setPath(window.location.pathname);
-
     window.addEventListener("popstate", onChange);
     return () => window.removeEventListener("popstate", onChange);
   }, []);
@@ -29,23 +29,22 @@ export default function App() {
         color: "white",
         padding: "20px",
         display: "flex",
-        gap: "20px"
+        gap: "20px",
+        flexWrap: "wrap"
       }}>
-        
         <button onClick={() => go("/")} style={btn}>Home</button>
         <button onClick={() => go("/properties")} style={btn}>Properties</button>
-        <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
         <button onClick={() => go("/adverts")} style={btn}>Adverts</button>
         <button onClick={() => go("/shop")} style={btn}>Shop</button>
-
+        <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
       </header>
 
-      {/* PAGES */}
-      {path === "/" && <h1 style={{ padding: 20 }}>Home Page</h1>}
+      {/* ROUTES */}
+      {path === "/" && <Home />}
       {path === "/properties" && <Properties />}
-      {path === "/holidayowners" && <HolidayOwners />}
       {path === "/adverts" && <Adverts />}
       {path === "/shop" && <Shop />}
+      {path === "/holidayowners" && <HolidayOwners />}
 
       {/* FOOTER */}
       <footer style={{
@@ -63,9 +62,10 @@ export default function App() {
 }
 
 const btn = {
-  background: "none",
-  border: "none",
+  background: "transparent",
+  border: "1px solid white",
   color: "white",
+  padding: "8px 12px",
   cursor: "pointer",
-  fontSize: "16px"
+  borderRadius: "6px"
 };
