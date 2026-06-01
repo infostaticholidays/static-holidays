@@ -1,45 +1,16 @@
 import { useState } from "react";
+
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
-  function toggleFavorite(id: number) {
-  if (favorites.includes(id)) {
- setFavorites(favorites.filter(x => x !== id));
-  } else {
-    setFavorites([...favorites, id]);
-  }
-}
- <button
-  style={{
-    marginTop: "15px",
-    width: "100%",
-    backgroundColor: "#16a34a",
-    color: "white",
-    border: "none",
-    padding: "14px",
-    borderRadius: "8px",
-    cursor: "pointer",
-  }}
->
-  View Property
-</button>
 
-<button
-  onClick={() => toggleFavorite(property.id)}
-  style={{
-    marginTop: "10px",
-    width: "100%",
-    backgroundColor: favorites.includes(property.id)
-      ? "#dc2626"
-      : "#111827",
-    color: "white",
-    border: "none",
-    padding: "10px",
-    borderRadius: "8px",
-    cursor: "pointer",
-  }}
->
-  {favorites.includes(property.id) ? "❤️ Remove Favorite" : "🤍 Add Favorite"}
-</button>
+  function toggleFavorite(id: number) {
+    if (favorites.includes(id)) {
+      setFavorites(favorites.filter(x => x !== id));
+    } else {
+      setFavorites([...favorites, id]);
+    }
+  }
+
   const properties = [
     {
       id: 1,
@@ -80,83 +51,13 @@ export default function Properties() {
       }}
     >
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
-        <h1
-          style={{
-            color: "#166534",
-            fontSize: "42px",
-          }}
-        >
+        <h1 style={{ color: "#166534", fontSize: "42px" }}>
           Holiday Properties
         </h1>
 
-        <p
-          style={{
-            color: "#14532d",
-            fontSize: "18px",
-          }}
-        >
+        <p style={{ color: "#14532d", fontSize: "18px" }}>
           Browse premium holiday homes, caravans and lodges across the UK.
         </p>
-      </div>
-
-      {/* FILTER BAR */}
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          justifyContent: "center",
-          marginBottom: "40px",
-          flexWrap: "wrap",
-        }}
-      >
-        <input
-          placeholder="Search location..."
-          style={{
-            padding: "12px",
-            width: "220px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
-        />
-
-        <select
-          style={{
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
-        >
-          <option>Any Property Type</option>
-          <option>Caravan</option>
-          <option>Lodge</option>
-          <option>Holiday Park</option>
-        </select>
-
-        <select
-          style={{
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
-        >
-          <option>Any Budget</option>
-          <option>Under £100</option>
-          <option>£100 - £200</option>
-          <option>Luxury</option>
-        </select>
-
-        <button
-          style={{
-            backgroundColor: "#16a34a",
-            color: "white",
-            border: "none",
-            padding: "12px 24px",
-            borderRadius: "8px",
-            cursor: "pointer",
-          }}
-        >
-          Search
-        </button>
       </div>
 
       {/* PROPERTY GRID */}
@@ -207,13 +108,9 @@ export default function Properties() {
             </div>
 
             <div style={{ padding: "20px" }}>
-              <h2 style={{ color: "#166534" }}>
-                {property.title}
-              </h2>
+              <h2 style={{ color: "#166534" }}>{property.title}</h2>
 
-              <p style={{ color: "#555" }}>
-                📍 {property.location}
-              </p>
+              <p style={{ color: "#555" }}>📍 {property.location}</p>
 
               <p
                 style={{
@@ -226,6 +123,7 @@ export default function Properties() {
                 {property.price}
               </p>
 
+              {/* VIEW BUTTON */}
               <button
                 style={{
                   marginTop: "15px",
@@ -239,6 +137,27 @@ export default function Properties() {
                 }}
               >
                 View Property
+              </button>
+
+              {/* ❤️ FAVORITE BUTTON (FIXED LOCATION) */}
+              <button
+                onClick={() => toggleFavorite(property.id)}
+                style={{
+                  marginTop: "10px",
+                  width: "100%",
+                  backgroundColor: favorites.includes(property.id)
+                    ? "#dc2626"
+                    : "#111827",
+                  color: "white",
+                  border: "none",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                {favorites.includes(property.id)
+                  ? "❤️ Remove Favorite"
+                  : "🤍 Add Favorite"}
               </button>
             </div>
           </div>
