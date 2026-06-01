@@ -2,18 +2,39 @@ import Adverts from "./pages/Adverts";
 import Shop from "./pages/Shop";
 import Properties from "./pages/Properties";
 import HolidayOwners from "./pages/HolidayOwners";
+
 export default function App() {
   const path = window.location.pathname;
 
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        backgroundColor: "#f5fff7",
-        minHeight: "100vh",
-        color: "#1f2937",
-      }}
-    >
+    <div style={{ fontFamily: "Arial, sans-serif" }}>
+
+      {/* NAV BAR */}
+      <nav style={{
+        display: "flex",
+        gap: "20px",
+        padding: "20px",
+        background: "#14532d",
+        color: "white"
+      }}>
+        <a href="/" style={{ color: "white" }}>Home</a>
+        <a href="/adverts" style={{ color: "white" }}>Adverts</a>
+        <a href="/shop" style={{ color: "white" }}>Shop</a>
+        <a href="/properties" style={{ color: "white" }}>Properties</a>
+        <a href="/holidayowners" style={{ color: "white" }}>Holiday Owners</a>
+      </nav>
+
+      {/* ROUTES */}
+      {path === "/" && <h1 style={{ padding: 20 }}>Home Page</h1>}
+
+      {path === "/adverts" && <Adverts />}
+      {path === "/shop" && <Shop />}
+      {path === "/properties" && <Properties />}
+      {path === "/holidayowners" && <HolidayOwners />}
+
+    </div>
+  );
+}
    {/* HEADER */}
 <header
   style={{
