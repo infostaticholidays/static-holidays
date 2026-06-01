@@ -8,7 +8,7 @@ export default function Properties() {
     setFavorites([...favorites, id]);
   }
 }
-  <button
+ <button
   style={{
     marginTop: "15px",
     width: "100%",
@@ -21,6 +21,24 @@ export default function Properties() {
   }}
 >
   View Property
+</button>
+
+<button
+  onClick={() => toggleFavorite(property.id)}
+  style={{
+    marginTop: "10px",
+    width: "100%",
+    backgroundColor: favorites.includes(property.id)
+      ? "#dc2626"
+      : "#111827",
+    color: "white",
+    border: "none",
+    padding: "10px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  }}
+>
+  {favorites.includes(property.id) ? "❤️ Remove Favorite" : "🤍 Add Favorite"}
 </button>
   const properties = [
     {
