@@ -8,15 +8,7 @@ import Properties from "./pages/Properties";
 import HolidayOwners from "./pages/HolidayOwners";
 import AddProperty from "./pages/AddProperty";
 import HostLogin from "./pages/HostLogin";
-import Login from "./pages/Login";
 
-<button onClick={() => go("/login")} style={btn}>
-  Login
-</button>
-{path === "/login" && <Login />}
-git add .
-git commit -m "Added login page"
-git push
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
 
@@ -53,6 +45,7 @@ export default function App() {
         <button onClick={() => go("/shop")} style={btn}>Shop</button>
         <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
         <button onClick={() => go("/host-login")} style={btn}>Become a Host</button>
+        <button onClick={() => go("/login")} style={btn}>Login</button>
       </header>
 
       {/* ROUTES */}
