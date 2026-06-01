@@ -4,7 +4,14 @@ import Properties from "./pages/Properties";
 import HolidayOwners from "./pages/HolidayOwners";
 
 export default function App() {
-  const path = window.location.pathname;
+ import { useState, useEffect } from "react";
+  const [path, setPath] = useState(window.location.pathname);
+
+useEffect(() => {
+  const onChange = () => setPath(window.location.pathname);
+  window.addEventListener("popstate", onChange);
+  return () => window.removeEventListener("popstate", onChange);
+}, []);
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
