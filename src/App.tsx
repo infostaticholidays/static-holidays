@@ -44,7 +44,9 @@ export default function App() {
       {path === "/properties" && <Properties />}
       {path === "/adverts" && <Adverts />}
       {path === "/shop" && <Shop />}
-      {path === "/holidayowners" && <HolidayOwners />}
+      {path.replace(/\/$/, "").toLowerCase() === "/holidayowners" && (
+  <HolidayOwners />
+)}
 
       {/* FOOTER */}
       <footer style={{
