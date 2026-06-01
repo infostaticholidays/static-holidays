@@ -6,6 +6,8 @@ import Shop from "./pages/Shop";
 import Properties from "./pages/Properties";
 import HolidayOwners from "./pages/HolidayOwners";
 import AddProperty from "./pages/AddProperty";
+import HostLogin from "./pages/HostLogin";
+{path === "/host-login" && <HostLogin />}
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
