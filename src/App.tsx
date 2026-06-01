@@ -14,26 +14,38 @@ export default function App() {
         color: "#1f2937",
       }}
     >
-      {/* HEADER */}
-      <header
-        style={{
-          background: "#14532d",
-          color: "white",
-          padding: "20px 40px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        }}
-      <nav style={{ display: "flex", gap: "25px" }}>
-  <a href="/" style={navLink}>Home</a>
-  <a href="/properties" style={navLink}>Properties</a>
-  <a href="/adverts" style={navLink}>Adverts</a>
-  <a href="/shop" style={navLink}>Shop</a>
-</nav>
+   {/* HEADER */}
+<header
+  style={{
+    background: "#14532d",
+    color: "white",
+    padding: "20px 40px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  }}
+>
+  <h1 style={{ fontSize: "28px", margin: 0 }}>
+    Static Holidays
+  </h1>
+
+  <nav style={{ display: "flex", gap: "25px" }}>
+    <a href="/" style={navLink}>Home</a>
+    <a href="/properties" style={navLink}>Properties</a>
+    <a href="/holidayowners" style={navLink}>Holiday Owners</a>
+    <a href="/adverts" style={navLink}>Adverts</a>
+    <a href="/shop" style={navLink}>Shop</a>
+  </nav>
+
+  <div style={{ display: "flex", gap: "12px" }}>
+    <button style={loginBtn}>Login</button>
+    <button style={signupBtn}>Sign Up</button>
+  </div>
+</header>
           Static Holidays
         </h1>
 <nav style={{ display: "flex", gap: "25px" }}>
