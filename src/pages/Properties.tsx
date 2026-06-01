@@ -1,6 +1,13 @@
 import { useState } from "react";
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
+  function toggleFavorite(id: number) {
+  if (favorites.includes(id)) {
+    setFavorites(favorites.filter(x => x !== id));
+  } else {
+    setFavorites([...favorites, id]);
+  }
+}
   const properties = [
     {
       id: 1,
