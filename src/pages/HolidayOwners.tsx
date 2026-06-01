@@ -1,129 +1,111 @@
 export default function HolidayOwners() {
   return (
-    <div
-      style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "60px 30px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <h1
-        style={{
-          color: "#14532d",
-          fontSize: "42px",
-          marginBottom: "20px",
-        }}
-      >
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "50px 20px", fontFamily: "Arial" }}>
+
+      {/* TITLE */}
+      <h1 style={{ fontSize: "40px", color: "#14532d", marginBottom: "10px" }}>
         Holiday Home Owners
       </h1>
 
-      <p
-        style={{
-          fontSize: "20px",
-          lineHeight: "1.8",
-          color: "#4b5563",
-          marginBottom: "40px",
-        }}
-      >
-        Welcome to Static Holidays. We help holiday home owners advertise
-        their caravans, lodges and holiday properties to thousands of
-        holidaymakers looking for their next UK getaway.
+      <p style={{ fontSize: "18px", color: "#4b5563", marginBottom: "30px" }}>
+        List your caravan, lodge or holiday home on Static Holidays and reach thousands of guests across the UK.
       </p>
 
-      <div
-        style={{
-          background: "#f0fdf4",
-          padding: "30px",
-          borderRadius: "16px",
-          marginBottom: "40px",
-        }}
-      >
-        <h2 style={{ color: "#14532d" }}>
-          Why Advertise With Static Holidays?
-        </h2>
+      {/* PRICING TABLE */}
+      <div style={{ overflowX: "auto", marginBottom: "40px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "700px" }}>
 
-        <ul
-          style={{
-            lineHeight: "2",
-            fontSize: "18px",
-            color: "#374151",
-          }}
-        >
-          <li>Reach holidaymakers across the UK.</li>
-          <li>Advertise caravans, lodges and holiday homes.</li>
-          <li>Receive direct booking enquiries.</li>
-          <li>Manage your availability calendar.</li>
-          <li>Promote special offers and last-minute deals.</li>
-          <li>Showcase your property with photos and descriptions.</li>
+          <thead>
+            <tr style={{ background: "#14532d", color: "white" }}>
+              <th style={th}>Plan</th>
+              <th style={th}>Monthly Price</th>
+              <th style={th}>Commission</th>
+              <th style={th}>Features</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td style={td}><b>🔑 Host (Free)</b></td>
+              <td style={td}>£0</td>
+              <td style={td}>12%</td>
+              <td style={td}>Basic listing, bookings, messaging</td>
+            </tr>
+
+            <tr style={{ background: "#f9fafb" }}>
+              <td style={td}><b>🏖️ Super Host</b></td>
+              <td style={td}>£19.99</td>
+              <td style={td}>5%</td>
+              <td style={td}>Higher ranking, featured boost, visibility</td>
+            </tr>
+
+            <tr>
+              <td style={td}><b>👑 Elite Host</b></td>
+              <td style={td}>£39.99</td>
+              <td style={td}>1%</td>
+              <td style={td}>Homepage feature, ads, blog, priority support</td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+      {/* BENEFITS */}
+      <div style={{ marginBottom: "40px" }}>
+        <h2 style={{ color: "#14532d" }}>Why Join Us?</h2>
+
+        <ul style={{ lineHeight: "2", fontSize: "16px", color: "#374151" }}>
+          <li>✔ Reach thousands of UK holidaymakers</li>
+          <li>✔ Get direct bookings instantly</li>
+          <li>✔ Promote your caravan or lodge easily</li>
+          <li>✔ Upgrade anytime for more visibility</li>
         </ul>
       </div>
 
-      <div
-        style={{
-          background: "white",
-          borderRadius: "16px",
-          padding: "30px",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-          marginBottom: "40px",
-        }}
-      >
-        <h2 style={{ color: "#14532d" }}>
-          How To List Your Holiday Home
-        </h2>
-
-        <ol
+      {/* CTA BUTTON */}
+      <div style={{ textAlign: "center" }}>
+        <button
+          onClick={() => window.location.href = "/login"}
           style={{
-            lineHeight: "2",
+            background: "#16a34a",
+            color: "white",
+            padding: "15px 30px",
+            border: "none",
+            borderRadius: "10px",
             fontSize: "18px",
-            color: "#374151",
+            cursor: "pointer",
+            marginRight: "10px"
           }}
         >
-          <li>Create your Holiday Owner account.</li>
-          <li>Add your caravan, lodge or holiday property.</li>
-          <li>Upload photos and property details.</li>
-          <li>Set your prices and availability.</li>
-          <li>Start receiving enquiries and bookings.</li>
-        </ol>
-      </div>
-
-      <div
-        style={{
-          background: "#14532d",
-          color: "white",
-          padding: "40px",
-          borderRadius: "16px",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginBottom: "15px" }}>
-          Ready To Advertise Your Holiday Home?
-        </h2>
-
-        <p
-          style={{
-            fontSize: "18px",
-            marginBottom: "25px",
-          }}
-        >
-          Join Static Holidays and start reaching more holidaymakers today.
-        </p>
+          Login / Add Property
+        </button>
 
         <button
+          onClick={() => window.location.href = "/signup"}
           style={{
-            background: "#22c55e",
+            background: "#14532d",
             color: "white",
-            border: "none",
             padding: "15px 30px",
+            border: "none",
             borderRadius: "10px",
-            cursor: "pointer",
             fontSize: "18px",
-            fontWeight: "bold",
+            cursor: "pointer"
           }}
         >
-          Become A Holiday Owner
+          Become a Host
         </button>
       </div>
+
     </div>
   );
 }
+
+const th = {
+  padding: "14px",
+  textAlign: "left",
+};
+
+const td = {
+  padding: "14px",
+  borderBottom: "1px solid #e5e7eb",
+};
