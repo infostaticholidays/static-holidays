@@ -1,7 +1,7 @@
 import Adverts from "./pages/Adverts";
 import Shop from "./pages/Shop";
 import Properties from "./pages/Properties";
-
+import HolidayOwners from "./pages/HolidayOwners";
 export default function App() {
   const path = window.location.pathname;
 
