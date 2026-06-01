@@ -10,6 +10,13 @@ import AddProperty from "./pages/AddProperty";
 import HostLogin from "./pages/HostLogin";
 import Login from "./pages/Login";
 
+<button onClick={() => go("/login")} style={btn}>
+  Login
+</button>
+{path === "/login" && <Login />}
+git add .
+git commit -m "Added login page"
+git push
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
 
