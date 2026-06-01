@@ -1,110 +1,165 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Home() {
-  const slides = [
-    {
-      title: "⭐ Top Rated Coastal Caravan",
-      subtitle: "Rated 4.9/5 by guests",
-      price: "From £89/night",
-      image:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-    },
-    {
-      title: "☀️ Summer Half-Term Deal",
-      subtitle: "Save up to 35% this summer",
-      price: "From £79/night",
-      image:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-    },
-    {
-      title: "⭐ Best Reviewed Lake Lodge",
-      subtitle: "Perfect for family stays",
-      price: "From £120/night",
-      image:
-        "https://images.unsplash.com/photo-1494526585095-c41746248156",
-    },
+  const [destination, setDestination] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState("2");
+
+  const recommended = [
+    { title: "Lake District Escape", price: "£110/night" },
+    { title: "Cornwall Coastal Stay", price: "£95/night" },
+    { title: "Devon Family Park", price: "£85/night" },
   ];
 
-  const [index, setIndex] = useState(0);
+  const summerDeals = [
+    { title: "Summer Beach Deal", price: "£79/night" },
+    { title: "Half-Term Family Offer", price: "£89/night" },
+    { title: "Last Minute Caravan", price: "£69/night" },
+  ];
 
-  // auto slide every 4 seconds
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % slides.length);
-    }, 4000);
+  const bestReviewed = [
+    { title: "5★ Luxury Lodge", price: "£150/night" },
+    { title: "Top Rated Caravan", price: "£99/night" },
+    { title: "Premium Coastal Home", price: "£130/night" },
+  ];
 
-    return () => clearInterval(timer);
-  }, []);
+  const popular = [
+    { title: "Holiday Park Classic", price: "£75/night" },
+    { title: "Seaside Retreat", price: "£90/night" },
+    { title: "Forest Cabin Stay", price: "£120/night" },
+  ];
 
-  return (
-    <div style={{ textAlign: "center" }}>
+  const renderSlider = (title: string, items: any[]) => (
+    <div style={{ margin: "40px 0" }}>
+      <h2 style={{ marginLeft: "40px", color: "#14532d" }}>{title}</h2>
 
-      {/* SLIDESHOW */}
       <div
         style={{
-          position: "relative",
-          height: "420px",
-          overflow: "hidden",
-          borderRadius: "16px",
-          margin: "40px",
+          display: "flex",
+          overflowX: "auto",
+          gap: "20px",
+          padding: "20px 40px",
         }}
       >
-        <img
-          src={slides[index].image}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
-
-        {/* DARK OVERLAY */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0,0,0,0.45)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            color: "white",
-          }}
-        >
-          <h2 style={{ fontSize: "36px", marginBottom: "10px" }}>
-            {slides[index].title}
-          </h2>
-
-          <p style={{ fontSize: "18px" }}>
-            {slides[index].subtitle}
-          </p>
-
-          <p style={{ fontSize: "22px", fontWeight: "bold" }}>
-            {slides[index].price}
-          </p>
-        </div>
-      </div>
-
-      {/* DOTS */}
-      <div style={{ marginBottom: "40px" }}>
-        {slides.map((_, i) => (
-          <span
+        {items.map((item, i) => (
+          <div
             key={i}
-            onClick={() => setIndex(i)}
             style={{
-              height: "10px",
-              width: "10px",
-              margin: "5px",
-              display: "inline-block",
-              borderRadius: "50%",
-              background: i === index ? "#16a34a" : "#ccc",
-              cursor: "pointer",
+              minWidth: "260px",
+              background: "white",
+              borderRadius: "12px",
+              padding: "20px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
             }}
-          />
+          >
+            <div
+              style={{
+                height: "140px",
+                background: "#e5e7eb",
+                borderRadius: "10px",
+                marginBottom: "10px",
+              }}
+            />
+
+            <h3>{item.title}</h3>
+            <p style={{ color: "#16a34a", fontWeight: "bold" }}>
+              {item.price}
+            </p>
+          </div>
         ))}
       </div>
     </div>
   );
+
+  return (
+    <div>
+
+      {/* HERO SEARCH */}
+      <div
+        style={{
+          padding: "70px 20px",
+          textAlign: "center",
+          background:
+            "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
+          backgroundSize: "cover",
+          color: "white",
+        }}
+      >
+        <h1 style={{ fontSize: "42px" }}>
+          Find Your Perfect Holiday Stay
+        </h1>
+
+        <div
+          style={{
+            marginTop: "25px",
+            background: "white",
+            padding: "20px",
+            borderRadius: "12px",
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          <input
+            placeholder="Destination"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            style={input}
+          />
+
+          <input
+            type="date"
+            value={checkIn}
+            onChange={(e) => setCheckIn(e.target.value)}
+            style={input}
+          />
+
+          <input
+            type="date"
+            value={checkOut}
+            onChange={(e) => setCheckOut(e.target.value)}
+            style={input}
+          />
+
+          <select
+            value={guests}
+            onChange={(e) => setGuests(e.target.value)}
+            style={input}
+          >
+            <option>1 Guest</option>
+            <option>2 Guests</option>
+            <option>3 Guests</option>
+            <option>4+ Guests</option>
+          </select>
+
+          <button style={btn}>Search</button>
+        </div>
+      </div>
+
+      {/* 4 SLIDERS */}
+      {renderSlider("⭐ Recommended Holidays", recommended)}
+      {renderSlider("☀️ Summer Holiday Deals", summerDeals)}
+      {renderSlider("🏆 Best Reviewed Stays", bestReviewed)}
+      {renderSlider("💡 Popular Holiday Parks", popular)}
+
+    </div>
+  );
 }
+
+const input = {
+  padding: "12px",
+  borderRadius: "8px",
+  border: "1px solid #ccc",
+  minWidth: "160px",
+};
+
+const btn = {
+  padding: "12px 18px",
+  background: "#16a34a",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+};
