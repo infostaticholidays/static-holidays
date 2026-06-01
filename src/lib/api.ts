@@ -1,12 +1,12 @@
-// src/lib/api.ts
-// MOCK API (Vercel safe - no external packages required)
+// ✅ SAFE MOCK API (NO external packages needed)
+// This replaces @workspace/api-client-react completely
 
 // ================= PROPERTIES =================
 
-export function useListProperties() {
+export const useListProperties = () => {
   return {
     data: {
-      total: 1,
+      total: 2,
       properties: [
         {
           id: 1,
@@ -30,39 +30,42 @@ export function useListProperties() {
     },
     isLoading: false,
   };
-}
+};
 
-export function useGetProperty(id: number) {
+export const useGetProperty = (id: number) => {
   return {
     data: {
       id,
-      title: "Cornwall Beach Cottage",
-      location: "Cornwall",
-      county: "UK",
-      pricePerNight: 120,
-      averageRating: 4.8,
-      reviewCount: 10,
-      maxGuests: 4,
-      bedrooms: 2,
+      title: "Sample Property",
+      location: "UK",
+      county: "England",
+      pricePerNight: 100,
+      averageRating: 4.5,
+      reviewCount: 5,
+      maxGuests: 2,
+      bedrooms: 1,
       bathrooms: 1,
-      hostName: "John",
+      hostName: "Host",
       hostAvatarUrl: "",
-      description: "Beautiful seaside cottage",
-      amenities: ["wifi", "kitchen"],
+      description: "Demo property",
+      amenities: ["wifi"],
       petFriendly: true,
       images: ["/images/cottage.png"],
     },
     isLoading: false,
   };
-}
+};
 
-export function useGetPropertyReviews() {
-  return { data: [] };
-}
+export const useGetPropertyReviews = () => {
+  return {
+    data: [],
+    isLoading: false,
+  };
+};
 
 // ================= EVENTS =================
 
-export function useListEvents() {
+export const useListEvents = () => {
   return {
     data: [
       {
@@ -81,9 +84,9 @@ export function useListEvents() {
     ],
     isLoading: false,
   };
-}
+};
 
-export function useGetEvent(id: number) {
+export const useGetEvent = (id: number) => {
   return {
     data: {
       id,
@@ -101,29 +104,21 @@ export function useGetEvent(id: number) {
     },
     isLoading: false,
   };
-}
+};
 
 // ================= BOOKINGS =================
 
-export function useListBookings() {
+export const useListBookings = () => {
   return { data: [], isLoading: false };
-}
+};
 
-export function useGetBooking() {
+export const useGetBooking = () => {
   return { data: null, isLoading: false };
-}
-
-export function useGetPaymentPlan() {
-  return { data: null };
-}
-
-export function usePayInstalment() {
-  return { mutate: () => {}, isPending: false };
-}
+};
 
 // ================= SHOP =================
 
-export function useListProducts() {
+export const useListProducts = () => {
   return {
     data: [
       {
@@ -137,9 +132,9 @@ export function useListProducts() {
     ],
     isLoading: false,
   };
-}
+};
 
-export function useGetProduct(id: number) {
+export const useGetProduct = (id: number) => {
   return {
     data: {
       id,
@@ -152,4 +147,4 @@ export function useGetProduct(id: number) {
     },
     isLoading: false,
   };
-}
+};
