@@ -3,11 +3,25 @@ export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
   function toggleFavorite(id: number) {
   if (favorites.includes(id)) {
-    setFavorites(favorites.filter(x => x !== id));
+ setFavorites(favorites.filter(x => x !== id));
   } else {
     setFavorites([...favorites, id]);
   }
 }
+  <button
+  style={{
+    marginTop: "15px",
+    width: "100%",
+    backgroundColor: "#16a34a",
+    color: "white",
+    border: "none",
+    padding: "14px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  }}
+>
+  View Property
+</button>
   const properties = [
     {
       id: 1,
