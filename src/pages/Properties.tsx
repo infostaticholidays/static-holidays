@@ -1,3 +1,4 @@
+import { useState } from "react";
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const properties = [
