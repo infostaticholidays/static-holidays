@@ -45,6 +45,7 @@ export default function App() {
         <button onClick={() => go("/shop")} style={btn}>Shop</button>
         <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
         <button onClick={() => go("/host-login")} style={btn}>Become a Host</button>
+        <button onClick={() => go("/host-dashboard")} style={btn}>Dashboard</button>
       </header>
 
       {/* ROUTES */}
