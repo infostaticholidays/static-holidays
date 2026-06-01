@@ -8,6 +8,7 @@ import Properties from "./pages/Properties";
 import HolidayOwners from "./pages/HolidayOwners";
 import AddProperty from "./pages/AddProperty";
 import HostLogin from "./pages/HostLogin";
+import Login from "./pages/Login";
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
