@@ -4,7 +4,10 @@ const supabaseUrl =
   "https://bkxqcaffqqikykskptgp.supabase.co";
 
 const supabaseAnonKey =
-  "YOUR_ANON_PUBLIC_KEY_HERE";
+  "PASTE_YOUR_ANON_KEY_HERE";
+
+console.log("URL:", supabaseUrl);
+console.log("KEY START:", supabaseAnonKey.substring(0, 20));
 
 export const supabase = createClient(
   supabaseUrl,
