@@ -1,4 +1,26 @@
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+
 export default function HostDashboard() {
+  const [propertyCount, setPropertyCount] = useState(0);
+
+  useEffect(() => {
+    async function loadProperties() {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("*");
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setPropertyCount(data?.length || 0);
+    }
+
+    loadProperties();
+  }, []);
+
   return (
     <div
       style={{
@@ -26,7 +48,7 @@ export default function HostDashboard() {
       >
         <div style={card}>
           <h2>🏡 Properties</h2>
-          <p>0 Properties Listed</p>
+          <p>{propertyCount} Properties Listed</p>
         </div>
 
         <div style={card}>
