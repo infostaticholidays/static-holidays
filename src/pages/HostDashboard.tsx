@@ -85,14 +85,28 @@ export default function HostDashboard() {
               <li
                 key={property.id}
                 style={{
-                  padding: "10px 0",
+                  padding: "12px 0",
                   borderBottom:
                     "1px solid #ddd",
                 }}
               >
-                <strong>
-                  {property.title}
-                </strong>
+                <div>
+                  <strong>
+                    {property.title ||
+                      "Untitled Property"}
+                  </strong>
+
+                  <p
+                    style={{
+                      margin: "5px 0",
+                      color: "#666",
+                    }}
+                  >
+                    📍{" "}
+                    {property.location ||
+                      "No location"}
+                  </p>
+                </div>
 
                 <div
                   style={{
