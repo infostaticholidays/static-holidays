@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function HostDashboard() {
-  const [propertyCount, setPropertyCount] = useState(0);
+  const [properties, setProperties] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadProperties() {
@@ -15,7 +15,7 @@ export default function HostDashboard() {
         return;
       }
 
-      setPropertyCount(data?.length || 0);
+      setProperties(data || []);
     }
 
     loadProperties();
@@ -48,7 +48,16 @@ export default function HostDashboard() {
       >
         <div style={card}>
           <h2>🏡 Properties</h2>
-          <p>{propertyCount} Properties Listed</p>
+
+          <p>{properties.length} Properties Listed</p>
+
+          <ul>
+            {properties.map((property) => (
+              <li key={property.id}>
+                {property.title}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div style={card}>
@@ -72,7 +81,9 @@ export default function HostDashboard() {
           style={btn}
           onClick={() => {
             window.history.pushState({}, "", "/add-property");
-            window.dispatchEvent(new PopStateEvent("popstate"));
+            window.dispatchEvent(
+              new PopStateEvent("popstate")
+            );
           }}
         >
           ➕ Add Property
