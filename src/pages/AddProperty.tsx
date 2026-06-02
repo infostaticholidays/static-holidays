@@ -34,10 +34,14 @@ export default function AddProperty() {
       ]);
 
     if (error) {
-      console.error(error);
-      alert("Error saving property");
-      return;
-    }
+  console.error("SUPABASE ERROR:", error);
+
+  alert(
+    `Error: ${error.message}`
+  );
+
+  return;
+}
 
     alert("Property saved successfully!");
 
