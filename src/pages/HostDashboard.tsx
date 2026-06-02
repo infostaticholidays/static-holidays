@@ -5,21 +5,42 @@ export default function HostDashboard() {
   const [properties, setProperties] = useState<any[]>([]);
 
   useEffect(() => {
-    async function loadProperties() {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("*");
+    loadProperties();
+  }, []);
 
-      if (error) {
-        console.error(error);
-        return;
-      }
+  async function loadProperties() {
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-      setProperties(data || []);
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setProperties(data || []);
+  }
+
+  async function deleteProperty(id: string) {
+    const confirmed = window.confirm(
+      "Delete this property?"
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("properties")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      alert(error.message);
+      return;
     }
 
     loadProperties();
-  }, []);
+  }
 
   return (
     <div
@@ -41,7 +62,8 @@ export default function HostDashboard() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+          gridTemplateColumns:
+            "repeat(auto-fit,minmax(250px,1fr))",
           gap: "20px",
           marginTop: "30px",
         }}
@@ -49,12 +71,56 @@ export default function HostDashboard() {
         <div style={card}>
           <h2>🏡 Properties</h2>
 
-          <p>{properties.length} Properties Listed</p>
+          <p>
+            {properties.length} Properties Listed
+          </p>
 
-          <ul>
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+            }}
+          >
             {properties.map((property) => (
-              <li key={property.id}>
-                {property.title}
+              <li
+                key={property.id}
+                style={{
+                  padding: "10px 0",
+                  borderBottom:
+                    "1px solid #ddd",
+                }}
+              >
+                <strong>
+                  {property.title}
+                </strong>
+
+                <div
+                  style={{
+                    marginTop: "8px",
+                  }}
+                >
+                  <button
+                    style={editBtn}
+                    onClick={() =>
+                      alert(
+                        "Edit page coming next"
+                      )
+                    }
+                  >
+                    ✏️ Edit
+                  </button>
+
+                  <button
+                    style={deleteBtn}
+                    onClick={() =>
+                      deleteProperty(
+                        property.id
+                      )
+                    }
+                  >
+                    🗑 Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -80,9 +146,16 @@ export default function HostDashboard() {
         <button
           style={btn}
           onClick={() => {
-            window.history.pushState({}, "", "/add-property");
+            window.history.pushState(
+              {},
+              "",
+              "/add-property"
+            );
+
             window.dispatchEvent(
-              new PopStateEvent("popstate")
+              new PopStateEvent(
+                "popstate"
+              )
             );
           }}
         >
@@ -97,7 +170,8 @@ const card = {
   background: "white",
   padding: "20px",
   borderRadius: "12px",
-  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  boxShadow:
+    "0 4px 10px rgba(0,0,0,0.1)",
 };
 
 const btn = {
@@ -106,5 +180,24 @@ const btn = {
   border: "none",
   padding: "14px 24px",
   borderRadius: "8px",
+  cursor: "pointer",
+};
+
+const editBtn = {
+  background: "#14532d",
+  color: "white",
+  border: "none",
+  padding: "6px 12px",
+  borderRadius: "6px",
+  marginRight: "8px",
+  cursor: "pointer",
+};
+
+const deleteBtn = {
+  background: "#dc2626",
+  color: "white",
+  border: "none",
+  padding: "6px 12px",
+  borderRadius: "6px",
   cursor: "pointer",
 };
