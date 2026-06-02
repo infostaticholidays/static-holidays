@@ -24,13 +24,51 @@ export default function AddProperty() {
     <div style={{ padding: 40 }}>
       <h1>Add Property</h1>
 
-      <input placeholder="Name" onChange={(e) => setName(e.target.value)} />
-      <br />
+     <h1>Add Property</h1>
 
-      <input
-        placeholder="Location"
-        onChange={(e) => setLocation(e.target.value)}
-      />
+<input
+  placeholder="Property Name"
+  onChange={(e) => setName(e.target.value)}
+/>
+
+<br /><br />
+
+<input
+  placeholder="Location"
+  onChange={(e) => setLocation(e.target.value)}
+/>
+
+<br /><br />
+
+<input placeholder="Price Per Night (£)" />
+
+<br /><br />
+
+<input placeholder="Bedrooms" />
+
+<br /><br />
+
+<input placeholder="Bathrooms" />
+
+<br /><br />
+
+<input placeholder="Max Guests" />
+
+<br /><br />
+
+<textarea
+  placeholder="Property Description"
+  rows={5}
+  style={{ width: "100%", maxWidth: "500px" }}
+/>
+
+<br /><br />
+
+<h3>Property Photos</h3>
+
+<input type="file" multiple />
+
+<br /><br />
 
       <h3>Filters</h3>
 
