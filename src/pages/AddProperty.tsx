@@ -65,6 +65,47 @@ export default function AddProperty() {
 <br /><br />
 
 <h3>Property Photos</h3>
+      <h3>Amenities</h3>
+
+<label>
+  <input type="checkbox" />
+  WiFi
+</label>
+
+<br />
+
+<label>
+  <input type="checkbox" />
+  Parking
+</label>
+
+<br />
+
+<label>
+  <input type="checkbox" />
+  Sea View
+</label>
+
+<br />
+
+<label>
+  <input type="checkbox" />
+  Disabled Access
+</label>
+
+<br /><br />
+
+<h3>Verification Documents</h3>
+
+<p>Upload ID</p>
+<input type="file" />
+
+<br /><br />
+
+<p>Upload Insurance Certificate</p>
+<input type="file" />
+
+<br /><br />
 
 <input type="file" multiple />
 
