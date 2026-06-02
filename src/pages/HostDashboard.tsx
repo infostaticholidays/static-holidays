@@ -45,10 +45,15 @@ export default function HostDashboard() {
         </div>
       </div>
 
-      <div style={{ marginTop: "40px" }}>
-        <button style={btn}>
-          ➕ Add Property
-        </button>
+      <button
+  style={btn}
+  onClick={() => {
+    window.history.pushState({}, "", "/add-property");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  }}
+>
+  ➕ Add Property
+</button>
       </div>
     </div>
   );
