@@ -1,15 +1,71 @@
 export default function HostDashboard() {
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>Host Dashboard</h1>
+    <div
+      style={{
+        padding: "40px",
+        fontFamily: "Arial",
+        maxWidth: "1200px",
+        margin: "0 auto",
+      }}
+    >
+      <h1 style={{ color: "#14532d" }}>
+        Host Dashboard
+      </h1>
 
-      <h2>🏡 My Properties</h2>
+      <p>
+        Manage your holiday properties, bookings and guests.
+      </p>
 
-      <h2>📅 My Bookings Calendar</h2>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+          gap: "20px",
+          marginTop: "30px",
+        }}
+      >
+        <div style={card}>
+          <h2>🏡 Properties</h2>
+          <p>0 Properties Listed</p>
+        </div>
 
-      <h2>💬 Guest Messages</h2>
+        <div style={card}>
+          <h2>📅 Bookings</h2>
+          <p>0 Upcoming Bookings</p>
+        </div>
 
-      <h2>🛡 Verification Status</h2>
+        <div style={card}>
+          <h2>💬 Messages</h2>
+          <p>0 New Messages</p>
+        </div>
+
+        <div style={card}>
+          <h2>🛡 Verification</h2>
+          <p>Pending</p>
+        </div>
+      </div>
+
+      <div style={{ marginTop: "40px" }}>
+        <button style={btn}>
+          ➕ Add Property
+        </button>
+      </div>
     </div>
   );
 }
+
+const card = {
+  background: "white",
+  padding: "20px",
+  borderRadius: "12px",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+};
+
+const btn = {
+  background: "#16a34a",
+  color: "white",
+  border: "none",
+  padding: "14px 24px",
+  borderRadius: "8px",
+  cursor: "pointer",
+};
