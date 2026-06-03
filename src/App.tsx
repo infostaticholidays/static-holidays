@@ -7,6 +7,18 @@ import Properties from "./pages/Properties";
 import HolidayOwners from "./pages/HolidayOwners";
 import AddProperty from "./pages/AddProperty";
 import HostLogin from "./pages/HostLogin";
+import Home from "./pages/Home";
+import Adverts from "./pages/Adverts";
+import Shop from "./pages/Shop";
+import Properties from "./pages/Properties";
+import HolidayOwners from "./pages/HolidayOwners";
+import AddProperty from "./pages/AddProperty";
+import HostLogin from "./pages/HostLogin";
+import HostDashboard from "./pages/HostDashboard";
+import GuestDashboard from "./pages/GuestDashboard";
+export default function App() {
+  const [path, setPath] = useState(window.location.pathname);
+
 import HostDashboard from "./pages/HostDashboard";
 import GuestDashboard from "./pages/GuestDashboard";
 export default function App() {
@@ -45,6 +57,9 @@ export default function App() {
         <button onClick={() => go("/shop")} style={btn}>Shop</button>
         <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
         <button onClick={() => go("/host-login")} style={btn}>Become a Host</button>
+        <button onClick={() => go("/login")} style={btn}>
+  Account
+</button>
         <button onClick={() => go("/host-dashboard")} style={btn}>Dashboard</button>
       </header>
 
@@ -58,6 +73,8 @@ export default function App() {
       {path === "/host-login" && <HostLogin />}
       {path === "/host-dashboard" && <HostDashboard />}
       {path === "/add-property" && <AddProperty />}
+      {path === "/login" && <Login />}
+      {path === "/signup" && <Signup />}
 
       {/* FOOTER */}
       <footer
