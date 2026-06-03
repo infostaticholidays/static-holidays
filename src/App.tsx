@@ -8,6 +8,8 @@ import HolidayOwners from "./pages/HolidayOwners";
 import HostLogin from "./pages/HostLogin";
 import Login from "./pages/Login";
 import HostDashboard from "./pages/HostDashboard";
+import Signup from "./pages/Signup";
+
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
@@ -55,6 +57,7 @@ export default function App() {
       {path === "/login" && <Login />}
        {path === "/guest-dashboard" && <GuestDashboard />}
        {path === "/signup" && <Signup />}
+
       
 
       {/* FOOTER */}
