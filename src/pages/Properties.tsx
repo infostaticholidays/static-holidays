@@ -4,6 +4,9 @@ import { supabase } from "../lib/supabase";
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
+  import DatePicker from "react-datepicker";
+  import "react-datepicker/dist/react-datepicker.css";
+  import { useState } from "react";
 
   function toggleFavorite(id: number) {
     if (favorites.includes(id)) {
@@ -16,6 +19,23 @@ export default function Properties() {
   useEffect(() => {
     fetchProperties();
   }, []);
+
+  <DatePicker
+  selected={startDate}
+  onChange={(dates) => {
+    const [start, end] = dates as [
+      Date | null,
+      Date | null
+    ];
+
+    setStartDate(start);
+    setEndDate(end);
+  }}
+  startDate={startDate}
+  endDate={endDate}
+  selectsRange
+  inline
+/>
 
   async function fetchProperties() {
     const { data, error } = await supabase
