@@ -34,6 +34,35 @@ export default function PropertyDetail() {
   }
 
     async function createBooking() {
+      const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+if (!user) {
+  alert("Please log in first");
+  return;
+}
+
+const { error } = await supabase.from("bookings").insert([
+  {
+    property_id: property.id,
+    owner_id: property.owner_id,
+    guest_id: user.id,
+
+    check_in: startDate.toISOString(),
+    check_out: endDate.toISOString(),
+
+    total_price: totalPrice,
+    booking_status: "pending",
+  },
+]);
+
+if (error) {
+  alert(error.message);
+  return;
+}
+
+alert("Booking request sent!");
 
   const { data: { user } } = await supabase.auth.getUser();
 
