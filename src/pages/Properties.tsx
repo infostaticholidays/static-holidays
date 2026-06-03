@@ -26,7 +26,7 @@ export default function Properties() {
     console.log("ERROR:", error);
 
     if (error) {
-      alert("ERROR: " + error.message);
+     
       return;
     }
 
