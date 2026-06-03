@@ -7,31 +7,20 @@ import Properties from "./pages/Properties";
 import HolidayOwners from "./pages/HolidayOwners";
 import AddProperty from "./pages/AddProperty";
 import HostLogin from "./pages/HostLogin";
-import Home from "./pages/Home";
-import Adverts from "./pages/Adverts";
-import Shop from "./pages/Shop";
-import Properties from "./pages/Properties";
-import HolidayOwners from "./pages/HolidayOwners";
-import AddProperty from "./pages/AddProperty";
-import HostLogin from "./pages/HostLogin";
 import HostDashboard from "./pages/HostDashboard";
 import GuestDashboard from "./pages/GuestDashboard";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
 
-import HostDashboard from "./pages/HostDashboard";
-import GuestDashboard from "./pages/GuestDashboard";
-export default function App() {
-  const [path, setPath] = useState(window.location.pathname);
-
-  // detect browser back/forward
   useEffect(() => {
     const onChange = () => setPath(window.location.pathname);
     window.addEventListener("popstate", onChange);
     return () => window.removeEventListener("popstate", onChange);
   }, []);
 
-  // navigation function
   const go = (url: string) => {
     window.history.pushState({}, "", url);
     setPath(url);
@@ -48,7 +37,7 @@ export default function App() {
           padding: "20px",
           display: "flex",
           gap: "20px",
-          flexWrap: "wrap"
+          flexWrap: "wrap",
         }}
       >
         <button onClick={() => go("/")} style={btn}>Home</button>
@@ -57,9 +46,7 @@ export default function App() {
         <button onClick={() => go("/shop")} style={btn}>Shop</button>
         <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
         <button onClick={() => go("/host-login")} style={btn}>Become a Host</button>
-        <button onClick={() => go("/login")} style={btn}>
-  Account
-</button>
+        <button onClick={() => go("/login")} style={btn}>Account</button>
         <button onClick={() => go("/host-dashboard")} style={btn}>Dashboard</button>
       </header>
 
@@ -83,22 +70,20 @@ export default function App() {
           color: "white",
           padding: "30px",
           marginTop: "40px",
-          textAlign: "center"
+          textAlign: "center",
         }}
       >
         Static Holidays © 2025
       </footer>
-
     </div>
   );
 }
 
-// BUTTON STYLE
 const btn = {
   background: "transparent",
   border: "1px solid white",
   color: "white",
   padding: "8px 12px",
   cursor: "pointer",
-  borderRadius: "6px"
+  borderRadius: "6px",
 };
