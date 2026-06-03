@@ -1,23 +1,60 @@
-async function handleSignup() {
-  const cleanEmail = email.trim();
-  const cleanPassword = password.trim();
+import { useState } from "react";
+import { supabase } from "../supabase";
 
-  if (!cleanEmail || !cleanPassword) {
-    alert("Please fill all fields");
-    return;
+export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function handleSignup() {
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+
+    if (!cleanEmail || !cleanPassword) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    const { error } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password: cleanPassword,
+    });
+
+    if (error) {
+      console.log(error);
+      alert(error.message);
+      return;
+    }
+
+    alert("Account created!");
   }
 
-  const { data, error } = await supabase.auth.signUp({
-    email: cleanEmail,
-    password: cleanPassword,
-  });
+  return (
+    <div style={{ padding: 40 }}>
+      <h1>Sign Up</h1>
 
-  if (error) {
-    console.log(error);
-    alert(error.message);
-    return;
-  }
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-  alert("Account created! Check your email (or go to login).");
-  navigate("/login");
+      <br />
+      <br />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <br />
+      <br />
+
+      <button onClick={handleSignup}>
+        Sign Up
+      </button>
+    </div>
+  );
 }
