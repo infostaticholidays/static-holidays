@@ -4,47 +4,38 @@ import { supabase } from "../lib/supabase";
 export default function HostLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
 
-  async function login() {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  // ✅ MUST be async
+  async function handleLogin() {
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
+      });
+
+    console.log("LOGIN DATA:", data);
+    console.log("LOGIN ERROR:", error);
 
     if (error) {
-      setMessage(error.message);
+      alert(error.message);
       return;
     }
+
+    alert("Logged in!");
 
     window.location.href = "/host-dashboard";
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "500px",
-        margin: "50px auto",
-        padding: "30px",
-        background: "white",
-        borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h1 style={{ color: "#14532d" }}>
-        Holiday Owner Login
-      </h1>
+    <div style={{ padding: "50px", fontFamily: "Arial" }}>
+      <h1>Holiday Owner Login</h1>
 
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "12px",
-          marginBottom: "15px",
-        }}
+        style={{ display: "block", margin: "10px 0" }}
       />
 
       <input
@@ -52,29 +43,12 @@ export default function HostLogin() {
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "12px",
-          marginBottom: "15px",
-        }}
+        style={{ display: "block", margin: "10px 0" }}
       />
 
-      <button
-        onClick={login}
-        style={{
-          width: "100%",
-          background: "#14532d",
-          color: "white",
-          padding: "12px",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-        }}
-      >
+      <button onClick={handleLogin}>
         Login
       </button>
-
-      <p>{message}</p>
     </div>
   );
 }
