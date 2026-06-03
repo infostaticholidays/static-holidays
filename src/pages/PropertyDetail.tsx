@@ -147,19 +147,20 @@ const [endDate, setEndDate] = useState<Date | null>(null);
       ) * property.price_per_night}
     </p>
 
-    <button
-      style={{
-        background: "#16a34a",
-        color: "white",
-        border: "none",
-        padding: "12px 20px",
-        borderRadius: "8px",
-        cursor: "pointer",
-        marginTop: "10px",
-      }}
-    >
-      Request Booking
-    </button>
+  <button
+  onClick={createBooking}
+  style={{
+    background: "#16a34a",
+    color: "white",
+    border: "none",
+    padding: "12px 20px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginTop: "10px",
+  }}
+>
+  Request Booking
+</button>
   </div>
 )}
         
