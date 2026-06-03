@@ -20,7 +20,7 @@ export default function Signup() {
     });
 
     if (error) {
-      console.log(error);
+      console.error(error);
       alert(error.message);
       return;
     }
