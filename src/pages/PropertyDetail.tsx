@@ -110,31 +110,55 @@ const [endDate, setEndDate] = useState<Date | null>(null);
   />
 
   {startDate && endDate && (
-    <div style={{ marginTop: "20px" }}>
-      <p>
-        Check In: {startDate.toLocaleDateString()}
-      </p>
+  <div style={{ marginTop: "20px" }}>
+    <p>
+      Check In: {startDate.toLocaleDateString("en-GB")}
+    </p>
 
-      <p>
-        Check Out: {endDate.toLocaleDateString()}
-      </p>
+    <p>
+      Check Out: {endDate.toLocaleDateString("en-GB")}
+    </p>
 
-      <button
-        style={{
-          background: "#16a34a",
-          color: "white",
-          border: "none",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          cursor: "pointer",
-          marginTop: "10px",
-        }}
-      >
-        Request Booking
-      </button>
-    </div>
-  )}
-</div>
-    </div>
-  );
-}
+    <p
+      style={{
+        fontWeight: "bold",
+        color: "#16a34a",
+      }}
+    >
+      Nights:{" "}
+      {Math.ceil(
+        (endDate.getTime() -
+          startDate.getTime()) /
+          (1000 * 60 * 60 * 24)
+      )}
+    </p>
+
+    <p
+      style={{
+        fontWeight: "bold",
+        fontSize: "18px",
+      }}
+    >
+      Total Price: £
+      {Math.ceil(
+        (endDate.getTime() -
+          startDate.getTime()) /
+          (1000 * 60 * 60 * 24)
+      ) * property.price_per_night}
+    </p>
+
+    <button
+      style={{
+        background: "#16a34a",
+        color: "white",
+        border: "none",
+        padding: "12px 20px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        marginTop: "10px",
+      }}
+    >
+      Request Booking
+    </button>
+  </div>
+)}
