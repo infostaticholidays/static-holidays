@@ -1,31 +1,50 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   async function signIn() {
-    await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    alert("Logged in");
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Logged in!");
+    navigate("/");
   }
 
   async function signUp() {
-    await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
-    alert("Account created");
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Account created, now log in");
   }
 
   return (
     <div style={{ padding: 40 }}>
       <h1>Login</h1>
 
-      <input placeholder="email" onChange={(e) => setEmail(e.target.value)} />
+      <input
+        placeholder="email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
       <br />
 
       <input
