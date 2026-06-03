@@ -30,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/holidayowners" element={<HolidayOwners />} />
         <Route path="/host-login" element={<HostLogin />} />
         <Route path="/host-dashboard" element={<HostDashboard />} />
+        {path === "/guest-dashboard" && <GuestDashboard />}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/add-property" element={<AddProperty />} />
