@@ -3,7 +3,8 @@ const { data, error } = await supabase.auth.signUp({
   password: password.trim(),
 });
 
-console.log("SIGNUP ERROR:", error);
+console.log("SIGNUP ERROR FULL:", error);
+console.log("SIGNUP DATA:", data);
 
 if (error) {
   alert(error.message);
