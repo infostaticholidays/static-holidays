@@ -13,34 +13,24 @@ export default function Properties() {
     }
   }
 
-
   useEffect(() => {
-  fetchProperties();
-}, []);
-async function fetchProperties() {
-  const { data, error } = await supabase
-    .from("properties")
-    .select("*");
+    fetchProperties();
+  }, []);
 
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
+  async function fetchProperties() {
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*");
 
-  if (error) {
-    alert("ERROR: " + error.message);
-    return;
-  }
-
-  alert("Found: " + (data?.length || 0));
-
-  setProperties(data || []);
-}
-
-    alert("Properties found: " + (data?.length || 0));
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
 
     if (error) {
-      alert("Error: " + error.message);
+      alert("ERROR: " + error.message);
       return;
     }
+
+    alert("Found: " + (data?.length || 0));
 
     setProperties(data || []);
   }
