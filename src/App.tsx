@@ -8,7 +8,7 @@ import HolidayOwners from "./pages/HolidayOwners";
 import AddProperty from "./pages/AddProperty";
 import HostLogin from "./pages/HostLogin";
 import HostDashboard from "./pages/HostDashboard";
-
+import GuestDashboard from "./pages/GuestDashboard";
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
 
@@ -54,6 +54,7 @@ export default function App() {
       {path === "/adverts" && <Adverts />}
       {path === "/shop" && <Shop />}
       {path === "/holidayowners" && <HolidayOwners />}
+      {path="/dashboard" element={<GuestDashboard />} />
       {path === "/host-login" && <HostLogin />}
       {path === "/host-dashboard" && <HostDashboard />}
       {path === "/add-property" && <AddProperty />}
