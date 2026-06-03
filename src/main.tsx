@@ -29,12 +29,4 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/host-dashboard" element={<HostDashboard />} />
         <Route path="/add-property" element={<AddProperty />} />
 
-        {/* Property Details Page */}
-        <Route
-          path="/property/:id"
-          element={<PropertyDetail />}
-        />
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
-);
+
