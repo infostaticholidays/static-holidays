@@ -33,7 +33,16 @@ export default function PropertyDetail() {
     setLoading(false);
   }
 
-  async function createBooking() {
+    async function createBooking() {
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  console.log("USER:", user); // 👈 ADD THIS LINE
+
+  if (!startDate || !endDate) {
+    alert("Please select dates");
+    return;
+  }
     if (!startDate || !endDate) {
       alert("Please select dates");
       return;
