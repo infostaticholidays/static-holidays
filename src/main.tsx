@@ -15,6 +15,8 @@ import HostLogin from "./pages/HostLogin";
 import HostDashboard from "./pages/HostDashboard";
 import AddProperty from "./pages/AddProperty";
 import PropertyDetail from "./pages/PropertyDetail";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -28,6 +30,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/holidayowners" element={<HolidayOwners />} />
         <Route path="/host-login" element={<HostLogin />} />
         <Route path="/host-dashboard" element={<HostDashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/add-property" element={<AddProperty />} />
       </Routes>
     </BrowserRouter>
