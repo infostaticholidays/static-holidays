@@ -1,33 +1,25 @@
 import { useState } from "react";
-import { supabase } from "../supabase";
+import { supabase } from "../lib/supabase";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   async function handleSignup() {
-    const cleanEmail = email.trim();
-    const cleanPassword = password.trim();
-
-    if (!cleanEmail || !cleanPassword) {
-      alert("Please fill all fields");
-      return;
-    }
-
     const { data, error } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password: cleanPassword,
+      email: email.trim(),
+      password: password.trim(),
     });
 
-    console.log("SIGNUP DATA:", data);
-    console.log("SIGNUP ERROR:", error);
-
     if (error) {
-      alert(JSON.stringify(error, null, 2));
+      alert(error.message);
       return;
     }
 
-    alert("Account created!");
+    alert("Account created! Now log in.");
+    navigate("/login");
   }
 
   return (
@@ -41,8 +33,7 @@ export default function Signup() {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="password"
@@ -51,12 +42,9 @@ export default function Signup() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
-      <button onClick={handleSignup}>
-        Sign Up
-      </button>
+      <button onClick={handleSignup}>Sign Up</button>
     </div>
   );
 }
