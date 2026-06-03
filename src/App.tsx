@@ -54,7 +54,7 @@ export default function App() {
       {path === "/adverts" && <Adverts />}
       {path === "/shop" && <Shop />}
       {path === "/holidayowners" && <HolidayOwners />}
-      {path="/dashboard" element={<GuestDashboard />} />
+      {path === "/dashboard" && <GuestDashboard />}
       {path === "/host-login" && <HostLogin />}
       {path === "/host-dashboard" && <HostDashboard />}
       {path === "/add-property" && <AddProperty />}
