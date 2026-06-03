@@ -6,7 +6,24 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+const { data } = await supabase.auth.signInWithPassword({
+  email,
+  password,
+});
 
+const user = data.user;
+
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role")
+  .eq("id", user.id)
+  .single();
+
+if (profile.role === "guest") {
+  navigate("/guest-dashboard");
+} else {
+  navigate("/host-dashboard");
+}
   async function signIn() {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
