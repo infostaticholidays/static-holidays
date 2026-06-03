@@ -54,6 +54,7 @@ export default function App() {
       {path === "/host-dashboard" && <HostDashboard />}
       {path === "/login" && <Login />}
        {path === "/guest-dashboard" && <GuestDashboard />}
+       {path === "/signup" && <Signup />}
       
 
       {/* FOOTER */}
