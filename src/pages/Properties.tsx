@@ -3,43 +3,33 @@ import { supabase } from "../supabaseClient";
 
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
 
   function toggleFavorite(id: number) {
     if (favorites.includes(id)) {
-      setFavorites(favorites.filter(x => x !== id));
+      setFavorites(favorites.filter((x) => x !== id));
     } else {
       setFavorites([...favorites, id]);
     }
   }
 
-const [properties, setProperties] = useState<any[]>([]);
-      id: 1,
-      title: "Luxury Coastal Caravan",
-      location: "Cornwall",
-      price: "£120/night",
-      image:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      featured: true,
-    },
-    {
-      id: 2,
-      title: "Woodland Lodge Retreat",
-      location: "Lake District",
-      price: "£160/night",
-      image:
-        "https://images.unsplash.com/photo-1494526585095-c41746248156",
-      featured: false,
-    },
-    {
-      id: 3,
-      title: "Family Holiday Park Stay",
-      location: "Devon",
-      price: "£95/night",
-      image:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-      featured: true,
-    },
-  ];
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  async function fetchProperties() {
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading properties:", error);
+      return;
+    }
+
+    setProperties(data || []);
+  }
 
   return (
     <div
@@ -51,16 +41,25 @@ const [properties, setProperties] = useState<any[]>([]);
       }}
     >
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
-        <h1 style={{ color: "#166534", fontSize: "42px" }}>
+        <h1
+          style={{
+            color: "#166534",
+            fontSize: "42px",
+          }}
+        >
           Holiday Properties
         </h1>
 
-        <p style={{ color: "#14532d", fontSize: "18px" }}>
+        <p
+          style={{
+            color: "#14532d",
+            fontSize: "18px",
+          }}
+        >
           Browse premium holiday homes, caravans and lodges across the UK.
         </p>
       </div>
 
-      {/* PROPERTY GRID */}
       <div
         style={{
           display: "grid",
@@ -80,7 +79,7 @@ const [properties, setProperties] = useState<any[]>([]);
           >
             <div style={{ position: "relative" }}>
               <img
-                src={property.image}
+                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
                 alt={property.title}
                 style={{
                   width: "100%",
@@ -102,15 +101,19 @@ const [properties, setProperties] = useState<any[]>([]);
                     fontSize: "14px",
                   }}
                 >
-                  Featured
+                  ⭐ Featured
                 </div>
               )}
             </div>
 
             <div style={{ padding: "20px" }}>
-              <h2 style={{ color: "#166534" }}>{property.title}</h2>
+              <h2 style={{ color: "#166534" }}>
+                {property.title}
+              </h2>
 
-              <p style={{ color: "#555" }}>📍 {property.location}</p>
+              <p style={{ color: "#555" }}>
+                📍 {property.location}
+              </p>
 
               <p
                 style={{
@@ -120,10 +123,9 @@ const [properties, setProperties] = useState<any[]>([]);
                   fontSize: "18px",
                 }}
               >
-                {property.price}
+                £{property.price_per_night}/night
               </p>
 
-              {/* VIEW BUTTON */}
               <button
                 style={{
                   marginTop: "15px",
@@ -139,7 +141,6 @@ const [properties, setProperties] = useState<any[]>([]);
                 View Property
               </button>
 
-              {/* ❤️ FAVORITE BUTTON (FIXED LOCATION) */}
               <button
                 onClick={() => toggleFavorite(property.id)}
                 style={{
