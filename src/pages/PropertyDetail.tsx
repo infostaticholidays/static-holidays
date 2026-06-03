@@ -22,7 +22,8 @@ import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 export default function PropertyDetail() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
@@ -112,17 +113,35 @@ export default function PropertyDetail() {
           </div>
         </div>
 
-        <Card>
-          <CardContent className="p-4 space-y-4">
-            <div className="text-xl font-bold">
-              £{property.pricePerNight} / night
-            </div>
+     <Card>
+  <CardContent className="p-4 space-y-4">
+    <div className="text-xl font-bold">
+      £{property.pricePerNight} / night
+    </div>
 
-            <Button onClick={handleBook} className="w-full">
-              Reserve
-            </Button>
-          </CardContent>
-        </Card>
+    <div>
+      <label className="block text-sm font-medium mb-2">
+        Select Check-In Date
+      </label>
+
+      <DatePicker
+        selected={date}
+        onChange={(selectedDate) =>
+          setDate(selectedDate || undefined)
+        }
+        minDate={new Date()}
+        inline
+      />
+    </div>
+
+    <Button
+      onClick={handleBook}
+      className="w-full"
+    >
+      Reserve
+    </Button>
+  </CardContent>
+</Card>
       </div>
     </div>
   );
