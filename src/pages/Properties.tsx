@@ -17,20 +17,17 @@ export default function Properties() {
     fetchProperties();
   }, []);
 
-async function fetchProperties() {
-  const { data, error } = await supabase
-    .from("properties")
-    .select("*");
+  async function fetchProperties() {
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*");
 
-  alert("Properties found: " + (data?.length || 0));
+    alert("Properties found: " + (data?.length || 0));
 
-  if (error) {
-    alert("Error: " + error.message);
-    return;
-  }
-
-  setProperties(data || []);
-}
+    if (error) {
+      alert("Error: " + error.message);
+      return;
+    }
 
     setProperties(data || []);
   }
