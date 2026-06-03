@@ -33,45 +33,7 @@ export default function PropertyDetail() {
     setLoading(false);
   }
 
-    async function createBooking() {
-      const {
-  data: { user },
-} = await supabase.auth.getUser();
-
-if (!user) {
-  alert("Please log in first");
-  return;
-}
-
-const { error } = await supabase.from("bookings").insert([
-  {
-    property_id: property.id,
-    owner_id: property.owner_id,
-    guest_id: user.id,
-
-    check_in: startDate.toISOString(),
-    check_out: endDate.toISOString(),
-
-    total_price: totalPrice,
-    booking_status: "pending",
-  },
-]);
-
-if (error) {
-  alert(error.message);
-  return;
-}
-
-alert("Booking request sent!");
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  console.log("USER:", user); // 👈 ADD THIS LINE
-
-  if (!startDate || !endDate) {
-    alert("Please select dates");
-    return;
-  }
+  async function createBooking() {
     if (!startDate || !endDate) {
       alert("Please select dates");
       return;
@@ -82,12 +44,13 @@ alert("Booking request sent!");
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("You must be logged in to book");
+      alert("Please log in first");
       return;
     }
 
     const nights = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (endDate.getTime() - startDate.getTime()) /
+        (1000 * 60 * 60 * 24)
     );
 
     const totalPrice = nights * property.price_per_night;
@@ -145,7 +108,9 @@ alert("Booking request sent!");
 
       <p>📍 {property.location}</p>
 
-      <h2 style={{ color: "#16a34a" }}>£{property.price_per_night}/night</h2>
+      <h2 style={{ color: "#16a34a" }}>
+        £{property.price_per_night}/night
+      </h2>
 
       <p style={{ marginTop: "20px" }}>{property.description}</p>
 
