@@ -1,148 +1,82 @@
-import {
-  useGetProperty,
-  useGetPropertyReviews,
-  useCreateBooking,
-} from "@workspace/api-client-react";
-import { useParams, useLocation } from "wouter";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Star,
-  MapPin,
-  Users,
-  BedDouble,
-  Bath,
-  Check,
-  Calendar as CalendarIcon,
-} from "lucide-react";
-import { useState } from "react";
-import { format } from "date-fns";
-import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+
 export default function PropertyDetail() {
   const { id } = useParams();
-  const [, setLocation] = useLocation();
-  const { user } = useAuth();
-  const { toast } = useToast();
 
-  const propertyId = parseInt(id || "0", 10);
+  const [property, setProperty] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { data: property, isLoading } = useGetProperty(propertyId, {
-    query: { enabled: !!propertyId },
-  });
+  useEffect(() => {
+    fetchProperty();
+  }, []);
 
-  const { data: reviews } = useGetPropertyReviews(propertyId, {
-    query: { enabled: !!propertyId },
-  });
+  async function fetchProperty() {
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [guests, setGuests] = useState(1);
-  const [useInstalments, setUseInstalments] = useState(false);
+    if (error) {
+      console.error(error);
+      return;
+    }
 
-  const createBookingMutation = useCreateBooking({
-    mutation: {
-      onSuccess: (data) => {
-        toast({ title: "Booking created!" });
-        setLocation(`/bookings/${data.id}`);
-      },
-      onError: (err) => {
-        toast({
-          title: "Error",
-          description: err.message,
-          variant: "destructive",
-        });
-      },
-    },
-  });
+    setProperty(data);
+    setLoading(false);
+  }
 
-  const handleBook = () => {
-    if (!user) return setLocation("/login");
-    if (!date) return;
+  if (loading) {
+    return <h2 style={{ padding: "40px" }}>Loading...</h2>;
+  }
 
-    const checkOut = new Date(date);
-    checkOut.setDate(checkOut.getDate() + 3);
-
-    createBookingMutation.mutate({
-      data: {
-        propertyId,
-        checkIn: date.toISOString(),
-        checkOut: checkOut.toISOString(),
-        guests,
-        instalmentPlan: useInstalments,
-      },
-    });
-  };
-
-  if (isLoading) return <div className="p-8">Loading...</div>;
-  if (!property) return <div className="p-8">Property not found</div>;
+  if (!property) {
+    return <h2 style={{ padding: "40px" }}>Property not found</h2>;
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <h1 className="text-3xl font-bold mb-2">{property.title}</h1>
-
-      <div className="flex items-center gap-4 text-sm mb-6">
-        <span className="flex items-center gap-1">
-          <Star className="h-4 w-4" />
-          {property.averageRating?.toFixed(1) || "New"}
-        </span>
-        <span>
-          <MapPin className="inline h-4 w-4" /> {property.location}
-        </span>
-      </div>
-
-      <img
-        src={property.images?.[0] || "/images/cottage.png"}
-        className="w-full h-[400px] object-cover rounded-xl mb-6"
-      />
-
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-4">
-          <p>{property.description}</p>
-
-          <div className="grid grid-cols-2 gap-4">
-            {property.amenities?.map((a: string) => (
-              <div key={a} className="flex items-center gap-2">
-                <Check className="h-4 w-4" /> {a}
-              </div>
-            ))}
-          </div>
-        </div>
-
-     <Card>
-  <CardContent className="p-4 space-y-4">
-    <div className="text-xl font-bold">
-      £{property.pricePerNight} / night
-    </div>
-
-    <div>
-      <label className="block text-sm font-medium mb-2">
-        Select Check-In Date
-      </label>
-
-      <DatePicker
-        selected={date}
-        onChange={(selectedDate) =>
-          setDate(selectedDate || undefined)
-        }
-        minDate={new Date()}
-        inline
-      />
-    </div>
-
-    <Button
-      onClick={handleBook}
-      className="w-full"
+    <div
+      style={{
+        padding: "40px",
+        maxWidth: "1000px",
+        margin: "0 auto",
+      }}
     >
-      Reserve
-    </Button>
-  </CardContent>
-</Card>
-      </div>
+      <img
+        src={
+          property.images ||
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+        }
+        alt={property.title}
+        style={{
+          width: "100%",
+          height: "450px",
+          objectFit: "cover",
+          borderRadius: "12px",
+        }}
+      />
+
+      <h1 style={{ marginTop: "20px" }}>
+        {property.title}
+      </h1>
+
+      <p>
+        📍 {property.location}
+      </p>
+
+      <h2
+        style={{
+          color: "#16a34a",
+        }}
+      >
+        £{property.price_per_night}/night
+      </h2>
+
+      <p style={{ marginTop: "20px" }}>
+        {property.description}
+      </p>
     </div>
   );
 }
