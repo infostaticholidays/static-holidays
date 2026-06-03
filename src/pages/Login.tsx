@@ -8,10 +8,13 @@ export default function Login() {
   const navigate = useNavigate();
 
   async function signIn() {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
     });
+
+    console.log("LOGIN DATA:", data);
+    console.log("LOGIN ERROR:", error);
 
     if (error) {
       alert(error.message);
@@ -22,41 +25,33 @@ export default function Login() {
     navigate("/");
   }
 
-  async function signUp() {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert("Account created, now log in");
-  }
-
   return (
     <div style={{ padding: 40 }}>
       <h1>Login</h1>
 
       <input
-        placeholder="email"
+        type="email"
+        placeholder="Email"
+        value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
       <br />
+      <br />
 
       <input
-        placeholder="password"
         type="password"
+        placeholder="Password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
-      <button onClick={signIn}>Login</button>
-      <button onClick={signUp}>Sign Up</button>
+      <button onClick={signIn}>
+        Login
+      </button>
     </div>
   );
 }
