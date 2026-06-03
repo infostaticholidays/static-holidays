@@ -13,10 +13,18 @@ export default function Signup() {
       alert("Please fill all fields");
       return;
     }
+const { data, error } = await supabase.auth.signUp({
+  email: cleanEmail,
+  password: cleanPassword,
+});
 
-    const { error } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password: cleanPassword,
+console.log("SIGNUP DATA", data);
+console.log("SIGNUP ERROR", error);
+
+if (error) {
+  alert(error.message);
+  return;
+}
     });
 
     if (error) {
