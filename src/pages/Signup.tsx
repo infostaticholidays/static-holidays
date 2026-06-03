@@ -19,8 +19,8 @@ export default function Signup() {
       password: cleanPassword,
     });
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
+    console.log("SIGNUP DATA:", data);
+    console.log("SIGNUP ERROR:", error);
 
     if (error) {
       alert(JSON.stringify(error, null, 2));
