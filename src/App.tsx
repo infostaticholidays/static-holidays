@@ -15,20 +15,68 @@ import Signup from "./pages/Signup";
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
 
+  // sync browser back/forward buttons
   useEffect(() => {
-    const onChange = () => setPath(window.location.pathname);
-    window.addEventListener("popstate", onChange);
-    return () => window.removeEventListener("popstate", onChange);
+    const onPopState = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
+  // navigation function
   const go = (url: string) => {
     window.history.pushState({}, "", url);
     setPath(url);
   };
 
+  const renderPage = () => {
+    switch (path) {
+      case "/":
+        return <Home />;
+
+      case "/properties":
+        return <Properties />;
+
+      case "/adverts":
+        return <Adverts />;
+
+      case "/shop":
+        return <Shop />;
+
+      case "/holidayowners":
+        return <HolidayOwners />;
+
+      case "/dashboard":
+        return <GuestDashboard />;
+
+      case "/host-login":
+        return <HostLogin />;
+
+      case "/host-dashboard":
+        return <HostDashboard />;
+
+      case "/add-property":
+        return <AddProperty />;
+
+      case "/login":
+        return <Login />;
+
+      case "/signup":
+        return <Signup />;
+
+      default:
+        return (
+          <div style={{ padding: "40px", textAlign: "center" }}>
+            <h2>404 - Page Not Found</h2>
+            <button onClick={() => go("/")} style={btn}>
+              Go Home
+            </button>
+          </div>
+        );
+    }
+  };
+
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
-
       {/* HEADER */}
       <header
         style={{
@@ -36,7 +84,7 @@ export default function App() {
           color: "white",
           padding: "20px",
           display: "flex",
-          gap: "20px",
+          gap: "12px",
           flexWrap: "wrap",
         }}
       >
@@ -46,22 +94,13 @@ export default function App() {
         <button onClick={() => go("/shop")} style={btn}>Shop</button>
         <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
         <button onClick={() => go("/host-login")} style={btn}>Become a Host</button>
-        <button onClick={() => go("/login")} style={btn}>Account</button>
+        <button onClick={() => go("/login")} style={btn}>Login</button>
+        <button onClick={() => go("/signup")} style={btn}>Sign Up</button>
         <button onClick={() => go("/host-dashboard")} style={btn}>Dashboard</button>
       </header>
 
-      {/* ROUTES */}
-      {path === "/" && <Home />}
-      {path === "/properties" && <Properties />}
-      {path === "/adverts" && <Adverts />}
-      {path === "/shop" && <Shop />}
-      {path === "/holidayowners" && <HolidayOwners />}
-      {path === "/dashboard" && <GuestDashboard />}
-      {path === "/host-login" && <HostLogin />}
-      {path === "/host-dashboard" && <HostDashboard />}
-      {path === "/add-property" && <AddProperty />}
-      {path === "/login" && <Login />}
-      {path === "/signup" && <Signup />}
+      {/* PAGE CONTENT */}
+      {renderPage()}
 
       {/* FOOTER */}
       <footer
@@ -79,7 +118,8 @@ export default function App() {
   );
 }
 
-const btn = {
+// shared button style
+const btn: React.CSSProperties = {
   background: "transparent",
   border: "1px solid white",
   color: "white",
