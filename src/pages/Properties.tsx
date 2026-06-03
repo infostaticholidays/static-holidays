@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   function toggleFavorite(id: number) {
     if (favorites.includes(id)) {
@@ -128,6 +130,7 @@ export default function Properties() {
               </p>
 
               <button
+                onClick={() => navigate(`/property/${property.id}`)}
                 style={{
                   marginTop: "15px",
                   width: "100%",
