@@ -36,8 +36,7 @@ export default function Login() {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="password"
@@ -46,11 +45,15 @@ export default function Login() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
-    <button onClick={() => navigate("/signup")}>
-  Sign Up
-</button>
+      <button onClick={signIn}>Login</button>
+
+      <br /><br />
+
+      <button onClick={() => navigate("/signup")}>
+        Sign Up
+      </button>
+    </div>
   );
 }
