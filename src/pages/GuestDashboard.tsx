@@ -1,27 +1,47 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
-export default function Dashboard() {
-  const [user, setUser] = useState<any>(null);
+export default function GuestDashboard() {
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-    });
+    getProfile();
   }, []);
+
+  async function getProfile() {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    setProfile(data);
+  }
 
   return (
     <div style={{ padding: 40 }}>
-      <h1>Dashboard</h1>
+      <h1>Guest Dashboard 🏖️</h1>
 
-      {user ? (
+      {profile && (
         <>
-          <p>Logged in as:</p>
-          <p>{user.email}</p>
+          <p>Email: {profile.email}</p>
+          <p>Role: {profile.role}</p>
         </>
-      ) : (
-        <p>Not logged in</p>
       )}
+
+      <hr />
+
+      <h3>✨ Features you will add next:</h3>
+      <ul>
+        <li>Favourite properties ❤️</li>
+        <li>Saved destinations 📍</li>
+        <li>Nearby events 🎉</li>
+        <li>Holiday countdown ⏳</li>
+      </ul>
     </div>
   );
 }
