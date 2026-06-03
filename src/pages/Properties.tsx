@@ -17,16 +17,20 @@ export default function Properties() {
     fetchProperties();
   }, []);
 
-  async function fetchProperties() {
-    const { data, error } = await supabase
-      .from("properties")
-      .select("*")
-      .order("created_at", { ascending: false });
+async function fetchProperties() {
+  const { data, error } = await supabase
+    .from("properties")
+    .select("*");
 
-    if (error) {
-      console.error("Error loading properties:", error);
-      return;
-    }
+  alert("Properties found: " + (data?.length || 0));
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  setProperties(data || []);
+}
 
     setProperties(data || []);
   }
