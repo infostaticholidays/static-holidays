@@ -30,7 +30,48 @@ const [endDate, setEndDate] = useState<Date | null>(null);
     setProperty(data);
     setLoading(false);
   }
+async function createBooking() {
+  if (!startDate || !endDate) {
+    alert("Please select dates");
+    return;
+  }
 
+  const nights =
+    Math.ceil(
+      (endDate.getTime() - startDate.getTime()) /
+      (1000 * 60 * 60 * 24)
+    );
+
+  const totalPrice =
+    nights * property.price_per_night;
+
+  const { error } = await supabase
+    .from("bookings")
+    .insert([
+      {
+        property_id: property.id,
+        owner_id: property.owner_id,
+
+        check_in_date:
+          startDate.toISOString(),
+
+        check_out_date:
+          endDate.toISOString(),
+
+        total_price: totalPrice,
+
+        booking_status: "pending",
+      },
+    ]);
+
+  if (error) {
+    console.error(error);
+    alert("Booking failed");
+    return;
+  }
+
+  alert("Booking request sent!");
+}
   if (loading) {
     return <h2 style={{ padding: "40px" }}>Loading...</h2>;
   }
