@@ -9,7 +9,8 @@ export default function PropertyDetail() {
 
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
+const [startDate, setStartDate] = useState<Date | null>(null);
+const [endDate, setEndDate] = useState<Date | null>(null);
   useEffect(() => {
     fetchProperty();
   }, []);
@@ -79,6 +80,61 @@ export default function PropertyDetail() {
       <p style={{ marginTop: "20px" }}>
         {property.description}
       </p>
+      <div
+  style={{
+    marginTop: "40px",
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "12px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+  }}
+>
+  <h2>Select Your Dates</h2>
+
+  <DatePicker
+    selected={startDate}
+    onChange={(dates) => {
+      const [start, end] = dates as [
+        Date | null,
+        Date | null
+      ];
+
+      setStartDate(start);
+      setEndDate(end);
+    }}
+    startDate={startDate}
+    endDate={endDate}
+    selectsRange
+    minDate={new Date()}
+    inline
+  />
+
+  {startDate && endDate && (
+    <div style={{ marginTop: "20px" }}>
+      <p>
+        Check In: {startDate.toLocaleDateString()}
+      </p>
+
+      <p>
+        Check Out: {endDate.toLocaleDateString()}
+      </p>
+
+      <button
+        style={{
+          background: "#16a34a",
+          color: "white",
+          border: "none",
+          padding: "12px 20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          marginTop: "10px",
+        }}
+      >
+        Request Booking
+      </button>
+    </div>
+  )}
+</div>
     </div>
   );
 }
