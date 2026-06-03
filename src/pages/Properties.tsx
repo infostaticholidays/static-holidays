@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../supabaseClient";
 
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
@@ -11,8 +12,7 @@ export default function Properties() {
     }
   }
 
-  const properties = [
-    {
+const [properties, setProperties] = useState<any[]>([]);
       id: 1,
       title: "Luxury Coastal Caravan",
       location: "Cornwall",
