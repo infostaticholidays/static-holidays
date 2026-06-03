@@ -30,8 +30,6 @@ export default function Properties() {
       return;
     }
 
-    alert("Found: " + (data?.length || 0));
-
     setProperties(data || []);
   }
 
