@@ -9,6 +9,7 @@ import HostLogin from "./pages/HostLogin";
 import Login from "./pages/Login";
 import HostDashboard from "./pages/HostDashboard";
 import Signup from "./pages/Signup";
+import GuestDashboard from "./pages/GuestDashboard";
 
 
 export default function App() {
@@ -57,6 +58,7 @@ export default function App() {
       {path === "/login" && <Login />}
        {path === "/guest-dashboard" && <GuestDashboard />}
        {path === "/signup" && <Signup />}
+      {path === "/guest-dashboard" && <GuestDashboard />}
 
       
 
