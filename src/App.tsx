@@ -23,6 +23,9 @@ export default function App() {
         <Link style={btn} to="/host-login">Become a Host</Link>
         <Link style={btn} to="/login">Login</Link>
         <Link style={btn} to="/signup">Sign Up</Link>
+        <Link style={btn} to="/login">Login</Link>
+        <Link style={btn} to="/signup">Sign Up</Link>
+        <Link style={btn} to="/account">My Account</Link>
       </header>
 
       {/* HOME CONTENT */}
