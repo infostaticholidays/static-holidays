@@ -6,38 +6,77 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   async function signIn() {
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    alert("Logged in");
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
+      });
+
+    console.log("LOGIN DATA:", data);
+    console.log("LOGIN ERROR:", error);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Logged in!");
+
+    window.location.href = "/";
   }
 
   async function signUp() {
-    await supabase.auth.signUp({
-      email,
-      password,
-    });
-    alert("Account created");
+    const { data, error } =
+      await supabase.auth.signUp({
+        email: email.trim(),
+        password: password.trim(),
+      });
+
+    console.log("SIGNUP DATA:", data);
+    console.log("SIGNUP ERROR:", error);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Account created!");
   }
 
   return (
     <div style={{ padding: 40 }}>
       <h1>Login</h1>
 
-      <input placeholder="email" onChange={(e) => setEmail(e.target.value)} />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <br />
       <br />
 
       <input
-        placeholder="password"
         type="password"
+        placeholder="Password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
-      <button onClick={signIn}>Login</button>
-      <button onClick={signUp}>Sign Up</button>
+      <button onClick={signIn}>
+        Login
+      </button>
+
+      <button
+        onClick={signUp}
+        style={{ marginLeft: "10px" }}
+      >
+        Sign Up
+      </button>
     </div>
   );
 }
