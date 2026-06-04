@@ -11,45 +11,47 @@ export default function Signup() {
   const navigate = useNavigate();
 
   async function handleSignup() {
+    // 1. Create auth user
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password: password.trim(),
     });
-
-    console.log("SIGNUP DATA:", data);
-    console.log("SIGNUP ERROR:", error);
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    const userId = data.user?.id;
+    const user = data.user;
 
-    if (!userId) {
-      alert("User ID not returned from Supabase");
+    if (!user) {
+      alert("User was not created");
       return;
     }
 
+    console.log("AUTH USER:", user);
+
+    // 2. Create profile row
     const { error: profileError } = await supabase
       .from("profiles")
       .insert([
         {
-          id: userId,
+          id: user.id,
           email: email.trim(),
           full_name: fullName.trim(),
           role: role,
         },
       ]);
 
-    console.log("PROFILE ERROR:", profileError);
-
     if (profileError) {
+      console.log("PROFILE ERROR:", profileError);
       alert(profileError.message);
       return;
     }
 
     alert("Account created successfully!");
+
+    // 3. Send user to login
     navigate("/login");
   }
 
@@ -64,8 +66,7 @@ export default function Signup() {
         onChange={(e) => setFullName(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="email"
@@ -74,8 +75,7 @@ export default function Signup() {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="password"
@@ -84,8 +84,7 @@ export default function Signup() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <label>
         <input
@@ -109,8 +108,7 @@ export default function Signup() {
         Holiday Owner
       </label>
 
-      <br />
-      <br />
+      <br /><br />
 
       <button onClick={handleSignup}>
         Sign Up
