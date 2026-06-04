@@ -11,10 +11,24 @@ export default function Signup() {
   const navigate = useNavigate();
 
   async function handleSignup() {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password: password.trim(),
-    });
+  const { data, error } = await supabase.auth.signUp({
+  email: email.trim(),
+  password: password.trim(),
+});
+
+if (error) {
+  alert(error.message);
+  return;
+}
+
+await supabase.from("profiles").insert([
+  {
+    id: data.user?.id,
+    email: email.trim(),
+    full_name: fullName,
+    role: role,
+  },
+]);
 
     console.log("SIGNUP DATA:", data);
     console.log("SIGNUP ERROR:", error);
