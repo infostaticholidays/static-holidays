@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 
 export default function HostDashboard() {
   const [properties, setProperties] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadProperties();
@@ -115,6 +116,17 @@ export default function HostDashboard() {
                   }}
                 >
                   <button
+                    style={calendarBtn}
+                    onClick={() =>
+                      navigate(
+                        `/calendar/${property.id}`
+                      )
+                    }
+                  >
+                    📅 Calendar
+                  </button>
+
+                  <button
                     style={editBtn}
                     onClick={() =>
                       alert(
@@ -195,6 +207,16 @@ const btn = {
   border: "none",
   padding: "14px 24px",
   borderRadius: "8px",
+  cursor: "pointer",
+};
+
+const calendarBtn = {
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  padding: "6px 12px",
+  borderRadius: "6px",
+  marginRight: "8px",
   cursor: "pointer",
 };
 
