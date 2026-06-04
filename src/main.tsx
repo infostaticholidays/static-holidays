@@ -18,6 +18,7 @@ import AddProperty from "./pages/AddProperty";
 import PropertyDetail from "./pages/PropertyDetail";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import PropertyCalendar from "./pages/PropertyCalendar";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/host-dashboard" element={<HostDashboard />} />
         <Route path="/guest-dashboard" element={<GuestDashboard />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/calendar/:propertyId" element={<PropertyCalendar />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/add-property" element={<AddProperty />} />
       </Routes>
