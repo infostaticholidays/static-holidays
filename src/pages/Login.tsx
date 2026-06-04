@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const navigate = useNavigate();
 
   async function signIn() {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -23,7 +20,6 @@ export default function Login() {
 
     if (!user) return;
 
-    // get profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("*")
@@ -36,9 +32,9 @@ export default function Login() {
     }
 
     if (profile.role === "owner") {
-      navigate("/host-dashboard");
+      window.location.href = "/host-dashboard";
     } else {
-      navigate("/guest-dashboard");
+      window.location.href = "/guest-dashboard";
     }
   }
 
@@ -46,12 +42,18 @@ export default function Login() {
     <div style={{ padding: 40 }}>
       <h1>Login</h1>
 
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
       <br /><br />
 
       <input
         type="password"
         placeholder="Password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
