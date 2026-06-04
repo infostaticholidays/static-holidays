@@ -5,8 +5,11 @@ export default function PropertyCalendar() {
 
   return (
     <div style={{ padding: "40px" }}>
-      <h1>Property Calendar</h1>
-      <p>Property ID: {propertyId}</p>
+      <h1>📅 Property Calendar</h1>
+
+      <p>
+        Property ID: {propertyId}
+      </p>
     </div>
   );
 }
