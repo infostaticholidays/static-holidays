@@ -1,32 +1,34 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+
   async function signIn() {
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    });
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    const userId = data.user?.id;
+    const user = data.user;
 
-    const { data: profile, error: profileError } =
-      await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+    if (!user) return;
 
-    console.log(profile);
+    // get profile
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
 
     if (profileError || !profile) {
       alert("Profile not found");
@@ -34,9 +36,9 @@ export default function Login() {
     }
 
     if (profile.role === "owner") {
-      window.location.href = "/host-dashboard";
+      navigate("/host-dashboard");
     } else {
-      window.location.href = "/guest-dashboard";
+      navigate("/guest-dashboard");
     }
   }
 
@@ -44,29 +46,18 @@ export default function Login() {
     <div style={{ padding: 40 }}>
       <h1>Login</h1>
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <br />
-      <br />
+      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <br /><br />
 
       <input
         type="password"
         placeholder="Password"
-        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
-      <button onClick={signIn}>
-        Login
-      </button>
+      <button onClick={signIn}>Login</button>
     </div>
   );
 }
