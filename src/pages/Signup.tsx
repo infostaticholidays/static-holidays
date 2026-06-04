@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState("guest");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const navigate = useNavigate();
+  const [role, setRole] = useState("guest");
 
   async function handleSignup() {
     const { data, error } = await supabase.auth.signUp({
@@ -24,11 +21,10 @@ export default function Signup() {
     const user = data.user;
 
     if (!user) {
-      alert("User not created");
+      alert("No user returned");
       return;
     }
 
-    // insert profile ONCE
     const { error: profileError } = await supabase.from("profiles").insert([
       {
         id: user.id,
@@ -44,34 +40,61 @@ export default function Signup() {
     }
 
     alert("Account created!");
-    navigate("/login");
+    window.location.href = "/login";
   }
 
   return (
     <div style={{ padding: 40 }}>
       <h1>Sign Up</h1>
 
-      <input placeholder="Full Name" onChange={(e) => setFullName(e.target.value)} />
+      <input
+        placeholder="Full Name"
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+      />
+
       <br /><br />
 
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
       <br /><br />
 
       <input
         type="password"
         placeholder="Password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <br /><br />
-
-      <select onChange={(e) => setRole(e.target.value)}>
-        <option value="guest">Guest</option>
-        <option value="owner">Holiday Owner</option>
-      </select>
 
       <br /><br />
 
-      <button onClick={handleSignup}>Sign Up</button>
+      <label>
+        <input
+          type="radio"
+          value="guest"
+          checked={role === "guest"}
+          onChange={(e) => setRole(e.target.value)}
+        />
+        Guest
+      </label>
+
+      <label style={{ marginLeft: 20 }}>
+        <input
+          type="radio"
+          value="owner"
+          checked={role === "owner"}
+          onChange={(e) => setRole(e.target.value)}
+        />
+        Holiday Owner
+      </label>
+
+      <br /><br />
+
+      <button onClick={handleSignup}>Create Account</button>
     </div>
   );
 }
