@@ -11,24 +11,10 @@ export default function Signup() {
   const navigate = useNavigate();
 
   async function handleSignup() {
-  const { data, error } = await supabase.auth.signUp({
-  email: email.trim(),
-  password: password.trim(),
-});
-
-if (error) {
-  alert(error.message);
-  return;
-}
-
-await supabase.from("profiles").insert([
-  {
-    id: data.user?.id,
-    email: email.trim(),
-    full_name: fullName,
-    role: role,
-  },
-]);
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password: password.trim(),
+    });
 
     console.log("SIGNUP DATA:", data);
     console.log("SIGNUP ERROR:", error);
@@ -38,66 +24,93 @@ await supabase.from("profiles").insert([
       return;
     }
 
-    // Save extra user information
+    const userId = data.user?.id;
+
+    if (!userId) {
+      alert("User ID not returned from Supabase");
+      return;
+    }
+
     const { error: profileError } = await supabase
       .from("profiles")
       .insert([
         {
-          id: data.user?.id,
+          id: userId,
           email: email.trim(),
-          full_name: fullName,
+          full_name: fullName.trim(),
           role: role,
         },
       ]);
 
+    console.log("PROFILE ERROR:", profileError);
+
     if (profileError) {
-      console.log(profileError);
       alert(profileError.message);
       return;
     }
 
-    alert("Account created!");
+    alert("Account created successfully!");
     navigate("/login");
   }
 
   return (
-    <div style={{ padding: 40 }}>
+    <div style={{ padding: "40px" }}>
       <h1>Create Account</h1>
 
       <input
+        type="text"
         placeholder="Full Name"
         value={fullName}
         onChange={(e) => setFullName(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
+        type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
-        placeholder="Password"
         type="password"
+        placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-      >
-        <option value="guest">Guest</option>
-        <option value="owner">Holiday Owner</option>
-      </select>
+      <label>
+        <input
+          type="radio"
+          value="guest"
+          checked={role === "guest"}
+          onChange={(e) => setRole(e.target.value)}
+        />
+        Guest
+      </label>
 
-      <br /><br />
+      <br />
+
+      <label>
+        <input
+          type="radio"
+          value="owner"
+          checked={role === "owner"}
+          onChange={(e) => setRole(e.target.value)}
+        />
+        Holiday Owner
+      </label>
+
+      <br />
+      <br />
 
       <button onClick={handleSignup}>
         Sign Up
