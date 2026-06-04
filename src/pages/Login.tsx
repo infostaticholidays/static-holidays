@@ -5,25 +5,9 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
-const { data } = await supabase.auth.signInWithPassword({
-  email,
-  password,
-});
 
-const user = data.user;
-
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("role")
-  .eq("id", user.id)
-  .single();
-
-if (profile.role === "guest") {
-  navigate("/guest-dashboard");
-} else {
-  navigate("/host-dashboard");
-}
   async function signIn() {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
@@ -38,8 +22,32 @@ if (profile.role === "guest") {
       return;
     }
 
-    alert("Logged in!");
-    navigate("/");
+    const user = data.user;
+
+    if (!user) {
+      alert("User not found.");
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error(profileError);
+      alert(profileError.message);
+      return;
+    }
+
+    if (profile?.role === "guest") {
+      navigate("/guest-dashboard");
+    } else if (profile?.role === "host") {
+      navigate("/host-dashboard");
+    } else {
+      navigate("/");
+    }
   }
 
   return (
@@ -53,7 +61,8 @@ if (profile.role === "guest") {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
         type="password"
@@ -62,11 +71,15 @@ if (profile.role === "guest") {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
-      <button onClick={signIn}>Login</button>
+      <button onClick={signIn}>
+        Login
+      </button>
 
-      <br /><br />
+      <br />
+      <br />
 
       <button onClick={() => navigate("/signup")}>
         Sign Up
