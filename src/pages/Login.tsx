@@ -20,27 +20,28 @@ export default function Login() {
       return;
     }
 
-    alert("Logged in!");
+    const userId = data.user?.id;
 
-    window.location.href = "/";
-  }
+    const { data: profile, error: profileError } =
+      await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
 
-  async function signUp() {
-    const { data, error } =
-      await supabase.auth.signUp({
-        email: email.trim(),
-        password: password.trim(),
-      });
+    console.log("PROFILE:", profile);
+    console.log("PROFILE ERROR:", profileError);
 
-    console.log("SIGNUP DATA:", data);
-    console.log("SIGNUP ERROR:", error);
-
-    if (error) {
-      alert(error.message);
+    if (profileError) {
+      alert("Profile not found");
       return;
     }
 
-    alert("Account created!");
+    if (profile.role === "owner") {
+      window.location.href = "/host-dashboard";
+    } else {
+      window.location.href = "/guest-dashboard";
+    }
   }
 
   return (
@@ -69,13 +70,6 @@ export default function Login() {
 
       <button onClick={signIn}>
         Login
-      </button>
-
-      <button
-        onClick={signUp}
-        style={{ marginLeft: "10px" }}
-      >
-        Sign Up
       </button>
     </div>
   );
