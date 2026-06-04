@@ -8,19 +8,22 @@ export default function Signup() {
   const navigate = useNavigate();
 
   async function handleSignup() {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password: password.trim(),
-    });
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim(),
+    password: password.trim(),
+  });
 
-    if (error) {
-      alert(error.message);
-      return; // ✅ OK because inside function
-    }
+  console.log("SIGNUP DATA:", data);
+  console.log("SIGNUP ERROR:", error);
 
-    alert("Account created!");
-    navigate("/login");
+  if (error) {
+    alert(error.message);
+    return;
   }
+
+  alert("Account created!");
+  navigate("/login");
+}
 
   return (
     <div style={{ padding: 40 }}>
