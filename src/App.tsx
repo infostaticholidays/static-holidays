@@ -11,44 +11,36 @@ import HostDashboard from "./pages/HostDashboard";
 import Signup from "./pages/Signup";
 import GuestDashboard from "./pages/GuestDashboard";
 
-
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
 
   useEffect(() => {
-    const onChange = () => setPath(window.location.pathname);
-    window.addEventListener("popstate", onChange);
-    return () => window.removeEventListener("popstate", onChange);
+    const syncPath = () => setPath(window.location.pathname);
+
+    window.addEventListener("popstate", syncPath);
+    window.addEventListener("pushstate", syncPath); // IMPORTANT FIX
+
+    return () => {
+      window.removeEventListener("popstate", syncPath);
+      window.removeEventListener("pushstate", syncPath);
+    };
   }, []);
 
   const go = (url: string) => {
     window.history.pushState({}, "", url);
+    window.dispatchEvent(new Event("pushstate")); // IMPORTANT FIX
     setPath(url);
   };
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif" }}>
-
-      {/* HEADER */}
-      <header style={{
-        background: "#14532d",
-        color: "white",
-        padding: "20px",
-        display: "flex",
-        gap: "10px",
-        flexWrap: "wrap"
-      }}>
-        <button onClick={() => go("/")} style={btn}>Home</button>
-        <button onClick={() => go("/properties")} style={btn}>Properties</button>
-        <button onClick={() => go("/adverts")} style={btn}>Adverts</button>
-        <button onClick={() => go("/shop")} style={btn}>Shop</button>
-        <button onClick={() => go("/holidayowners")} style={btn}>Holiday Owners</button>
-        <button onClick={() => go("/host-login")} style={btn}>Become a Host</button>
-        <button onClick={() => go("/login")} style={btn}>Login</button>
-        <button onClick={() => go("/signup")} style={btn}>Sign Up</button>
+    <div>
+      <header>
+        <button onClick={() => go("/")}>Home</button>
+        <button onClick={() => go("/properties")}>Properties</button>
+        <button onClick={() => go("/login")}>Login</button>
+        <button onClick={() => go("/signup")}>Signup</button>
       </header>
 
-      {/* ROUTES */}
       {path === "/" && <Home />}
       {path === "/properties" && <Properties />}
       {path === "/adverts" && <Adverts />}
@@ -56,34 +48,9 @@ export default function App() {
       {path === "/holidayowners" && <HolidayOwners />}
       {path === "/host-login" && <HostLogin />}
       {path === "/host-dashboard" && <HostDashboard />}
+      {path === "/guest-dashboard" && <GuestDashboard />}
       {path === "/login" && <Login />}
-       {path === "/guest-dashboard" && <GuestDashboard />}
-       {path === "/signup" && <Signup />}
-    
-      
-
-      
-
-      {/* FOOTER */}
-      <footer style={{
-        background: "#14532d",
-        color: "white",
-        padding: "30px",
-        marginTop: "40px",
-        textAlign: "center"
-      }}>
-        Static Holidays © 2025
-      </footer>
-
+      {path === "/signup" && <Signup />}
     </div>
   );
 }
-
-const btn = {
-  background: "transparent",
-  border: "1px solid white",
-  color: "white",
-  padding: "8px 12px",
-  cursor: "pointer",
-  borderRadius: "6px"
-};
