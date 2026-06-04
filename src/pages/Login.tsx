@@ -12,9 +12,6 @@ export default function Login() {
         password: password.trim(),
       });
 
-    console.log("LOGIN DATA:", data);
-    console.log("LOGIN ERROR:", error);
-
     if (error) {
       alert(error.message);
       return;
@@ -29,10 +26,9 @@ export default function Login() {
         .eq("id", userId)
         .single();
 
-    console.log("PROFILE:", profile);
-    console.log("PROFILE ERROR:", profileError);
+    console.log(profile);
 
-    if (profileError) {
+    if (profileError || !profile) {
       alert("Profile not found");
       return;
     }
