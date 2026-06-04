@@ -6,33 +6,53 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("guest");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   async function handleSignup() {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      setLoading(true);
 
-    if (error) {
-      alert(error.message);
-      return;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      if (!data.user) {
+        alert("User was not created.");
+        return;
+      }
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: data.user.id,
+            email,
+            role,
+          },
+        ]);
+
+      if (profileError) {
+        console.error(profileError);
+        alert(profileError.message);
+        return;
+      }
+
+      alert("Account created successfully!");
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      alert("Unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
-
-    const user = data.user;
-
-    if (user) {
-      await supabase.from("profiles").insert([
-        {
-          id: user.id,
-          email: email,
-          role: role,
-        },
-      ]);
-    }
-
-    alert("Account created!");
-    navigate("/login");
   }
 
   return (
@@ -40,30 +60,38 @@ export default function Signup() {
       <h1>Sign Up</h1>
 
       <input
-        placeholder="email"
+        type="email"
+        placeholder="Email"
+        value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
-        placeholder="password"
         type="password"
+        placeholder="Password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
-      {/* ROLE SELECT */}
-      <select onChange={(e) => setRole(e.target.value)}>
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+      >
         <option value="guest">Guest</option>
         <option value="host">Holiday Owner</option>
       </select>
 
-      <br /><br />
+      <br />
+      <br />
 
-      <button onClick={handleSignup}>
-        Create Account
+      <button onClick={handleSignup} disabled={loading}>
+        {loading ? "Creating Account..." : "Create Account"}
       </button>
     </div>
   );
