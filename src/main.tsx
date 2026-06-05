@@ -85,9 +85,9 @@ ReactDOM.createRoot(
         />
 
         <Route
-          path="/account"
-          element={<Account />}
-        />
+  path="/account"
+  element={<Account />}
+/>
 
         <Route
           path="/add-property"
