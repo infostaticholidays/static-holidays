@@ -55,6 +55,11 @@ ReactDOM.createRoot(
         />
 
         <Route
+  path="/calendar/:propertyId"
+  element={<PropertyCalendar />}
+/>
+
+        <Route
           path="/host-login"
           element={<HostLogin />}
         />
