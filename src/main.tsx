@@ -54,10 +54,7 @@ ReactDOM.createRoot(
           element={<HolidayOwners />}
         />
 
-        <Route
-  path="/calendar/:propertyId"
-  element={<PropertyCalendar />}
-/>
+   
 
         <Route
           path="/host-login"
