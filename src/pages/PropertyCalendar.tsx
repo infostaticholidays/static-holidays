@@ -1,16 +1,49 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function PropertyCalendar() {
   const { propertyId } = useParams();
   const navigate = useNavigate();
 
+  const [date, setDate] = useState("");
+  const [priceOverride, setPriceOverride] = useState("");
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  async function saveDate() {
+    const { error } = await supabase
+      .from("property_calendar")
+      .insert([
+        {
+          property_id: propertyId,
+          date,
+          is_blocked: isBlocked,
+          price_override:
+            priceOverride === ""
+              ? null
+              : Number(priceOverride),
+        },
+      ]);
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
+
+    alert("Calendar updated");
+    setDate("");
+    setPriceOverride("");
+    setIsBlocked(false);
+  }
+
   return (
     <div
       style={{
         padding: "40px",
-        maxWidth: "1000px",
+        maxWidth: "900px",
         margin: "0 auto",
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "Arial",
       }}
     >
       <h1 style={{ color: "#14532d" }}>
@@ -29,28 +62,49 @@ export default function PropertyCalendar() {
           marginTop: "20px",
         }}
       >
-        <h2>Calendar Management</h2>
+        <h2>Block Dates / Set Prices</h2>
 
-        <p>
-          This is where owners will:
-        </p>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          style={{
+            padding: "10px",
+            marginBottom: "10px",
+            display: "block",
+          }}
+        />
 
-        <ul>
-          <li>✅ Block dates</li>
-          <li>✅ Set custom prices</li>
-          <li>✅ Add special offers</li>
-          <li>✅ Sync Airbnb calendars later</li>
-          <li>✅ Sync Booking.com calendars later</li>
-        </ul>
-      </div>
+        <input
+          type="number"
+          placeholder="Custom price (£)"
+          value={priceOverride}
+          onChange={(e) =>
+            setPriceOverride(e.target.value)
+          }
+          style={{
+            padding: "10px",
+            marginBottom: "10px",
+            display: "block",
+          }}
+        />
 
-      <div
-        style={{
-          marginTop: "30px",
-        }}
-      >
+        <label>
+          <input
+            type="checkbox"
+            checked={isBlocked}
+            onChange={() =>
+              setIsBlocked(!isBlocked)
+            }
+          />
+          {" "}Block this date
+        </label>
+
+        <br />
+        <br />
+
         <button
-          onClick={() => navigate("/host-dashboard")}
+          onClick={saveDate}
           style={{
             background: "#14532d",
             color: "white",
@@ -60,9 +114,27 @@ export default function PropertyCalendar() {
             cursor: "pointer",
           }}
         >
-          ← Back to Dashboard
+          Save Calendar Entry
         </button>
       </div>
+
+      <br />
+
+      <button
+        onClick={() =>
+          navigate("/host-dashboard")
+        }
+        style={{
+          background: "#14532d",
+          color: "white",
+          border: "none",
+          padding: "12px 20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+        }}
+      >
+        ← Back to Dashboard
+      </button>
     </div>
   );
 }
