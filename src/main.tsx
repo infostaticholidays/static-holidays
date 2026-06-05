@@ -19,6 +19,8 @@ import PropertyDetail from "./pages/PropertyDetail";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import PropertyCalendar from "./pages/PropertyCalendar";
+import Account from "./pages/Account";
+
 
 ReactDOM.createRoot(
   document.getElementById("root")!
@@ -57,6 +59,7 @@ ReactDOM.createRoot(
         <Route
           path="/login"
           element={<Login />}
+          <Route path="/account" element={<Account />} />
         />
         <Route
           path="/signup"
