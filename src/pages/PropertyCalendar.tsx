@@ -46,9 +46,9 @@ export default function PropertyCalendar() {
         fontFamily: "Arial",
       }}
     >
-      <h1 style={{ color: "#14532d" }}>
-        📅 Property Calendar
-      </h1>
+    <h1 style={{ color: "red" }}>
+  NEW CALENDAR VERSION
+</h1>
 
       <p>
         <strong>Property ID:</strong> {propertyId}
