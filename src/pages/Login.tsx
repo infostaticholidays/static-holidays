@@ -1,3 +1,4 @@
+```tsx
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useNavigate } from "react-router-dom";
@@ -5,21 +6,43 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
 
   async function signIn() {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password: password.trim(),
-    });
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
+      });
 
     if (error) {
       alert(error.message);
       return;
     }
 
+    const user = data.user;
+
+    const { data: profile, error: profileError } =
+      await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+    if (profileError) {
+      console.error(profileError);
+      alert("Could not load user profile.");
+      return;
+    }
+
     alert("Logged in!");
-    navigate("/");
+
+    if (profile.role === "host") {
+      navigate("/host-dashboard");
+    } else {
+      navigate("/guest-dashboard");
+    }
   }
 
   return (
@@ -27,23 +50,29 @@ export default function Login() {
       <h1>Login</h1>
 
       <input
+        type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="email"
+        placeholder="Email"
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
+        type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        type="password"
-        placeholder="password"
+        placeholder="Password"
       />
 
-      <br /><br />
+      <br />
+      <br />
 
-      <button onClick={signIn}>Login</button>
+      <button onClick={signIn}>
+        Login
+      </button>
     </div>
   );
 }
+```
