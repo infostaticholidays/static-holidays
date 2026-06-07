@@ -1,4 +1,8 @@
-import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+const navigate = useNavigate();
+
+navigate("/host-dashboard");
 
 import Home from "./pages/Home";
 import Adverts from "./pages/Adverts";
