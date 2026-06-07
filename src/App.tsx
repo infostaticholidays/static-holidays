@@ -12,7 +12,7 @@ import Signup from "./pages/Signup";
 import GuestDashboard from "./pages/GuestDashboard";
 import AddProperty from "./pages/AddProperty";
 import PropertyCalendar from "./pages/PropertyCalendar";
-import Account from "./pages/Account";
+
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
@@ -56,7 +56,7 @@ export default function App() {
       {path === "/signup" && <Signup />}
       {path === "/add-property" && <AddProperty />}
       {path === "/calendar" && <PropertyCalendar />}
-      {path === "/account" && <Account />}
-      </div>
+    
+</div>
   );
 }
