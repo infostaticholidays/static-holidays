@@ -4,8 +4,6 @@ export default function App() {
   return <Home />;
 }
 
-export default function App() {
-  return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
 
       {/* HEADER */}
