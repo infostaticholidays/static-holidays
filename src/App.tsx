@@ -1,66 +1,57 @@
-import { useNavigate } from "react-router-dom";
-
-const navigate = useNavigate();
-
-navigate("/host-dashboard");
-
+import { Link } from "react-router-dom";
 import Home from "./pages/Home";
-import Adverts from "./pages/Adverts";
-import Shop from "./pages/Shop";
-import Properties from "./pages/Properties";
-import HolidayOwners from "./pages/HolidayOwners";
-import HostLogin from "./pages/HostLogin";
-import Login from "./pages/Login";
-import HostDashboard from "./pages/HostDashboard";
-import Signup from "./pages/Signup";
-import GuestDashboard from "./pages/GuestDashboard";
-import AddProperty from "./pages/AddProperty";
-import PropertyCalendar from "./pages/PropertyCalendar";
-
 
 export default function App() {
-  const [path, setPath] = useState(window.location.pathname);
-
-  useEffect(() => {
-    const syncPath = () => setPath(window.location.pathname);
-
-    window.addEventListener("popstate", syncPath);
-    window.addEventListener("pushstate", syncPath); // IMPORTANT FIX
-
-    return () => {
-      window.removeEventListener("popstate", syncPath);
-      window.removeEventListener("pushstate", syncPath);
-    };
-  }, []);
-
-  const go = (url: string) => {
-    window.history.pushState({}, "", url);
-    window.dispatchEvent(new Event("pushstate")); // IMPORTANT FIX
-    setPath(url);
-  };
-
   return (
-    <div>
-      <header>
-        <button onClick={() => go("/")}>Home</button>
-        <button onClick={() => go("/properties")}>Properties</button>
-        <button onClick={() => go("/login")}>Login</button>
-        <button onClick={() => go("/signup")}>Signup</button>
+    <div style={{ fontFamily: "Arial, sans-serif" }}>
+      {/* HEADER */}
+      <header
+        style={{
+          background: "#14532d",
+          color: "white",
+          padding: "20px",
+          display: "flex",
+          gap: "12px",
+          flexWrap: "wrap",
+        }}
+      >
+        <Link style={btn} to="/">Home</Link>
+        <Link style={btn} to="/properties">Properties</Link>
+        <Link style={btn} to="/adverts">Adverts</Link>
+        <Link style={btn} to="/shop">Shop</Link>
+        <Link style={btn} to="/holidayowners">Holiday Owners</Link>
+        <Link style={btn} to="/host-login">Become a Host</Link>
+        <Link style={btn} to="/login">Login</Link>
+        <Link style={btn} to="/signup">Sign Up</Link>
+        <Link style={btn} to="/account">My Account</Link>
       </header>
 
-      {path === "/" && <Home />}
-      {path === "/properties" && <Properties />}
-      {path === "/adverts" && <Adverts />}
-      {path === "/shop" && <Shop />}
-      {path === "/holidayowners" && <HolidayOwners />}
-      {path === "/host-login" && <HostLogin />}
-      {path === "/host-dashboard" && <HostDashboard />}
-      {path === "/guest-dashboard" && <GuestDashboard />}
-      {path === "/login" && <Login />}
-      {path === "/signup" && <Signup />}
-      {path === "/add-property" && <AddProperty />}
-      {path === "/calendar" && <PropertyCalendar />}
-    
-</div>
+      {/* HOME CONTENT */}
+      <div style={{ padding: 40 }}>
+        <Home />
+      </div>
+
+      {/* FOOTER */}
+      <footer
+        style={{
+          background: "#14532d",
+          color: "white",
+          padding: "30px",
+          marginTop: "40px",
+          textAlign: "center",
+        }}
+      >
+        Static Holidays © 2025
+      </footer>
+    </div>
   );
 }
+
+const btn = {
+  background: "transparent",
+  border: "1px solid white",
+  color: "white",
+  padding: "8px 12px",
+  borderRadius: "6px",
+  textDecoration: "none",
+};
