@@ -1,13 +1,13 @@
+import { Link, Routes, Route } from "react-router-dom";
+
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Account from "./pages/Account";
 
 export default function App() {
   return (
-    ...
-  );
-}
-    <div style={{ fontFamily: "Arial, sans-serif" }}>
-
-      {/* HEADER */}
+    <div style={{ fontFamily: "Arial, sans-serif", minHeight: "100vh" }}>
       <header
         style={{
           background: "#14532d",
@@ -29,19 +29,26 @@ export default function App() {
         <Link style={btn} to="/account">My Account</Link>
       </header>
 
-      {/* HOME CONTENT */}
-      <div style={{ padding: 40 }}>
-        <h1>Welcome to Static Holidays</h1>
-        <p>Select a section from the menu above.</p>
-      </div>
+      <main style={{ padding: "40px", minHeight: "70vh" }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/account" element={<Account />} />
 
-      {/* FOOTER */}
+          <Route path="/properties" element={<h1>Properties</h1>} />
+          <Route path="/adverts" element={<h1>Adverts</h1>} />
+          <Route path="/shop" element={<h1>Shop</h1>} />
+          <Route path="/holidayowners" element={<h1>Holiday Owners</h1>} />
+          <Route path="/host-login" element={<h1>Become a Host</h1>} />
+        </Routes>
+      </main>
+
       <footer
         style={{
           background: "#14532d",
           color: "white",
           padding: "30px",
-          marginTop: "40px",
           textAlign: "center",
         }}
       >
