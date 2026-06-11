@@ -12,7 +12,7 @@ export default function PropertyDetail() {
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-
+ const [saved, setSaved] = useState(false);
   useEffect(() => {
     fetchProperty();
   }, []);
