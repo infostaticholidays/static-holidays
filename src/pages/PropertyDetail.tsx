@@ -4,18 +4,32 @@ import { supabase } from "../lib/supabase";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+type Property = {
+  id: string;
+  title: string;
+  location: string;
+  description: string;
+  images: string;
+  price_per_night: number;
+  owner_id: string;
+};
+
 export default function PropertyDetail() {
   const { id } = useParams();
 
-  const [property, setProperty] = useState<any>(null);
+  const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
- const [saved, setSaved] = useState(false);
+
+  const [saved, setSaved] = useState(false);
+  const [savingFav, setSavingFav] = useState(false);
+  const [bookingLoading, setBookingLoading] = useState(false);
+
   useEffect(() => {
-    fetchProperty();
-  }, []);
+    if (id) fetchProperty();
+  }, [id]);
 
   async function fetchProperty() {
     const { data, error } = await supabase
@@ -26,6 +40,7 @@ export default function PropertyDetail() {
 
     if (error) {
       console.error(error);
+      setLoading(false);
       return;
     }
 
@@ -33,11 +48,11 @@ export default function PropertyDetail() {
     setLoading(false);
   }
 
-  async function createBooking() {
-    if (!startDate || !endDate) {
-      alert("Please select dates");
-      return;
-    }
+  // ✅ TOGGLE FAVORITE (prevents duplicates)
+  async function toggleFavourite() {
+    if (!property) return;
+
+    setSavingFav(true);
 
     const {
       data: { user },
@@ -45,34 +60,98 @@ export default function PropertyDetail() {
 
     if (!user) {
       alert("Please log in first");
+      setSavingFav(false);
+      return;
+    }
+
+    // check if already exists
+    const { data: existing } = await supabase
+      .from("favourites")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("property_id", property.id)
+      .maybeSingle();
+
+    if (existing) {
+      // remove favourite
+      const { error } = await supabase
+        .from("favourites")
+        .delete()
+        .eq("id", existing.id);
+
+      if (error) {
+        console.error(error);
+        alert(error.message);
+        setSavingFav(false);
+        return;
+      }
+
+      setSaved(false);
+      setSavingFav(false);
+      return;
+    }
+
+    // add favourite
+    const { error } = await supabase.from("favourites").insert([
+      {
+        user_id: user.id,
+        property_id: property.id,
+      },
+    ]);
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      setSavingFav(false);
+      return;
+    }
+
+    setSaved(true);
+    setSavingFav(false);
+  }
+
+  async function createBooking() {
+    if (!property) return;
+
+    if (!startDate || !endDate) {
+      alert("Please select dates");
+      return;
+    }
+
+    setBookingLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Please log in first");
+      setBookingLoading(false);
       return;
     }
 
     const nights = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) /
-        (1000 * 60 * 60 * 24)
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
     );
 
     const totalPrice = nights * property.price_per_night;
 
-    const { error } = await supabase
-      .from("bookings")
-      .insert([
-        {
-          property_id: property.id,
-          owner_id: property.owner_id,
-          guest_id: user.id,
+    const { error } = await supabase.from("bookings").insert([
+      {
+        property_id: property.id,
+        owner_id: property.owner_id,
+        guest_id: user.id,
+        check_in: startDate.toISOString(),
+        check_out: endDate.toISOString(),
+        total_price: totalPrice,
+        booking_status: "pending",
+      },
+    ]);
 
-          check_in: startDate.toISOString(),
-          check_out: endDate.toISOString(),
-
-          total_price: totalPrice,
-          booking_status: "pending",
-        },
-      ]);
+    setBookingLoading(false);
 
     if (error) {
-      console.error("BOOKING ERROR:", error);
+      console.error(error);
       alert(error.message);
       return;
     }
@@ -88,37 +167,68 @@ export default function PropertyDetail() {
     return <h2 style={{ padding: "40px" }}>Property not found</h2>;
   }
 
+  const nights =
+    startDate && endDate
+      ? Math.ceil(
+          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+        )
+      : 0;
+
+  const totalPrice = nights * property.price_per_night;
+
   return (
-    <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
+    <div style={{ padding: "40px", maxWidth: "900px", margin: "0 auto" }}>
+      {/* IMAGE */}
       <img
         src={
           property.images ||
           "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
         }
-        alt={property.title}
         style={{
           width: "100%",
-          height: "450px",
+          height: "420px",
           objectFit: "cover",
           borderRadius: "12px",
         }}
       />
 
+      {/* TITLE */}
       <h1 style={{ marginTop: "20px" }}>{property.title}</h1>
-
       <p>📍 {property.location}</p>
 
       <h2 style={{ color: "#16a34a" }}>
         £{property.price_per_night}/night
       </h2>
 
-      <p style={{ marginTop: "20px" }}>{property.description}</p>
+      <p style={{ marginTop: "10px" }}>{property.description}</p>
 
+      {/* FAVOURITE BUTTON */}
+      <button
+        onClick={toggleFavourite}
+        disabled={savingFav}
+        style={{
+          marginTop: "20px",
+          background: saved ? "#16a34a" : "#dc2626",
+          color: "white",
+          border: "none",
+          padding: "12px 18px",
+          borderRadius: "8px",
+          cursor: "pointer",
+        }}
+      >
+        {savingFav
+          ? "Loading..."
+          : saved
+          ? "❤️ Saved"
+          : "🤍 Add to Favourites"}
+      </button>
+
+      {/* DATE PICKER */}
       <div
         style={{
           marginTop: "40px",
-          background: "#fff",
           padding: "20px",
+          background: "#fff",
           borderRadius: "12px",
           boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
         }}
@@ -142,83 +252,35 @@ export default function PropertyDetail() {
         {startDate && endDate && (
           <div style={{ marginTop: "20px" }}>
             <p>
-              <button
-  onClick={saveFavourite}
-  style={{
-    background: saved ? "#16a34a" : "#dc2626",
-    color: "white",
-    border: "none",
-    padding: "12px 20px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    marginTop: "20px",
-  }}
->
-  {saved ? "❤️ Saved" : "🤍 Add to Favourites"}
-</button>
               Check In: {startDate.toLocaleDateString("en-GB")}
             </p>
-
             <p>
               Check Out: {endDate.toLocaleDateString("en-GB")}
             </p>
 
             <p style={{ fontWeight: "bold", color: "#16a34a" }}>
-              Nights:{" "}
-              {Math.ceil(
-                (endDate.getTime() - startDate.getTime()) /
-                  (1000 * 60 * 60 * 24)
-              )}
+              Nights: {nights}
             </p>
 
             <p style={{ fontWeight: "bold", fontSize: "18px" }}>
-              Total Price: £
-              {Math.ceil(
-                (endDate.getTime() - startDate.getTime()) /
-                  (1000 * 60 * 60 * 24)
-              ) * property.price_per_night}
+              Total Price: £{totalPrice}
             </p>
-async function saveFavourite() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    alert("Please log in first");
-    return;
-  }
-
-  const { error } = await supabase
-    .from("favourites")
-    .insert([
-      {
-        user_id: user.id,
-        property_id: property.id,
-      },
-    ]);
-
-  if (error) {
-    console.error(error);
-    alert(error.message);
-    return;
-  }
-
-  setSaved(true);
-  alert("❤️ Property added to favourites!");
-}
+            {/* BOOK BUTTON */}
             <button
               onClick={createBooking}
+              disabled={bookingLoading}
               style={{
+                marginTop: "10px",
                 background: "#16a34a",
                 color: "white",
                 border: "none",
-                padding: "12px 20px",
+                padding: "12px 18px",
                 borderRadius: "8px",
                 cursor: "pointer",
-                marginTop: "10px",
               }}
             >
-              Request Booking
+              {bookingLoading ? "Booking..." : "Request Booking"}
             </button>
           </div>
         )}
