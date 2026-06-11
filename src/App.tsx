@@ -4,6 +4,13 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Account from "./pages/Account";
+import GuestDashboard from "./pages/GuestDashboard";
+import HostDashboard from "./pages/HostDashboard";
+import Properties from "./pages/Properties";
+import Adverts from "./pages/Adverts";
+import Shop from "./pages/Shop";
+import HolidayOwners from "./pages/HolidayOwners";
+import HostLogin from "./pages/HostLogin";
 
 export default function App() {
   return (
@@ -31,17 +38,14 @@ export default function App() {
 
       <main style={{ padding: "40px", minHeight: "70vh" }}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/account" element={<Account />} />
-
-          <Route path="/properties" element={<h1>Properties</h1>} />
-          <Route path="/adverts" element={<h1>Adverts</h1>} />
-          <Route path="/shop" element={<h1>Shop</h1>} />
-          <Route path="/holidayowners" element={<h1>Holiday Owners</h1>} />
-          <Route path="/host-login" element={<h1>Become a Host</h1>} />
-        </Routes>
+<Route path="/properties" element={<Properties />} />
+<Route path="/adverts" element={<Adverts />} />
+<Route path="/shop" element={<Shop />} />
+<Route path="/holidayowners" element={<HolidayOwners />} />
+<Route path="/host-login" element={<HostLogin />} />
+<Route path="/guest-dashboard" element={<GuestDashboard />} />
+<Route path="/host-dashboard" element={<HostDashboard />} />
+        
       </main>
 
       <footer
