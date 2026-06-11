@@ -142,6 +142,20 @@ export default function PropertyDetail() {
         {startDate && endDate && (
           <div style={{ marginTop: "20px" }}>
             <p>
+              <button
+  onClick={saveFavourite}
+  style={{
+    background: saved ? "#16a34a" : "#dc2626",
+    color: "white",
+    border: "none",
+    padding: "12px 20px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginTop: "20px",
+  }}
+>
+  {saved ? "❤️ Saved" : "🤍 Add to Favourites"}
+</button>
               Check In: {startDate.toLocaleDateString("en-GB")}
             </p>
 
