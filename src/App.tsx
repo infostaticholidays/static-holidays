@@ -14,7 +14,15 @@ import HostLogin from "./pages/HostLogin";
 
 export default function App() {
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", minHeight: "100vh" }}>
+    <div
+      style={{
+        fontFamily: "Arial, sans-serif",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* HEADER */}
       <header
         style={{
           background: "#14532d",
@@ -25,29 +33,85 @@ export default function App() {
           flexWrap: "wrap",
         }}
       >
-        <Link style={btn} to="/">Home</Link>
-        <Link style={btn} to="/properties">Properties</Link>
-        <Link style={btn} to="/adverts">Adverts</Link>
-        <Link style={btn} to="/shop">Shop</Link>
-        <Link style={btn} to="/holidayowners">Holiday Owners</Link>
-        <Link style={btn} to="/host-login">Become a Host</Link>
-        <Link style={btn} to="/login">Login</Link>
-        <Link style={btn} to="/signup">Sign Up</Link>
-        <Link style={btn} to="/account">My Account</Link>
+        <Link style={btn} to="/">
+          Home
+        </Link>
+
+        <Link style={btn} to="/properties">
+          Properties
+        </Link>
+
+        <Link style={btn} to="/adverts">
+          Adverts
+        </Link>
+
+        <Link style={btn} to="/shop">
+          Shop
+        </Link>
+
+        <Link style={btn} to="/holidayowners">
+          Holiday Owners
+        </Link>
+
+        <Link style={btn} to="/host-login">
+          Become a Host
+        </Link>
+
+        <Link style={btn} to="/login">
+          Login
+        </Link>
+
+        <Link style={btn} to="/signup">
+          Sign Up
+        </Link>
+
+        <Link style={btn} to="/account">
+          My Account
+        </Link>
       </header>
 
-      <main style={{ padding: "40px", minHeight: "70vh" }}>
+      {/* PAGE CONTENT */}
+      <main
+        style={{
+          flex: 1,
+          padding: "40px",
+        }}
+      >
         <Routes>
-<Route path="/properties" element={<Properties />} />
-<Route path="/adverts" element={<Adverts />} />
-<Route path="/shop" element={<Shop />} />
-<Route path="/holidayowners" element={<HolidayOwners />} />
-<Route path="/host-login" element={<HostLogin />} />
-<Route path="/guest-dashboard" element={<GuestDashboard />} />
-<Route path="/host-dashboard" element={<HostDashboard />} />
-        
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/account" element={<Account />} />
+
+          <Route path="/properties" element={<Properties />} />
+          <Route path="/adverts" element={<Adverts />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/holidayowners" element={<HolidayOwners />} />
+          <Route path="/host-login" element={<HostLogin />} />
+
+          <Route
+            path="/guest-dashboard"
+            element={<GuestDashboard />}
+          />
+
+          <Route
+            path="/host-dashboard"
+            element={<HostDashboard />}
+          />
+
+          <Route
+            path="*"
+            element={
+              <div>
+                <h1>404</h1>
+                <p>Page not found.</p>
+              </div>
+            }
+          />
+        </Routes>
       </main>
 
+      {/* FOOTER */}
       <footer
         style={{
           background: "#14532d",
