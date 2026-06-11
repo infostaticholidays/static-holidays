@@ -164,7 +164,34 @@ export default function PropertyDetail() {
                   (1000 * 60 * 60 * 24)
               ) * property.price_per_night}
             </p>
+async function saveFavourite() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
+  if (!user) {
+    alert("Please log in first");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("favourites")
+    .insert([
+      {
+        user_id: user.id,
+        property_id: property.id,
+      },
+    ]);
+
+  if (error) {
+    console.error(error);
+    alert(error.message);
+    return;
+  }
+
+  setSaved(true);
+  alert("❤️ Property added to favourites!");
+}
             <button
               onClick={createBooking}
               style={{
