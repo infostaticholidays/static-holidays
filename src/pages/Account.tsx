@@ -41,6 +41,7 @@ export default function Account() {
     if (error) {
       console.error(error);
     } else {
+      console.log("FAVOURITES:", data);
       setFavourites(data || []);
     }
 
