@@ -4,42 +4,39 @@ import { supabase } from "../lib/supabase";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-type Property = {
-  id: string;
-  title: string;
-  location: string;
-  description: string;
-  images: string;
-  price_per_night: number;
-  owner_id: string;
-};
-
 export default function PropertyDetail() {
   const { id } = useParams();
+  const propertyId = id ?? "";
 
-  const [property, setProperty] = useState<Property | null>(null);
+  const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const [saved, setSaved] = useState(false);
   const [savingFav, setSavingFav] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
 
+  // -----------------------------
+  // LOAD PROPERTY
+  // -----------------------------
   useEffect(() => {
-    if (id) fetchProperty();
-  }, [id]);
+    if (propertyId) fetchProperty();
+  }, [propertyId]);
 
   async function fetchProperty() {
+    setLoading(true);
+
     const { data, error } = await supabase
       .from("properties")
       .select("*")
-      .eq("id", id)
+      .eq("id", propertyId)
       .single();
 
     if (error) {
       console.error(error);
+      setProperty(null);
       setLoading(false);
       return;
     }
@@ -48,7 +45,33 @@ export default function PropertyDetail() {
     setLoading(false);
   }
 
-  // ✅ TOGGLE FAVORITE (prevents duplicates)
+  // -----------------------------
+  // CHECK IF FAVOURITED
+  // -----------------------------
+  useEffect(() => {
+    if (property) checkFavourite();
+  }, [property]);
+
+  async function checkFavourite() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user || !property) return;
+
+    const { data } = await supabase
+      .from("favourites")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("property_id", property.id)
+      .maybeSingle();
+
+    setSaved(!!data);
+  }
+
+  // -----------------------------
+  // TOGGLE FAVOURITE
+  // -----------------------------
   async function toggleFavourite() {
     if (!property) return;
 
@@ -64,7 +87,6 @@ export default function PropertyDetail() {
       return;
     }
 
-    // check if already exists
     const { data: existing } = await supabase
       .from("favourites")
       .select("*")
@@ -73,14 +95,12 @@ export default function PropertyDetail() {
       .maybeSingle();
 
     if (existing) {
-      // remove favourite
       const { error } = await supabase
         .from("favourites")
         .delete()
         .eq("id", existing.id);
 
       if (error) {
-        console.error(error);
         alert(error.message);
         setSavingFav(false);
         return;
@@ -91,43 +111,40 @@ export default function PropertyDetail() {
       return;
     }
 
-  // add favourite
-const { data, error } = await supabase
-  .from("favourites")
-  .insert({
-    user_id: user.id,
-    property_id: property.id,
-  })
-  .select();
+    const { error } = await supabase.from("favourites").insert([
+      {
+        user_id: user.id,
+        property_id: property.id,
+      },
+    ]);
 
-console.log("INSERT DATA:", data);
-console.log("INSERT ERROR:", error);
+    if (error) {
+      alert(error.message);
+      setSavingFav(false);
+      return;
+    }
 
-console.log("USER:", user);
-console.log("PROPERTY:", property);
-console.log("INSERT DATA:", data);
-console.log("INSERT ERROR:", error);
+    setSaved(true);
+    setSavingFav(false);
+  }
 
-if (error) {
-  console.error(error);
-  alert(error.message);
-  setSavingFav(false);
-  return;
-}
-
-alert("Favourite saved!");
-
-setSaved(true);
-setSavingFav(false);
-    
-}   // 
-
-
+  // -----------------------------
+  // CREATE BOOKING
+  // -----------------------------
   async function createBooking() {
     if (!property) return;
 
     if (!startDate || !endDate) {
       alert("Please select dates");
+      return;
+    }
+
+    const nights = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (nights <= 0) {
+      alert("Invalid date range");
       return;
     }
 
@@ -142,10 +159,6 @@ setSavingFav(false);
       setBookingLoading(false);
       return;
     }
-
-    const nights = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
 
     const totalPrice = nights * property.price_per_night;
 
@@ -164,7 +177,6 @@ setSavingFav(false);
     setBookingLoading(false);
 
     if (error) {
-      console.error(error);
       alert(error.message);
       return;
     }
@@ -172,13 +184,11 @@ setSavingFav(false);
     alert("Booking request sent!");
   }
 
-  if (loading) {
-    return <h2 style={{ padding: "40px" }}>Loading...</h2>;
-  }
-
-  if (!property) {
-    return <h2 style={{ padding: "40px" }}>Property not found</h2>;
-  }
+  // -----------------------------
+  // LOADING STATES
+  // -----------------------------
+  if (loading) return <h2 style={{ padding: 40 }}>Loading...</h2>;
+  if (!property) return <h2 style={{ padding: 40 }}>Property not found</h2>;
 
   const nights =
     startDate && endDate
@@ -189,43 +199,48 @@ setSavingFav(false);
 
   const totalPrice = nights * property.price_per_night;
 
+  const imageUrl = Array.isArray(property.images)
+    ? property.images[0]
+    : property.images;
+
+  // -----------------------------
+  // UI
+  // -----------------------------
   return (
-    <div style={{ padding: "40px", maxWidth: "900px", margin: "0 auto" }}>
-      {/* IMAGE */}
+    <div style={{ padding: 40, maxWidth: 900, margin: "0 auto" }}>
       <img
         src={
-          property.images ||
+          imageUrl ||
           "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
         }
         style={{
           width: "100%",
-          height: "420px",
+          height: 420,
           objectFit: "cover",
-          borderRadius: "12px",
+          borderRadius: 12,
         }}
       />
 
-      {/* TITLE */}
-      <h1 style={{ marginTop: "20px" }}>{property.title}</h1>
+      <h1 style={{ marginTop: 20 }}>{property.title}</h1>
       <p>📍 {property.location}</p>
 
       <h2 style={{ color: "#16a34a" }}>
         £{property.price_per_night}/night
       </h2>
 
-      <p style={{ marginTop: "10px" }}>{property.description}</p>
+      <p>{property.description}</p>
 
-      {/* FAVOURITE BUTTON */}
+      {/* FAVOURITE */}
       <button
         onClick={toggleFavourite}
         disabled={savingFav}
         style={{
-          marginTop: "20px",
+          marginTop: 20,
           background: saved ? "#16a34a" : "#dc2626",
           color: "white",
           border: "none",
           padding: "12px 18px",
-          borderRadius: "8px",
+          borderRadius: 8,
           cursor: "pointer",
         }}
       >
@@ -239,19 +254,18 @@ setSavingFav(false);
       {/* DATE PICKER */}
       <div
         style={{
-          marginTop: "40px",
-          padding: "20px",
-          background: "#fff",
-          borderRadius: "12px",
+          marginTop: 40,
+          padding: 20,
+          borderRadius: 12,
           boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
         }}
       >
-        <h2>Select Your Dates</h2>
+        <h2>Select Dates</h2>
 
         <DatePicker
           selected={startDate}
           onChange={(dates) => {
-            const [start, end] = dates as [Date | null, Date | null];
+            const [start, end] = dates;
             setStartDate(start);
             setEndDate(end);
           }}
@@ -263,33 +277,28 @@ setSavingFav(false);
         />
 
         {startDate && endDate && (
-          <div style={{ marginTop: "20px" }}>
+          <div style={{ marginTop: 20 }}>
+            <p>Check-in: {startDate.toLocaleDateString("en-GB")}</p>
+            <p>Check-out: {endDate.toLocaleDateString("en-GB")}</p>
+
             <p>
-              Check In: {startDate.toLocaleDateString("en-GB")}
+              Nights: <b>{nights}</b>
             </p>
+
             <p>
-              Check Out: {endDate.toLocaleDateString("en-GB")}
+              Total: <b>£{totalPrice}</b>
             </p>
 
-            <p style={{ fontWeight: "bold", color: "#16a34a" }}>
-              Nights: {nights}
-            </p>
-
-            <p style={{ fontWeight: "bold", fontSize: "18px" }}>
-              Total Price: £{totalPrice}
-            </p>
-
-            {/* BOOK BUTTON */}
             <button
               onClick={createBooking}
               disabled={bookingLoading}
               style={{
-                marginTop: "10px",
+                marginTop: 10,
                 background: "#16a34a",
                 color: "white",
                 border: "none",
                 padding: "12px 18px",
-                borderRadius: "8px",
+                borderRadius: 8,
                 cursor: "pointer",
               }}
             >
