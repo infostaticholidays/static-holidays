@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 export default function Account() {
-  const [user, setUser] = useState<any>(null);
-  const [favourites, setFavourites] = useState<any[]>([]);
+  const [user, setUser] = useState(null);
+  const [favourites, setFavourites] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,8 +25,7 @@ export default function Account() {
 
     const { data, error } = await supabase
       .from("favourites")
-      .select(
-        `
+      .select(`
         id,
         properties (
           id,
@@ -35,21 +34,19 @@ export default function Account() {
           images,
           price_per_night
         )
-      `
-      )
+      `)
       .eq("user_id", user.id);
 
     if (error) {
       console.error(error);
     } else {
-      console.log("FAVOURITES:", data);
       setFavourites(data || []);
     }
 
     setLoading(false);
   }
 
-  async function removeFavourite(id: number) {
+  async function removeFavourite(id) {
     const { error } = await supabase
       .from("favourites")
       .delete()
@@ -60,7 +57,7 @@ export default function Account() {
       return;
     }
 
-    setFavourites(favourites.filter((fav) => fav.id !== id));
+    setFavourites((prev) => prev.filter((fav) => fav.id !== id));
   }
 
   async function handleLogout() {
@@ -77,9 +74,7 @@ export default function Account() {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1 style={{ color: "#14532d" }}>
-        👤 My Account
-      </h1>
+      <h1 style={{ color: "#14532d" }}>👤 My Account</h1>
 
       <div
         style={{
@@ -92,13 +87,11 @@ export default function Account() {
         <h2>Account Information</h2>
 
         <p>
-          <strong>Email:</strong>{" "}
-          {user?.email || "Not logged in"}
+          <strong>Email:</strong> {user?.email || "Not logged in"}
         </p>
 
         <p>
-          <strong>User ID:</strong>{" "}
-          {user?.id || "N/A"}
+          <strong>User ID:</strong> {user?.id || "N/A"}
         </p>
       </div>
 
@@ -117,85 +110,77 @@ export default function Account() {
         ) : favourites.length === 0 ? (
           <p>No favourite properties yet.</p>
         ) : (
-        favourites.map((fav: any) => (
-  <div
-    key={fav.id}
-              key={fav.id}
-              style={{
-                background: "white",
-                borderRadius: "10px",
-                padding: "15px",
-                marginTop: "20px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              }}
-            >
-              <img
-                src={
-                  fav.properties?.images ||
-                  "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-                }
-                alt={fav.properties?.title}
+          favourites.map((fav) => {
+            const property = fav.properties;
+
+            return (
+              <div
+                key={fav.id}
                 style={{
-                  width: "100%",
-                  height: "220px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                }}
-              />
-
-              <h3 style={{ marginTop: "15px" }}>
-                {fav.properties?.title}
-              </h3>
-
-              <p>
-                📍 {fav.properties?.location}
-              </p>
-
-              <p
-                style={{
-                  color: "#16a34a",
-                  fontWeight: "bold",
+                  background: "white",
+                  borderRadius: "10px",
+                  padding: "15px",
+                  marginTop: "20px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                 }}
               >
-                £{fav.properties?.price_per_night}/night
-              </p>
-    <Link
-  to={`/property/${fav.properties?.id}`}
-  style={{
-    textDecoration: "none",
-  }}
->
-  <button
-    style={{
-      background: "#14532d",
-      color: "white",
-      border: "none",
-      padding: "10px 16px",
-      borderRadius: "6px",
-      cursor: "pointer",
-      marginRight: "10px",
-    }}
-  >
-    View Property
-  </button>
-</Link>
+                <img
+                  src={
+                    property?.images ||
+                    "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+                  }
+                  alt={property?.title}
+                  style={{
+                    width: "100%",
+                    height: "220px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
 
-              <button
-                onClick={() => removeFavourite(fav.id)}
-                style={{
-                  background: "#dc2626",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 16px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  marginTop: "10px",
-                }}
-              >
-                Remove Favourite
-              </button>
-            </div>
-          ))
+                <h3 style={{ marginTop: "15px" }}>
+                  {property?.title}
+                </h3>
+
+                <p>📍 {property?.location}</p>
+
+                <p style={{ color: "#16a34a", fontWeight: "bold" }}>
+                  £{property?.price_per_night}/night
+                </p>
+
+                <Link to={`/property/${property?.id}`}>
+                  <button
+                    style={{
+                      background: "#14532d",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 16px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      marginRight: "10px",
+                    }}
+                  >
+                    View Property
+                  </button>
+                </Link>
+
+                <button
+                  onClick={() => removeFavourite(fav.id)}
+                  style={{
+                    background: "#dc2626",
+                    color: "white",
+                    border: "none",
+                    padding: "10px 16px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    marginTop: "10px",
+                  }}
+                >
+                  Remove Favourite
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
 
