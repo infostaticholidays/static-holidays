@@ -1,4 +1,4 @@
-import { useParams } from "wouter";
+import { Link, Routes, Route } from "react-router-dom";
 import { useGetProduct } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft, Package, Truck, ShieldCheck } from "lucide-react";
