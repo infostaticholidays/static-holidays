@@ -29,11 +29,11 @@ export default function Login() {
       return;
     }
 
-  const { data: profile, error: profileError } = await supabase
-  .from("profiles")
-  .select("role")
-  .eq("id", user.id)
-  .maybeSingle();   //
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
 
     if (profileError) {
       console.error(profileError);
@@ -42,12 +42,13 @@ export default function Login() {
     }
 
     if (profile?.role === "guest") {
-  navigate("/guest-account");
-} else if (profile?.role === "host") {
-  navigate("/owner-account");
-} else {
-  navigate("/");
-}
+      navigate("/guest-account");
+    } else if (profile?.role === "host") {
+      navigate("/owner-account");
+    } else {
+      navigate("/");
+    }
+  }
 
   return (
     <div style={{ padding: 40 }}>
