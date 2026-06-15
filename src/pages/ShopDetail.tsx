@@ -1,131 +1,142 @@
-import { Link, Routes, Route } from "react-router-dom";
-import { useGetProduct } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { ShoppingBag, ArrowLeft, Package, Truck, ShieldCheck } from "lucide-react";
-import { Link } from "wouter";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function ShopDetail() {
   const { id } = useParams();
-  const productId = parseInt(id || "0", 10);
 
-  const { data: product, isLoading } = useGetProduct(productId);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const { toast } = useToast();
 
-  if (isLoading) {
-    return <div className="container mx-auto p-8">Loading product...</div>;
+  useEffect(() => {
+    loadProduct();
+  }, [id]);
+
+  async function loadProduct() {
+    const { data, error } = await supabase
+      .from("shop")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.log(error);
+      setLoading(false);
+      return;
+    }
+
+    setProduct(data);
+    setLoading(false);
+  }
+
+  if (loading) {
+    return <h2 style={{ padding: 40 }}>Loading...</h2>;
   }
 
   if (!product) {
-    return <div className="container mx-auto p-8">Product not found</div>;
+    return <h2 style={{ padding: 40 }}>Product not found</h2>;
   }
 
-  const handleAddToCart = () => {
-    toast({
-      title: "Added to basket",
-      description: `${quantity}x ${product.name} has been added to your order.`,
-    });
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-
-      {/* BACK BUTTON */}
+    <div
+      style={{
+        maxWidth: "1000px",
+        margin: "0 auto",
+        padding: "40px",
+      }}
+    >
       <Link
-        href="/shop"
-        className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary mb-8"
+        to="/shop"
+        style={{
+          textDecoration: "none",
+          color: "#14532d",
+          fontWeight: "bold",
+        }}
       >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Shop
+        ← Back to Shop
       </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-
-        {/* IMAGE */}
-        <div className="bg-muted rounded-2xl p-8 flex items-center justify-center min-h-[400px]">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "40px",
+          marginTop: "30px",
+        }}
+      >
+        <div>
           <img
-            src={product.imageUrl || "/images/trust-badge.png"}
+            src={
+              product.image ||
+              "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+            }
             alt={product.name}
-            className="max-w-full max-h-full object-contain"
+            style={{
+              width: "100%",
+              borderRadius: "12px",
+            }}
           />
         </div>
 
-        {/* DETAILS */}
-        <div className="space-y-6">
+        <div>
+          <h1>{product.name}</h1>
 
-          <div>
-            <Badge className="mb-3">{product.category}</Badge>
+          <h2 style={{ color: "#16a34a" }}>
+            £{product.price}
+          </h2>
 
-            <h1 className="text-3xl font-bold mb-4">
-              {product.name}
-            </h1>
+          <p>{product.description}</p>
 
-            <p className="text-3xl font-bold mb-4">
-              £{product.price}
-            </p>
+          <div style={{ marginTop: "30px" }}>
+            <p>Quantity</p>
 
-            <p className="text-muted-foreground">
-              {product.description}
-            </p>
+            <button
+              onClick={() =>
+                setQuantity(Math.max(1, quantity - 1))
+              }
+            >
+              -
+            </button>
+
+            <span
+              style={{
+                margin: "0 20px",
+                fontWeight: "bold",
+              }}
+            >
+              {quantity}
+            </span>
+
+            <button
+              onClick={() =>
+                setQuantity(quantity + 1)
+              }
+            >
+              +
+            </button>
           </div>
 
-          {/* QUANTITY */}
-          <div className="flex items-center gap-4">
-            <span>Quantity</span>
-
-            <div className="flex items-center border rounded-md">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              >
-                -
-              </Button>
-
-              <span className="w-10 text-center">{quantity}</span>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setQuantity(quantity + 1)}
-              >
-                +
-              </Button>
-            </div>
-          </div>
-
-          {/* BUTTON */}
-          <Button
-            className="w-full h-12 text-base"
-            onClick={handleAddToCart}
+          <button
+            style={{
+              marginTop: "30px",
+              background: "#16a34a",
+              color: "white",
+              border: "none",
+              padding: "15px 25px",
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}
+            onClick={() => alert("Added to basket")}
           >
-            <ShoppingBag className="mr-2 h-5 w-5" />
             Add to Basket
-          </Button>
+          </button>
 
-          {/* INFO */}
-          <div className="space-y-3 text-sm text-muted-foreground">
-
-            <div className="flex gap-2">
-              <Truck className="h-5 w-5" />
-              Free UK delivery over £50
-            </div>
-
-            <div className="flex gap-2">
-              <Package className="h-5 w-5" />
-              Eco-friendly packaging
-            </div>
-
-            <div className="flex gap-2">
-              <ShieldCheck className="h-5 w-5" />
-              Secure checkout & returns
-            </div>
-
+          <div style={{ marginTop: "30px" }}>
+            <p>🚚 Free UK delivery over £50</p>
+            <p>📦 Eco-friendly packaging</p>
+            <p>🔒 Secure checkout</p>
           </div>
-
         </div>
       </div>
     </div>
