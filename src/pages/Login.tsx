@@ -42,13 +42,12 @@ export default function Login() {
     }
 
     if (profile?.role === "guest") {
-      navigate("/guest-dashboard");
-    } else if (profile?.role === "host") {
-      navigate("/host-dashboard");
-    } else {
-      navigate("/");
-    }
-  }
+  navigate("/guest-account");
+} else if (profile?.role === "host") {
+  navigate("/owner-account");
+} else {
+  navigate("/");
+}
 
   return (
     <div style={{ padding: 40 }}>
