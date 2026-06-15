@@ -117,8 +117,9 @@ export default function Account() {
         ) : favourites.length === 0 ? (
           <p>No favourite properties yet.</p>
         ) : (
-          favourites.map((fav: any) => (
-            <div
+        favourites.map((fav: any) => (
+  <div
+    key={fav.id}
               key={fav.id}
               style={{
                 background: "white",
@@ -158,6 +159,26 @@ export default function Account() {
               >
                 £{fav.properties?.price_per_night}/night
               </p>
+    <Link
+  to={`/property/${fav.properties?.id}`}
+  style={{
+    textDecoration: "none",
+  }}
+>
+  <button
+    style={{
+      background: "#14532d",
+      color: "white",
+      border: "none",
+      padding: "10px 16px",
+      borderRadius: "6px",
+      cursor: "pointer",
+      marginRight: "10px",
+    }}
+  >
+    View Property
+  </button>
+</Link>
 
               <button
                 onClick={() => removeFavourite(fav.id)}
