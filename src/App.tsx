@@ -88,6 +88,8 @@ export default function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/holidayowners" element={<HolidayOwners />} />
           <Route path="/host-login" element={<HostLogin />} />
+          <Route
+
 
           <Route
             path="/guest-dashboard"
@@ -98,6 +100,10 @@ export default function App() {
             path="/host-dashboard"
             element={<HostDashboard />}
           />
+          <Route
+  path="/property/:id"
+  element={<PropertyDetail />}
+/>
 
           <Route
             path="*"
