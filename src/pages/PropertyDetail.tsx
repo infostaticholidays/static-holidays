@@ -118,7 +118,8 @@ alert("Favourite saved!");
 
 setSaved(true);
 setSavingFav(false);
-
+    
+}   // 
 
 
   async function createBooking() {
