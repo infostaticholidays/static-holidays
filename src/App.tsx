@@ -34,41 +34,15 @@ export default function App() {
           flexWrap: "wrap",
         }}
       >
-        <Link style={btn} to="/">
-          Home
-        </Link>
-
-        <Link style={btn} to="/properties">
-          Properties
-        </Link>
-
-        <Link style={btn} to="/adverts">
-          Adverts
-        </Link>
-
-        <Link style={btn} to="/shop">
-          Shop
-        </Link>
-
-        <Link style={btn} to="/holidayowners">
-          Holiday Owners
-        </Link>
-
-        <Link style={btn} to="/host-login">
-          Become a Host
-        </Link>
-
-        <Link style={btn} to="/login">
-          Login
-        </Link>
-
-        <Link style={btn} to="/signup">
-          Sign Up
-        </Link>
-
-        <Link style={btn} to="/account">
-          My Account
-        </Link>
+        <Link style={btn} to="/">Home</Link>
+        <Link style={btn} to="/properties">Properties</Link>
+        <Link style={btn} to="/adverts">Adverts</Link>
+        <Link style={btn} to="/shop">Shop</Link>
+        <Link style={btn} to="/holidayowners">Holiday Owners</Link>
+        <Link style={btn} to="/host-login">Become a Host</Link>
+        <Link style={btn} to="/login">Login</Link>
+        <Link style={btn} to="/signup">Sign Up</Link>
+        <Link style={btn} to="/account">My Account</Link>
       </header>
 
       {/* PAGE CONTENT */}
@@ -79,33 +53,33 @@ export default function App() {
         }}
       >
         <Routes>
-   
-  <Route path="/" element={<Home />} />
-  <Route path="/login" element={<Login />} />
-  <Route path="/signup" element={<Signup />} />
-  <Route path="/account" element={<Account />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/account" element={<Account />} />
 
-  <Route path="/properties" element={<Properties />} />
-  <Route path="/adverts" element={<Adverts />} />
-  <Route path="/shop" element={<Shop />} />
-  <Route path="/holidayowners" element={<HolidayOwners />} />
-  <Route path="/host-login" element={<HostLogin />} />
+          <Route path="/properties" element={<Properties />} />
+          <Route path="/adverts" element={<Adverts />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/holidayowners" element={<HolidayOwners />} />
+          <Route path="/host-login" element={<HostLogin />} />
 
-  <Route path="/guest-dashboard" element={<GuestDashboard />} />
-  <Route path="/host-dashboard" element={<HostDashboard />} />
+          <Route path="/guest-dashboard" element={<GuestDashboard />} />
+          <Route path="/host-dashboard" element={<HostDashboard />} />
 
-  <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route path="/property/:id" element={<PropertyDetail />} />
 
-  <Route
-    path="*"
-    element={
-      <div>
-        <h1>404</h1>
-        <p>Page not found.</p>
-      </div>
-    }
-  />
-</Routes>
+          <Route
+            path="*"
+            element={
+              <div>
+                <h1>404</h1>
+                <p>Page not found.</p>
+              </div>
+            }
+          />
+        </Routes>
+      </main>
 
       {/* FOOTER */}
       <footer
@@ -122,7 +96,7 @@ export default function App() {
   );
 }
 
-const btn: React.CSSProperties = {
+const btn = {
   background: "transparent",
   border: "1px solid white",
   color: "white",
