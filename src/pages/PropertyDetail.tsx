@@ -94,13 +94,14 @@ export default function PropertyDetail() {
   // add favourite
 const { data, error } = await supabase
   .from("favourites")
-  .insert([
-    {
-      user_id: user.id,
-      property_id: property.id,
-    },
-  ])
+  .insert({
+    user_id: user.id,
+    property_id: property.id,
+  })
   .select();
+
+console.log("INSERT DATA:", data);
+console.log("INSERT ERROR:", error);
 
 console.log("USER:", user);
 console.log("PROPERTY:", property);
