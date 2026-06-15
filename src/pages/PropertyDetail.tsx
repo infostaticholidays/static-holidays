@@ -91,24 +91,35 @@ export default function PropertyDetail() {
       return;
     }
 
-    // add favourite
-    const { error } = await supabase.from("favourites").insert([
-      {
-        user_id: user.id,
-        property_id: property.id,
-      },
-    ]);
+  // add favourite
+const { data, error } = await supabase
+  .from("favourites")
+  .insert([
+    {
+      user_id: user.id,
+      property_id: property.id,
+    },
+  ])
+  .select();
 
-    if (error) {
-      console.error(error);
-      alert(error.message);
-      setSavingFav(false);
-      return;
-    }
+console.log("USER:", user);
+console.log("PROPERTY:", property);
+console.log("INSERT DATA:", data);
+console.log("INSERT ERROR:", error);
 
-    setSaved(true);
-    setSavingFav(false);
-  }
+if (error) {
+  console.error(error);
+  alert(error.message);
+  setSavingFav(false);
+  return;
+}
+
+alert("Favourite saved!");
+
+setSaved(true);
+setSavingFav(false);
+
+
 
   async function createBooking() {
     if (!property) return;
