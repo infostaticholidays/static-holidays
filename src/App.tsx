@@ -12,6 +12,8 @@ import Shop from "./pages/Shop";
 import HolidayOwners from "./pages/HolidayOwners";
 import HostLogin from "./pages/HostLogin";
 import PropertyDetail from "./pages/PropertyDetail";
+import GuestAccount from "./pages/GuestAccount";
+import OwnerAccount from "./pages/OwnerAccount";
 
 export default function App() {
   return (
@@ -66,6 +68,13 @@ export default function App() {
 
           <Route path="/guest-dashboard" element={<GuestDashboard />} />
           <Route path="/host-dashboard" element={<HostDashboard />} />
+          <Route path="/guest-account"  element={<GuestAccount />}
+            />
+
+<Route
+  path="/owner-account"
+  element={<OwnerAccount />}
+  />
 
           <Route path="/property/:id" element={<PropertyDetail />} />
 
