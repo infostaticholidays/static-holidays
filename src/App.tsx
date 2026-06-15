@@ -78,44 +78,33 @@ export default function App() {
         }}
       >
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/account" element={<Account />} />
+       <Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/login" element={<Login />} />
+  <Route path="/signup" element={<Signup />} />
+  <Route path="/account" element={<Account />} />
 
-          <Route path="/properties" element={<Properties />} />
-          <Route path="/adverts" element={<Adverts />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/holidayowners" element={<HolidayOwners />} />
-          <Route path="/host-login" element={<HostLogin />} />
-          <Route
+  <Route path="/properties" element={<Properties />} />
+  <Route path="/adverts" element={<Adverts />} />
+  <Route path="/shop" element={<Shop />} />
+  <Route path="/holidayowners" element={<HolidayOwners />} />
+  <Route path="/host-login" element={<HostLogin />} />
 
+  <Route path="/guest-dashboard" element={<GuestDashboard />} />
+  <Route path="/host-dashboard" element={<HostDashboard />} />
 
-          <Route
-            path="/guest-dashboard"
-            element={<GuestDashboard />}
-          />
+  <Route path="/property/:id" element={<PropertyDetail />} />
 
-          <Route
-            path="/host-dashboard"
-            element={<HostDashboard />}
-          />
-          <Route
-  path="/property/:id"
-  element={<PropertyDetail />}
-/>
-
-          <Route
-            path="*"
-            element={
-              <div>
-                <h1>404</h1>
-                <p>Page not found.</p>
-              </div>
-            }
-          />
-        </Routes>
-      </main>
+  <Route
+    path="*"
+    element={
+      <div>
+        <h1>404</h1>
+        <p>Page not found.</p>
+      </div>
+    }
+  />
+</Routes>
 
       {/* FOOTER */}
       <footer
