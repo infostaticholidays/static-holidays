@@ -11,6 +11,7 @@ import Adverts from "./pages/Adverts";
 import Shop from "./pages/Shop";
 import HolidayOwners from "./pages/HolidayOwners";
 import HostLogin from "./pages/HostLogin";
+import PropertyDetail from "./pages/PropertyDetail";
 
 export default function App() {
   return (
