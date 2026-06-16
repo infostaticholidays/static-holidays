@@ -57,7 +57,8 @@ export default function Account() {
 
     if (!tripError) {
       setTrip(tripData);
-    }
+    console.log("TRIP DATA:", tripData);
+    
 
     setLoading(false);
   }
