@@ -14,9 +14,6 @@ export default function Login() {
       password: password.trim(),
     });
 
-    console.log("LOGIN DATA:", data);
-    console.log("LOGIN ERROR:", error);
-
     if (error) {
       alert(error.message);
       return;
@@ -41,6 +38,7 @@ export default function Login() {
       return;
     }
 
+    // ✅ FINAL ROUTING (NO DASHBOARDS)
     if (profile?.role === "guest") {
       navigate("/guest-account");
     } else if (profile?.role === "host") {
@@ -61,8 +59,7 @@ export default function Login() {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="password"
@@ -71,19 +68,13 @@ export default function Login() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
-      <button onClick={signIn}>
-        Login
-      </button>
+      <button onClick={signIn}>Login</button>
 
-      <br />
-      <br />
+      <br /><br />
 
-      <button onClick={() => navigate("/signup")}>
-        Sign Up
-      </button>
+      <button onClick={() => navigate("/signup")}>Sign Up</button>
     </div>
   );
 }
