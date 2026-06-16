@@ -3,12 +3,11 @@ import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 export default function Account() {
-  const [user, setUser] = useState(null);
-  const [favourites, setFavourites] = useState([]);
+  const [user, setUser] = useState<any>(null);
+  const [favourites, setFavourites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🆕 TRIP STATES
-  const [trip, setTrip] = useState(null);
+  const [trip, setTrip] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
@@ -27,7 +26,7 @@ export default function Account() {
       return;
     }
 
-    // ❤️ FAVOURITES
+    // Load favourites
     const { data, error } = await supabase
       .from("favourites")
       .select(`
@@ -48,46 +47,52 @@ export default function Account() {
       setFavourites(data || []);
     }
 
-    // 🏖️ TRIP FETCH (IMPORTANT: INSIDE FUNCTION)
+    // Load trip
     const { data: tripData, error: tripError } = await supabase
       .from("trips")
-      .select("destination, start_date")
+      .select("destination,start_date,end_date")
       .eq("user_id", user.id)
       .maybeSingle();
 
-   if (!tripError) {
-  setTrip(tripData);
-  console.log("TRIP DATA:", tripData);
-}
+    if (tripError) {
+      console.error(tripError);
+    } else {
+      setTrip(tripData);
+      console.log("TRIP DATA:", tripData);
+    }
 
-setLoading(false);
+    setLoading(false);
+  }
 
-  // ⏳ COUNTDOWN TIMER
   useEffect(() => {
     if (!trip?.start_date) return;
 
-    const holidayStart = new Date(trip.start_date);
-
     const timer = setInterval(() => {
-      const now = new Date();
-      const diff = holidayStart.getTime() - now.getTime();
+      const now = new Date().getTime();
+      const holiday = new Date(trip.start_date).getTime();
+
+      const diff = holiday - now;
 
       if (diff <= 0) {
-        setTimeLeft("🎉 Trip started!");
+        setTimeLeft("🎉 Your holiday has started!");
         return;
       }
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const hours = Math.floor(
+        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor(
+        (diff % (1000 * 60 * 60)) / (1000 * 60)
+      );
 
-      setTimeLeft(`${days}d ${hours}h ${minutes}m`);
+      setTimeLeft(`${days} days ${hours} hours ${minutes} minutes`);
     }, 1000);
 
     return () => clearInterval(timer);
   }, [trip]);
 
-  async function removeFavourite(id) {
+  async function removeFavourite(id: string) {
     const { error } = await supabase
       .from("favourites")
       .delete()
@@ -117,7 +122,6 @@ setLoading(false);
     >
       <h1 style={{ color: "#14532d" }}>👤 My Account</h1>
 
-      {/* ACCOUNT INFO */}
       <div
         style={{
           background: "#f5f5f5",
@@ -137,7 +141,6 @@ setLoading(false);
         </p>
       </div>
 
-      {/* 🏖️ TRIP COUNTDOWN */}
       <div
         style={{
           background: "#f5f5f5",
@@ -155,6 +158,7 @@ setLoading(false);
             <p>
               <strong>Destination:</strong> {trip.destination}
             </p>
+
             <p>
               <strong>Countdown:</strong> {timeLeft}
             </p>
@@ -162,7 +166,6 @@ setLoading(false);
         )}
       </div>
 
-      {/* ❤️ FAVOURITES */}
       <div
         style={{
           background: "#f5f5f5",
@@ -178,7 +181,7 @@ setLoading(false);
         ) : favourites.length === 0 ? (
           <p>No favourite properties yet.</p>
         ) : (
-          favourites.map((fav) => {
+          favourites.map((fav: any) => {
             const property = fav.properties;
 
             return (
@@ -206,13 +209,16 @@ setLoading(false);
                   }}
                 />
 
-                <h3 style={{ marginTop: "15px" }}>
-                  {property?.title}
-                </h3>
+                <h3>{property?.title}</h3>
 
                 <p>📍 {property?.location}</p>
 
-                <p style={{ color: "#16a34a", fontWeight: "bold" }}>
+                <p
+                  style={{
+                    color: "#16a34a",
+                    fontWeight: "bold",
+                  }}
+                >
                   £{property?.price_per_night}/night
                 </p>
 
@@ -252,7 +258,6 @@ setLoading(false);
         )}
       </div>
 
-      {/* LOGOUT */}
       <div style={{ marginTop: "30px" }}>
         <button
           onClick={handleLogout}
