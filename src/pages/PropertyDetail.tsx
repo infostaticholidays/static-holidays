@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -11,8 +9,8 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const [saved, setSaved] = useState(false);
   const [savingFav, setSavingFav] = useState(false);
@@ -139,8 +137,11 @@ export default function PropertyDetail() {
       return;
     }
 
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
     const nights = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
     );
 
     if (nights <= 0) {
@@ -167,8 +168,8 @@ export default function PropertyDetail() {
         property_id: property.id,
         owner_id: property.owner_id,
         guest_id: user.id,
-        check_in: startDate.toISOString(),
-        check_out: endDate.toISOString(),
+        check_in: start.toISOString(),
+        check_out: end.toISOString(),
         total_price: totalPrice,
         booking_status: "pending",
       },
@@ -190,11 +191,12 @@ export default function PropertyDetail() {
   if (loading) return <h2 style={{ padding: 40 }}>Loading...</h2>;
   if (!property) return <h2 style={{ padding: 40 }}>Property not found</h2>;
 
+  const start = startDate ? new Date(startDate) : null;
+  const end = endDate ? new Date(endDate) : null;
+
   const nights =
-    startDate && endDate
-      ? Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-        )
+    start && end
+      ? Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
       : 0;
 
   const totalPrice = nights * property.price_per_night;
@@ -244,14 +246,10 @@ export default function PropertyDetail() {
           cursor: "pointer",
         }}
       >
-        {savingFav
-          ? "Loading..."
-          : saved
-          ? "❤️ Saved"
-          : "🤍 Add to Favourites"}
+        {savingFav ? "Loading..." : saved ? "❤️ Saved" : "🤍 Add to Favourites"}
       </button>
 
-      {/* DATE PICKER */}
+      {/* DATE PICKER (NO LIBRARY) */}
       <div
         style={{
           marginTop: 40,
@@ -262,24 +260,32 @@ export default function PropertyDetail() {
       >
         <h2>Select Dates</h2>
 
-        <DatePicker
-          selected={startDate}
-          onChange={(dates) => {
-            const [start, end] = dates;
-            setStartDate(start);
-            setEndDate(end);
-          }}
-          startDate={startDate}
-          endDate={endDate}
-          selectsRange
-          minDate={new Date()}
-          inline
-        />
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <div>
+            <p>Check-in</p>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+            />
+          </div>
+
+          <div>
+            <p>Check-out</p>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              min={startDate || new Date().toISOString().split("T")[0]}
+            />
+          </div>
+        </div>
 
         {startDate && endDate && (
           <div style={{ marginTop: 20 }}>
-            <p>Check-in: {startDate.toLocaleDateString("en-GB")}</p>
-            <p>Check-out: {endDate.toLocaleDateString("en-GB")}</p>
+            <p>Check-in: {new Date(startDate).toLocaleDateString("en-GB")}</p>
+            <p>Check-out: {new Date(endDate).toLocaleDateString("en-GB")}</p>
 
             <p>
               Nights: <b>{nights}</b>
