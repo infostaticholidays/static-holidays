@@ -1,6 +1,6 @@
 import { useState } from "react";
+export default function AddProperty() {}
 
-export default function AddProperty() {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
 
