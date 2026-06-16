@@ -97,6 +97,8 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
 
           <Route path="/add-property" element={<AddProperty />} />
+          <Route path="/guest-account" element={<GuestAccount />} />
+<Route path="/owner-account" element={<OwnerAccount />} />
 
           <Route
   path="/property-calendar/:propertyId"
