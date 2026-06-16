@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { Routes, Route, Link } from "react-router-dom";
 
 // Pages
 import Home from "./pages/Home";
@@ -31,30 +29,54 @@ import PropertyCalendar from "./pages/PropertyCalendar";
 
 export default function App() {
   return (
-    <div style={{ fontFamily: "Arial", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-
-      {/* HEADER */}
-      <header style={{
-        background: "#14532d",
-        color: "white",
-        padding: 20,
+    <div
+      style={{
+        fontFamily: "Arial",
+        minHeight: "100vh",
         display: "flex",
-        gap: 12,
-        flexWrap: "wrap"
-      }}>
-        <Link style={btn} to="/">Home</Link>
-        <Link style={btn} to="/properties">Properties</Link>
-        <Link style={btn} to="/adverts">Adverts</Link>
-        <Link style={btn} to="/shop">Shop</Link>
-        <Link style={btn} to="/holidayowners">Holiday Owners</Link>
-        <Link style={btn} to="/login">Login</Link>
-        <Link style={btn} to="/signup">Sign Up</Link>
+        flexDirection: "column",
+      }}
+    >
+      {/* HEADER */}
+      <header
+        style={{
+          background: "#14532d",
+          color: "white",
+          padding: 20,
+          display: "flex",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <Link style={btn} to="/">
+          Home
+        </Link>
+        <Link style={btn} to="/properties">
+          Properties
+        </Link>
+        <Link style={btn} to="/adverts">
+          Adverts
+        </Link>
+        <Link style={btn} to="/shop">
+          Shop
+        </Link>
+        <Link style={btn} to="/holidayowners">
+          Holiday Owners
+        </Link>
+        <Link style={btn} to="/login">
+          Login
+        </Link>
+        <Link style={btn} to="/signup">
+          Sign Up
+        </Link>
+        <Link style={btn} to="/account">
+          Account
+        </Link>
       </header>
 
       {/* ROUTES */}
       <main style={{ flex: 1, padding: 40 }}>
         <Routes>
-
           <Route path="/" element={<Home />} />
 
           {/* AUTH */}
@@ -80,25 +102,29 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-property" element={<AddProperty />} />
 
-          {/* ACCOUNT (ONLY LOGIN DESTINATION) */}
+          {/* ACCOUNT */}
           <Route path="/account" element={<Account />} />
 
           {/* PROPERTY CALENDAR */}
-          <Route path="/property-calendar/:propertyId" element={<PropertyCalendar />} />
+          <Route
+            path="/property-calendar/:propertyId"
+            element={<PropertyCalendar />}
+          />
 
           {/* 404 */}
           <Route path="*" element={<h1>404 Page not found</h1>} />
-
         </Routes>
       </main>
 
       {/* FOOTER */}
-      <footer style={{
-        background: "#14532d",
-        color: "white",
-        padding: 20,
-        textAlign: "center"
-      }}>
+      <footer
+        style={{
+          background: "#14532d",
+          color: "white",
+          padding: 20,
+          textAlign: "center",
+        }}
+      >
         Static Holidays © 2025
       </footer>
     </div>
@@ -112,5 +138,5 @@ const btn = {
   color: "white",
   padding: "8px 12px",
   borderRadius: "6px",
-  textDecoration: "none"
+  textDecoration: "none",
 };
