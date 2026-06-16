@@ -3,15 +3,16 @@ import { Link, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
+
 import Adverts from "./pages/Adverts";
 import Shop from "./pages/Shop";
+import ShopDetail from "./pages/ShopDetail";
+
 import HolidayOwners from "./pages/HolidayOwners";
 import HostLogin from "./pages/HostLogin";
-
-import GuestDashboard from "./pages/GuestDashboard";
-import HostDashboard from "./pages/HostDashboard";
 
 import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
@@ -21,41 +22,23 @@ import BookingDetail from "./pages/BookingDetail";
 
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
-import ShopDetail from "./pages/ShopDetail";
 import PropertyCalendar from "./pages/PropertyCalendar";
+
+// ✅ ACCOUNT PAGES (ONLY ONES YOU NEED)
+import GuestAccount from "./pages/GuestAccount";
+import OwnerAccount from "./pages/OwnerAccount";
 
 export default function App() {
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <header
-        style={{
-          background: "#14532d",
-          color: "white",
-          padding: "20px",
-          display: "flex",
-          gap: "12px",
-          flexWrap: "wrap",
-        }}
-      >
+    <div style={{ fontFamily: "Arial, sans-serif", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+
+      <header style={{ background: "#14532d", color: "white", padding: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
         <Link style={btn} to="/">Home</Link>
-
         <Link style={btn} to="/properties">Properties</Link>
-
         <Link style={btn} to="/adverts">Adverts</Link>
-
         <Link style={btn} to="/shop">Shop</Link>
-
         <Link style={btn} to="/holidayowners">Holiday Owners</Link>
-
         <Link style={btn} to="/login">Login</Link>
-
         <Link style={btn} to="/signup">Sign Up</Link>
       </header>
 
@@ -63,70 +46,40 @@ export default function App() {
         <Routes>
 
           <Route path="/" element={<Home />} />
-
           <Route path="/login" element={<Login />} />
-
           <Route path="/signup" element={<Signup />} />
 
-          <Route path="/guest-dashboard" element={<GuestDashboard />} />
-
-          <Route path="/host-dashboard" element={<HostDashboard />} />
-
           <Route path="/properties" element={<Properties />} />
-
           <Route path="/property/:id" element={<PropertyDetail />} />
 
           <Route path="/adverts" element={<Adverts />} />
-
           <Route path="/shop" element={<Shop />} />
-
           <Route path="/shop/:id" element={<ShopDetail />} />
 
           <Route path="/holidayowners" element={<HolidayOwners />} />
-
           <Route path="/host-login" element={<HostLogin />} />
 
           <Route path="/events" element={<Events />} />
-
           <Route path="/events/:id" element={<EventDetail />} />
 
           <Route path="/bookings" element={<Bookings />} />
-
           <Route path="/booking/:id" element={<BookingDetail />} />
 
           <Route path="/profile" element={<Profile />} />
-
           <Route path="/add-property" element={<AddProperty />} />
+
+          {/* ✅ FINAL ACCOUNT ROUTES */}
           <Route path="/guest-account" element={<GuestAccount />} />
-<Route path="/owner-account" element={<OwnerAccount />} />
+          <Route path="/owner-account" element={<OwnerAccount />} />
 
-          <Route
-  path="/property-calendar/:propertyId"
-  element={<PropertyCalendar />}
-/>
-        
+          <Route path="/property-calendar/:propertyId" element={<PropertyCalendar />} />
 
-          <Route
-            path="*"
-            element={
-              <div>
-                <h1>404</h1>
-                <p>Page not found.</p>
-              </div>
-            }
-          />
+          <Route path="*" element={<h1>404 Page not found</h1>} />
 
         </Routes>
       </main>
 
-      <footer
-        style={{
-          background: "#14532d",
-          color: "white",
-          padding: "30px",
-          textAlign: "center",
-        }}
-      >
+      <footer style={{ background: "#14532d", color: "white", padding: "30px", textAlign: "center" }}>
         Static Holidays © 2025
       </footer>
     </div>
