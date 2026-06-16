@@ -6,6 +6,8 @@ export default function Account() {
   const [user, setUser] = useState(null);
   const [favourites, setFavourites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [trip, setTrip] = useState(null);
+const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     loadUser();
