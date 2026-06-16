@@ -53,6 +53,8 @@ export default function Account() {
       .select("destination,start_date,end_date")
       .eq("user_id", user.id)
       .maybeSingle();
+    console.log("tripData:", tripData);
+console.log("tripError:", tripError);
 
     if (tripError) {
       console.error(tripError);
