@@ -99,8 +99,9 @@ export default function App() {
           <Route path="/add-property" element={<AddProperty />} />
 
           <Route
-            path="/property-calendar"
-            element={<PropertyCalendar />}
+  path="/property-calendar/:propertyId"
+  element={<PropertyCalendar />}
+/>
           />
 
           <Route
