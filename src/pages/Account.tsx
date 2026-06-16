@@ -26,7 +26,7 @@ export default function Account() {
       return;
     }
 
-    // Load favourites
+    // ❤️ FAVOURITES
     const { data, error } = await supabase
       .from("favourites")
       .select(`
@@ -41,63 +41,38 @@ export default function Account() {
       `)
       .eq("user_id", user.id);
 
-    if (error) {
-      console.error(error);
-    } else {
-      setFavourites(data || []);
-    }
+    if (error) console.error(error);
+    else setFavourites(data || []);
 
-    // Load trip
+    // 🏖️ TRIP
     const { data: tripData, error: tripError } = await supabase
       .from("trips")
-      .select("destination,start_date,end_date")
+      .select("destination, start_date, end_date")
       .eq("user_id", user.id)
       .maybeSingle();
-    console.log("tripData:", tripData);
-console.log("tripError:", tripError);
 
-    if (tripError) {
-      console.error(tripError);
-    } else {
-      setTrip(tripData);
-      console.log("TRIP DATA:", tripData);
+    console.log("tripData:", tripData);
+    console.log("tripError:", tripError);
+
+    if (!tripError) {
+      setTrip(tripData || null);
     }
 
     setLoading(false);
   }
 
- useEffect(() => {
-  if (!trip?.start_date) {
-    setTimeLeft("");
-    return;
-  }
-
-  const holiday = new Date(trip.start_date).getTime();
-
-  const timer = setInterval(() => {
-    const now = Date.now();
-    const diff = holiday - now;
-
-    if (diff <= 0) {
-      setTimeLeft("🎉 Your holiday has started!");
+  // ⏳ COUNTDOWN (FIXED - SINGLE useEffect ONLY)
+  useEffect(() => {
+    if (!trip?.start_date) {
+      setTimeLeft("");
       return;
     }
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-
-    setTimeLeft(`${days}d ${hours}h ${minutes}m`);
-  }, 1000);
-
-  return () => clearInterval(timer);
-}, [trip]);
+    const holidayStart = new Date(trip.start_date).getTime();
 
     const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const holiday = new Date(trip.start_date).getTime();
-
-      const diff = holiday - now;
+      const now = Date.now();
+      const diff = holidayStart - now;
 
       if (diff <= 0) {
         setTimeLeft("🎉 Your holiday has started!");
@@ -105,14 +80,10 @@ console.log("tripError:", tripError);
       }
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor(
-        (diff % (1000 * 60 * 60)) / (1000 * 60)
-      );
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
 
-      setTimeLeft(`${days} days ${hours} hours ${minutes} minutes`);
+      setTimeLeft(`${days}d ${hours}h ${minutes}m`);
     }, 1000);
 
     return () => clearInterval(timer);
@@ -146,62 +117,31 @@ console.log("tripError:", tripError);
         fontFamily: "Arial, sans-serif",
       }}
     >
-    <h1 style={{ color: "#14532d" }}>
-  👤 My Account TEST 123
-</h1>
+      <h1 style={{ color: "#14532d" }}>👤 My Account</h1>
 
-      <div
-        style={{
-          background: "#f5f5f5",
-          padding: "20px",
-          borderRadius: "10px",
-          marginTop: "20px",
-        }}
-      >
+      {/* ACCOUNT */}
+      <div style={{ background: "#f5f5f5", padding: 20, borderRadius: 10 }}>
         <h2>Account Information</h2>
-
-        <p>
-          <strong>Email:</strong> {user?.email || "Not logged in"}
-        </p>
-
-        <p>
-          <strong>User ID:</strong> {user?.id || "N/A"}
-        </p>
+        <p><strong>Email:</strong> {user?.email || "Not logged in"}</p>
+        <p><strong>User ID:</strong> {user?.id || "N/A"}</p>
       </div>
 
-      <div
-        style={{
-          background: "#f5f5f5",
-          padding: "20px",
-          borderRadius: "10px",
-          marginTop: "20px",
-        }}
-      >
+      {/* TRIP */}
+      <div style={{ background: "#f5f5f5", padding: 20, borderRadius: 10, marginTop: 20 }}>
         <h2>🏖️ My Next Trip</h2>
 
         {!trip ? (
           <p>No trip booked yet.</p>
         ) : (
           <>
-            <p>
-              <strong>Destination:</strong> {trip.destination}
-            </p>
-
-            <p>
-              <strong>Countdown:</strong> {timeLeft}
-            </p>
+            <p><strong>Destination:</strong> {trip.destination}</p>
+            <p><strong>Countdown:</strong> {timeLeft}</p>
           </>
         )}
       </div>
 
-      <div
-        style={{
-          background: "#f5f5f5",
-          padding: "20px",
-          borderRadius: "10px",
-          marginTop: "20px",
-        }}
-      >
+      {/* FAVOURITES */}
+      <div style={{ background: "#f5f5f5", padding: 20, borderRadius: 10, marginTop: 20 }}>
         <h2>❤️ My Favourite Properties</h2>
 
         {loading ? (
@@ -209,7 +149,7 @@ console.log("tripError:", tripError);
         ) : favourites.length === 0 ? (
           <p>No favourite properties yet.</p>
         ) : (
-          favourites.map((fav: any) => {
+          favourites.map((fav) => {
             const property = fav.properties;
 
             return (
@@ -217,10 +157,9 @@ console.log("tripError:", tripError);
                 key={fav.id}
                 style={{
                   background: "white",
-                  borderRadius: "10px",
-                  padding: "15px",
-                  marginTop: "20px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  padding: 15,
+                  marginTop: 15,
+                  borderRadius: 10,
                 }}
               >
                 <img
@@ -228,56 +167,18 @@ console.log("tripError:", tripError);
                     property?.images ||
                     "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
                   }
-                  alt={property?.title}
-                  style={{
-                    width: "100%",
-                    height: "220px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  }}
+                  style={{ width: "100%", height: 200, objectFit: "cover", borderRadius: 8 }}
                 />
 
                 <h3>{property?.title}</h3>
-
                 <p>📍 {property?.location}</p>
-
-                <p
-                  style={{
-                    color: "#16a34a",
-                    fontWeight: "bold",
-                  }}
-                >
-                  £{property?.price_per_night}/night
-                </p>
+                <p>£{property?.price_per_night}/night</p>
 
                 <Link to={`/property/${property?.id}`}>
-                  <button
-                    style={{
-                      background: "#14532d",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 16px",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      marginRight: "10px",
-                    }}
-                  >
-                    View Property
-                  </button>
+                  <button style={{ marginRight: 10 }}>View Property</button>
                 </Link>
 
-                <button
-                  onClick={() => removeFavourite(fav.id)}
-                  style={{
-                    background: "#dc2626",
-                    color: "white",
-                    border: "none",
-                    padding: "10px 16px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    marginTop: "10px",
-                  }}
-                >
+                <button onClick={() => removeFavourite(fav.id)}>
                   Remove Favourite
                 </button>
               </div>
@@ -286,20 +187,9 @@ console.log("tripError:", tripError);
         )}
       </div>
 
-      <div style={{ marginTop: "30px" }}>
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "#dc2626",
-            color: "white",
-            border: "none",
-            padding: "12px 20px",
-            borderRadius: "8px",
-            cursor: "pointer",
-          }}
-        >
-          Logout
-        </button>
+      {/* LOGOUT */}
+      <div style={{ marginTop: 30 }}>
+        <button onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );
