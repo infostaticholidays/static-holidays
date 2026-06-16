@@ -8,31 +8,27 @@ async function submit() {
     return;
   }
 
-  const { error } = await supabase
-    .from("properties")
-    .insert([
-      {
-        owner_id: user.id,
+  const { error } = await supabase.from("properties").insert([
+    {
+      owner_id: user.id,
 
-        title: name,
-        location: location,
+      title: name,
+      location: location,
 
-        pet_friendly: petFriendly,
-        has_pool: pool !== "none",
-        has_hot_tub: hotTub,
+      pet_friendly: petFriendly,
+      has_pool: pool !== "none",
+      has_hot_tub: hotTub,
 
-        wifi: wifi,
-        parking: parking,
-        sea_view: seaView,
-        wheelchair_friendly: wheelchairFriendly,
-      },
-    ]);
+      wifi: wifi,
+      parking: parking,
+      sea_view: seaView,
+      wheelchair_friendly: wheelchairFriendly,
+    },
+  ]);
 
   if (error) {
     console.error("SUPABASE ERROR:", error);
-
     alert(`Error: ${error.message}`);
-
     return;
   }
 
