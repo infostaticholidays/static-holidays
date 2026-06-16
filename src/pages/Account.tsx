@@ -6,8 +6,10 @@ export default function Account() {
   const [user, setUser] = useState(null);
   const [favourites, setFavourites] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // 🆕 TRIP STATES
   const [trip, setTrip] = useState(null);
-const [timeLeft, setTimeLeft] = useState("");
+  const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     loadUser();
@@ -25,6 +27,7 @@ const [timeLeft, setTimeLeft] = useState("");
       return;
     }
 
+    // ❤️ FAVOURITES
     const { data, error } = await supabase
       .from("favourites")
       .select(`
@@ -43,18 +46,46 @@ const [timeLeft, setTimeLeft] = useState("");
       console.error(error);
     } else {
       setFavourites(data || []);
-    const { data: tripData, error: tripError } = await supabase
-  .from("trips")
-  .select("destination, start_date")
-  .eq("user_id", user.id)
-  .maybeSingle();
+    }
 
-if (!tripError) {
-  setTrip(tripData);
-}
+    // 🏖️ TRIP FETCH (IMPORTANT: INSIDE FUNCTION)
+    const { data: tripData, error: tripError } = await supabase
+      .from("trips")
+      .select("destination, start_date")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!tripError) {
+      setTrip(tripData);
+    }
 
     setLoading(false);
   }
+
+  // ⏳ COUNTDOWN TIMER
+  useEffect(() => {
+    if (!trip?.start_date) return;
+
+    const holidayStart = new Date(trip.start_date);
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      const diff = holidayStart.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeLeft("🎉 Trip started!");
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+      setTimeLeft(`${days}d ${hours}h ${minutes}m`);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [trip]);
 
   async function removeFavourite(id) {
     const { error } = await supabase
@@ -69,7 +100,6 @@ if (!tripError) {
 
     setFavourites((prev) => prev.filter((fav) => fav.id !== id));
   }
-
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -87,6 +117,7 @@ if (!tripError) {
     >
       <h1 style={{ color: "#14532d" }}>👤 My Account</h1>
 
+      {/* ACCOUNT INFO */}
       <div
         style={{
           background: "#f5f5f5",
@@ -106,6 +137,32 @@ if (!tripError) {
         </p>
       </div>
 
+      {/* 🏖️ TRIP COUNTDOWN */}
+      <div
+        style={{
+          background: "#f5f5f5",
+          padding: "20px",
+          borderRadius: "10px",
+          marginTop: "20px",
+        }}
+      >
+        <h2>🏖️ My Next Trip</h2>
+
+        {!trip ? (
+          <p>No trip booked yet.</p>
+        ) : (
+          <>
+            <p>
+              <strong>Destination:</strong> {trip.destination}
+            </p>
+            <p>
+              <strong>Countdown:</strong> {timeLeft}
+            </p>
+          </>
+        )}
+      </div>
+
+      {/* ❤️ FAVOURITES */}
       <div
         style={{
           background: "#f5f5f5",
@@ -195,6 +252,7 @@ if (!tripError) {
         )}
       </div>
 
+      {/* LOGOUT */}
       <div style={{ marginTop: "30px" }}>
         <button
           onClick={handleLogout}
