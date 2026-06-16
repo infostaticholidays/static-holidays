@@ -44,3 +44,6 @@ async function submit() {
   setSeaView(false);
   setWheelchairFriendly(false);
 }
+export default function AddProperty() {
+  return <div>Add Property Page</div>;
+}
