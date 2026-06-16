@@ -43,7 +43,15 @@ const [timeLeft, setTimeLeft] = useState("");
       console.error(error);
     } else {
       setFavourites(data || []);
-    }
+    const { data: tripData, error: tripError } = await supabase
+  .from("trips")
+  .select("destination, start_date")
+  .eq("user_id", user.id)
+  .maybeSingle();
+
+if (!tripError) {
+  setTrip(tripData);
+}
 
     setLoading(false);
   }
@@ -61,15 +69,7 @@ const [timeLeft, setTimeLeft] = useState("");
 
     setFavourites((prev) => prev.filter((fav) => fav.id !== id));
   }
-  const { data: tripData, error: tripError } = await supabase
-  .from("trips")
-  .select("destination, start_date")
-  .eq("user_id", user.id)
-  .maybeSingle();
 
-if (!tripError) {
-  setTrip(tripData);
-}
 
   async function handleLogout() {
     await supabase.auth.signOut();
