@@ -24,9 +24,7 @@ import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
 import PropertyCalendar from "./pages/PropertyCalendar";
 
-// ✅ ACCOUNT PAGES (ONLY ONES YOU NEED)
-import GuestAccount from "./pages/GuestAccount";
-import OwnerAccount from "./pages/OwnerAccount";
+
 
 export default function App() {
   return (
