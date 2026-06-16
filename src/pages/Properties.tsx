@@ -3,13 +3,38 @@ import { useState } from "react";
 export default function Properties() {
   const [favorites, setFavorites] = useState<number[]>([]);
 
-  function toggleFavorite(id: number) {
-    if (favorites.includes(id)) {
-      setFavorites(favorites.filter(x => x !== id));
-    } else {
-      setFavorites([...favorites, id]);
-    }
+ async function toggleFavorite(propertyId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    alert("Please login first");
+    navigate("/login");
+    return;
   }
+
+  const stringId = String(propertyId);
+
+  if (favorites.includes(stringId)) {
+    await supabase
+      .from("favourites")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("property_id", propertyId);
+
+    setFavorites(favorites.filter((x) => x !== stringId));
+  } else {
+    await supabase.from("favourites").insert([
+      {
+        user_id: user.id,
+        property_id: propertyId,
+      },
+    ]);
+
+    setFavorites([...favorites, stringId]);
+  }
+}
 
   const properties = [
     {
