@@ -66,8 +66,32 @@ console.log("tripError:", tripError);
     setLoading(false);
   }
 
-  useEffect(() => {
-    if (!trip?.start_date) return;
+ useEffect(() => {
+  if (!trip?.start_date) {
+    setTimeLeft("");
+    return;
+  }
+
+  const holiday = new Date(trip.start_date).getTime();
+
+  const timer = setInterval(() => {
+    const now = Date.now();
+    const diff = holiday - now;
+
+    if (diff <= 0) {
+      setTimeLeft("🎉 Your holiday has started!");
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+    setTimeLeft(`${days}d ${hours}h ${minutes}m`);
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [trip]);
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
