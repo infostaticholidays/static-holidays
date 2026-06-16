@@ -55,13 +55,12 @@ export default function Account() {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (!tripError) {
-      setTrip(tripData);
-    console.log("TRIP DATA:", tripData);
-    
+   if (!tripError) {
+  setTrip(tripData);
+  console.log("TRIP DATA:", tripData);
+}
 
-    setLoading(false);
-  }
+setLoading(false);
 
   // ⏳ COUNTDOWN TIMER
   useEffect(() => {
