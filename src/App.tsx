@@ -102,7 +102,7 @@ export default function App() {
   path="/property-calendar/:propertyId"
   element={<PropertyCalendar />}
 />
-          />
+        
 
           <Route
             path="*"
