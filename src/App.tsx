@@ -21,8 +21,8 @@ import BookingDetail from "./pages/BookingDetail";
 
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
-import PropertyCalendar from "./pages/PropertyCalendar";
-import ShopDetail from "./pages/ShopDetail";
+import PropertyCalendar from "./pages/PropertyCalendar.tsx";
+import ShopDetail from "./pages/ShopDetail.tsx";
 
 export default function App() {
   return (
