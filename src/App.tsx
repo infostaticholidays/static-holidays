@@ -26,6 +26,8 @@ import AddProperty from "./pages/AddProperty";
 import Account from "./pages/Account";
 
 import PropertyCalendar from "./pages/PropertyCalendar";
+import Blog from "./pages/Blog";
+import BlogDetail from "./pages/BlogDetail";
 
 export default function App() {
   return (
@@ -53,6 +55,9 @@ export default function App() {
         </Link>
         <Link style={btn} to="/properties">
           Properties
+          <Link style={btn} to="/blog">
+  Blog
+</Link>
         </Link>
         <Link style={btn} to="/adverts">
           Adverts
@@ -101,6 +106,9 @@ export default function App() {
 
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-property" element={<AddProperty />} />
+          <Route path="/blog" element={<Blog />} />
+
+          <Route path="/blog/:id" element={<BlogDetail />} />
 
           {/* ACCOUNT */}
           <Route path="/account" element={<Account />} />
