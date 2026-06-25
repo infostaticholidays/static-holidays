@@ -40,48 +40,52 @@ export default function App() {
         flexDirection: "column",
       }}
     >
-      {/* HEADER */}
-      <header
-        style={{
-          background: "#14532d",
-          color: "white",
-          padding: 20,
-          display: "flex",
-          gap: 12,
-          flexWrap: "wrap",
-        }}
-      >
-        <Link style={btn} to="/">
-          Home
-        </Link>
-        <Link style={btn} to="/properties">
-          Properties
-          
-          <Link style={btn} to="/blog">
-  Blog
-</Link>
-          
+     <header
+  style={{
+    background: "#14532d",
+    color: "white",
+    padding: 20,
+    display: "flex",
+    gap: 12,
+    flexWrap: "wrap",
+  }}
+>
+  <Link style={btn} to="/">
+    Home
+  </Link>
 
-        </Link>
-        <Link style={btn} to="/adverts">
-          Adverts
-        </Link>
-        <Link style={btn} to="/shop">
-          Shop
-        </Link>
-        <Link style={btn} to="/holidayowners">
-          Holiday Owners
-        </Link>
-        <Link style={btn} to="/login">
-          Login
-        </Link>
-        <Link style={btn} to="/signup">
-          Sign Up
-        </Link>
-        <Link style={btn} to="/account">
-          Account
-        </Link>
-      </header>
+  <Link style={btn} to="/properties">
+    Properties
+  </Link>
+
+  <Link style={btn} to="/blog">
+    Blog
+  </Link>
+
+  <Link style={btn} to="/adverts">
+    Adverts
+  </Link>
+
+  <Link style={btn} to="/shop">
+    Shop
+  </Link>
+
+  <Link style={btn} to="/holidayowners">
+    Holiday Owners
+  </Link>
+
+  <Link style={btn} to="/login">
+    Login
+  </Link>
+
+  <Link style={btn} to="/signup">
+    Sign Up
+  </Link>
+
+  <Link style={btn} to="/account">
+    Account
+  </Link>
+</header>
 
       {/* ROUTES */}
       <main style={{ flex: 1, padding: 40 }}>
