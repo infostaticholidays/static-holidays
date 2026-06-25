@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 
+<Link to="/blog/cornwall-dog-friendly">
+  Read: Dog Friendly Cornwall Guide
+</Link>
 const posts = [
   {
     id: 1,
