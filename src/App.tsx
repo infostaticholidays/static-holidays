@@ -56,7 +56,7 @@ export default function App() {
         </Link>
         <Link style={btn} to="/properties">
           Properties
-           </Link>
+          
           <Link style={btn} to="/blog">
   Blog
 </Link>
