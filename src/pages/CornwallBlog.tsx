@@ -259,8 +259,7 @@ export default function CornwallBlog() {
         holidays. From Perranporth Beach and Watergate Bay to coastal pubs,
         restaurants and attractions, there is something for every dog owner
         to enjoy.
-      </p>
+     </p>
     </div>
   );
 }
-```
