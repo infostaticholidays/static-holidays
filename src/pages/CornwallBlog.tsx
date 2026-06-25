@@ -1,6 +1,4 @@
-src/pages/CornwallBlog.tsx
-
-```tsx
+import { Link } from "react-router-dom";
 export default function CornwallBlog() {
   return (
     <div
