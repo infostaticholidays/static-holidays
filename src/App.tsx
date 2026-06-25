@@ -111,6 +111,7 @@ export default function App() {
 
           <Route path="/bookings" element={<Bookings />} />
           <Route path="/booking/:id" element={<BookingDetail />} />
+          <Route path="/guest-account" element={<GuestAccount />} />
 
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-property" element={<AddProperty />} />
