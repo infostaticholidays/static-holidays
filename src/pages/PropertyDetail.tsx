@@ -3,9 +3,6 @@ import { useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import ReviewsList from "../components/ReviewsList";
 
-
-<ReviewsList propertyId={property.id} />
-
 export default function PropertyDetail() {
   const { id } = useParams();
   const propertyId = id ?? "";
