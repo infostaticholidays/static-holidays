@@ -119,8 +119,6 @@ export default function App() {
           <Route path="/add-property" element={<AddProperty />} />
           <Route path="/blog" element={<Blog />} />
 
-          <Route path="/blog/:id" element={<BlogDetail />} />
-          
 <Route
   path="/blog/cornwall-dog-friendly"
   element={<CornwallBlog />}
