@@ -39,13 +39,44 @@ export default function Login() {
     }
 
     // ✅ FINAL ROUTING (NO DASHBOARDS)
-    if (profile?.role === "host") {
-  navigate("/host-dashboard");
-} else {
-  navigate("/account");
-}
+   async function signIn() {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password: password.trim(),
+  });
 
-  return (
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  const user = data.user;
+
+  if (!user) {
+    alert("User not found.");
+    return;
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    console.error(profileError);
+    alert(profileError.message);
+    return;
+  }
+
+  if (profile?.role === "host") {
+    navigate("/host-dashboard");
+  } else {
+    navigate("/account");
+  }
+} // <-- THIS BRACE IS MISSING
+
+return (
     <div style={{ padding: 40 }}>
       <h1>Login</h1>
 
