@@ -4,30 +4,32 @@ const posts = [
   {
     slug: "dog-friendly-cornwall-guide",
     title: "Dog Friendly Cornwall Guide",
-    excerpt: "Best beaches, pubs and cottages for dogs in Cornwall",
+    excerpt: "Beaches, pubs, walks and cottages that allow dogs",
     image:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
   },
+
   {
-    slug: "best-dog-friendly-beaches-cornwall",
-    title: "Best Dog Friendly Beaches in Cornwall",
-    excerpt: "Explore Cornwall’s most beautiful dog-friendly beaches",
+    slug: "best-walks-in-wales",
+    title: "Best Walks in Wales (Mountains & Waterfalls)",
+    excerpt: "Snowdonia, Brecon Beacons, waterfalls & hidden gems",
     image:
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
   },
+
   {
-    slug: "top-dog-friendly-cottages-cornwall",
-    title: "Top Dog Friendly Cottages in Cornwall",
-    excerpt: "Handpicked cottages perfect for dogs and families",
+    slug: "best-family-holidays-uk",
+    title: "Best Family Holidays in the UK",
+    excerpt: "Theme parks, zoos, attractions & family cottages",
     image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
   },
 ];
 
 export default function Blog() {
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: 40 }}>
-      <h1 style={{ color: "#14532d" }}>Dog Friendly Cornwall Guides</h1>
+      <h1 style={{ color: "#14532d" }}>Travel Blog</h1>
 
       <div
         style={{
@@ -53,17 +55,11 @@ export default function Blog() {
             >
               <img
                 src={post.image}
-                alt={post.title}
-                style={{
-                  width: "100%",
-                  height: 200,
-                  objectFit: "cover",
-                }}
+                style={{ width: "100%", height: 200, objectFit: "cover" }}
               />
-
               <div style={{ padding: 15 }}>
-                <h2 style={{ marginBottom: 10 }}>{post.title}</h2>
-                <p style={{ color: "#555" }}>{post.excerpt}</p>
+                <h2>{post.title}</h2>
+                <p>{post.excerpt}</p>
               </div>
             </div>
           </Link>
