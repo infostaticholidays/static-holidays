@@ -38,45 +38,14 @@ export default function Login() {
       return;
     }
 
-    // ✅ FINAL ROUTING (NO DASHBOARDS)
-   async function signIn() {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.trim(),
-    password: password.trim(),
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
+    if (profile?.role === "host") {
+      navigate("/host-dashboard");
+    } else {
+      navigate("/account");
+    }
   }
 
-  const user = data.user;
-
-  if (!user) {
-    alert("User not found.");
-    return;
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    console.error(profileError);
-    alert(profileError.message);
-    return;
-  }
-
-  if (profile?.role === "host") {
-    navigate("/host-dashboard");
-  } else {
-    navigate("/account");
-  }
-} // <-- THIS BRACE IS MISSING
-
-return (
+  return (
     <div style={{ padding: 40 }}>
       <h1>Login</h1>
 
@@ -87,7 +56,8 @@ return (
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
         type="password"
@@ -96,13 +66,17 @@ return (
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <button onClick={signIn}>Login</button>
 
-      <br /><br />
+      <br />
+      <br />
 
-      <button onClick={() => navigate("/signup")}>Sign Up</button>
+      <button onClick={() => navigate("/signup")}>
+        Sign Up
+      </button>
     </div>
   );
 }
