@@ -3,58 +3,82 @@ import { useParams } from "react-router-dom";
 const posts: Record<string, { title: string; content: string }> = {
   "dog-friendly-cornwall-guide": {
     title: "Dog Friendly Cornwall Guide",
-    content:
-      "Cornwall is perfect for dog owners. Beaches, pubs and cottages everywhere.",
+    content: `
+Cornwall is one of the best places in the UK for dog-friendly holidays.
+
+🏖 Beaches:
+- Perranporth Beach
+- Watergate Bay
+- Crantock Beach
+
+🍺 Pubs:
+- The Watering Hole
+- The Merrymoor Inn
+
+🏡 Cottages:
+Cornwall has thousands of dog-friendly cottages with enclosed gardens.
+
+🐕 Why Cornwall is perfect:
+- Coastal walks
+- Dog-friendly attractions
+- Open beaches all year round
+
+It is one of the best destinations for dog owners in the UK.
+    `,
   },
 
   "best-dog-friendly-beaches-cornwall": {
     title: "Best Dog Friendly Beaches in Cornwall",
     content:
-      "Perranporth, Watergate Bay and Fistral Beach are top dog beaches.",
+      "Perranporth, Watergate Bay and Fistral Beach are the top dog-friendly beaches in Cornwall.",
   },
 
   "top-dog-friendly-cottages-cornwall": {
     title: "Top Dog Friendly Cottages in Cornwall",
     content:
-      "Cornwall has many cottages with gardens and sea views.",
-  },
-
-  "save-money-cornwall-holiday": {
-    title: "How To Save Money on Cornwall Holidays",
-    content:
-      "Book early and travel off-season to save money.",
+      "Cornwall offers many cottages with enclosed gardens, sea views and walking access.",
   },
 };
 
 export default function BlogDetail() {
-  const params = useParams();
-  const slug = params.slug;
+  const { slug } = useParams();
 
-  // 🔴 DEBUG (IMPORTANT)
-  console.log("URL SLUG =", slug);
+  console.log("SLUG:", slug);
 
   const post = slug ? posts[slug] : undefined;
-
-  if (!slug) {
-    return <h1 style={{ padding: 40 }}>No slug in URL</h1>;
-  }
 
   if (!post) {
     return (
       <div style={{ padding: 40 }}>
         <h1>Blog not found</h1>
-        <p>Slug was: {slug}</p>
+        <p>Slug received: {slug}</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: 40 }}>
-      <h1 style={{ color: "#14532d" }}>{post.title}</h1>
+    <div
+      style={{
+        maxWidth: 800,
+        margin: "0 auto",
+        padding: 40,
+        fontFamily: "Arial",
+      }}
+    >
+      <h1 style={{ color: "#14532d", marginBottom: 20 }}>
+        {post.title}
+      </h1>
 
-      <p style={{ fontSize: 18, lineHeight: 1.8 }}>
+      <div
+        style={{
+          fontSize: 18,
+          lineHeight: 1.8,
+          whiteSpace: "pre-wrap",
+          color: "#333",
+        }}
+      >
         {post.content}
-      </p>
+      </div>
     </div>
   );
 }
