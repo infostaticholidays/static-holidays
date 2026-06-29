@@ -5,6 +5,12 @@ export default function BookingDetail() {
   return (
     <div style={{ padding: "40px" }}>
       <h1>Booking #{id}</h1>
+      <GuestReviewForm
+  bookingId={booking.id}
+  propertyId={booking.property_id}
+  reviewerId={user.id}
+  reviewedUserId={booking.owner_id}
+/>
 
       <p>This is a demo booking detail page.</p>
 
