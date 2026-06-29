@@ -23,6 +23,8 @@ import BookingDetail from "./pages/BookingDetail";
 
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
+import Businesses from "./pages/Businesses";
+import Services from "./pages/Services";
 
 
 import Account from "./pages/Account";
@@ -112,7 +114,9 @@ export default function App() {
           <Route path="/events/:id" element={<EventDetail />} />
 
           <Route path="/bookings" element={<Bookings />} />
-          <Route path="/booking/:id" element={<BookingDetail />} />
+          <Route path="/booking/:id" element={<BookingDetail />} 
+            <Route path="/businesses" element={<Businesses />} />
+<Route path="/services" element={<Services />} />
          
 
           <Route path="/profile" element={<Profile />} />
