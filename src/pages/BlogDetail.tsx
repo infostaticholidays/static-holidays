@@ -1,84 +1,150 @@
 import { useParams } from "react-router-dom";
 
-const posts: Record<string, { title: string; content: string }> = {
+const posts: Record<string, any> = {
+  // 🐶 CORNWALL
   "dog-friendly-cornwall-guide": {
     title: "Dog Friendly Cornwall Guide",
     content: `
-Cornwall is one of the best places in the UK for dog-friendly holidays.
+🐶 DOG FRIENDLY CORNWALL
 
-🏖 Beaches:
-- Perranporth Beach
-- Watergate Bay
-- Crantock Beach
+Cornwall is one of the UK’s best destinations for dog owners.
 
-🍺 Pubs:
-- The Watering Hole
+🏖 BEACHES THAT ALLOW DOGS
+- Perranporth Beach (huge, off-lead)
+- Watergate Bay (surf + dog friendly cafes)
+- Crantock Beach (scenic walks)
+- Holywell Bay (quiet & open)
+
+🍺 DOG FRIENDLY PUBS
+- The Watering Hole (on the beach)
 - The Merrymoor Inn
+- The Blue Anchor, Helston
 
-🏡 Cottages:
-Cornwall has thousands of dog-friendly cottages with enclosed gardens.
+🏡 COTTAGES NEAR DOG AREAS
+- Coastal cottages near Newquay
+- St Ives countryside cottages
+- Padstow dog-friendly stays
 
-🐕 Why Cornwall is perfect:
-- Coastal walks
-- Dog-friendly attractions
-- Open beaches all year round
+👉 BOOK LINKS (example structure)
+- https://www.sykescottages.co.uk
+- https://www.hoseasons.co.uk
 
-It is one of the best destinations for dog owners in the UK.
+🐕 LOCAL WALKS
+- South West Coast Path
+- Bedruthan Steps cliffs
+- Padstow to Rock ferry walk
+
+✔ Cornwall is perfect for dogs all year round.
     `,
   },
 
-  "best-dog-friendly-beaches-cornwall": {
-    title: "Best Dog Friendly Beaches in Cornwall",
-    content:
-      "Perranporth, Watergate Bay and Fistral Beach are the top dog-friendly beaches in Cornwall.",
+  // 🏔 WALES
+  "best-walks-in-wales": {
+    title: "Best Walks in Wales (Mountains & Waterfalls)",
+    content: `
+🏔 BEST WALKS IN WALES
+
+Wales is famous for dramatic landscapes, mountains, lakes and waterfalls.
+
+⛰ SNOWDONIA (ERYRI NATIONAL PARK)
+- Snowdon Summit Walk
+- Llyn Idwal circular walk
+- Tryfan for experienced hikers
+
+💦 BEST WATERFALL WALKS
+- Four Waterfalls Walk (Brecon Beacons)
+- Henrhyd Falls (Batman cave location)
+- Swallow Falls (Betws-y-Coed)
+
+🏘 LOCAL SMALL BUSINESSES TO VISIT
+- Betws-y-Coed cafés & bakeries
+- Llanberis mountain shops
+- Local Welsh craft shops in Beddgelert
+
+🍽 PUBS & FOOD STOPS
+- The Heights, Snowdon
+- Ye Olde Bull’s Head Inn
+- Riverside cafés in Conwy
+
+🏡 NEARBY COTTAGES
+- Snowdonia log cabins
+- Brecon Beacons farm stays
+- Riverside cottages in Betws-y-Coed
+
+🌄 PERFECT FOR:
+- Hiking
+- Photography
+- Waterfall walks
+- Nature lovers
+    `,
   },
 
-  "top-dog-friendly-cottages-cornwall": {
-    title: "Top Dog Friendly Cottages in Cornwall",
-    content:
-      "Cornwall offers many cottages with enclosed gardens, sea views and walking access.",
+  // 👨‍👩‍👧 FAMILY HOLIDAYS
+  "best-family-holidays-uk": {
+    title: "Best Family Holidays in the UK",
+    content: `
+👨‍👩‍👧 BEST FAMILY HOLIDAYS IN THE UK
+
+Perfect places for kids, attractions and family fun.
+
+🎢 THEME PARKS
+- Legoland Windsor
+- Alton Towers
+- Thorpe Park
+
+🐘 ZOOS & ANIMAL PARKS
+- Chester Zoo
+- Edinburgh Zoo
+- Paignton Zoo
+
+🎠 FAMILY ATTRACTIONS
+- Warwick Castle
+- Blackpool Pleasure Beach
+- Eden Project (Cornwall)
+
+🏡 FAMILY COTTAGES NEARBY
+- Windsor cottages near Legoland
+- Cheshire cottages near Chester Zoo
+- Cornwall family beach cottages
+
+🍦 FUN FOR KIDS
+- Ice cream farms
+- Adventure parks
+- Soft play centres
+- Coastal beaches
+
+✔ Best for school holidays & weekend trips
+    `,
   },
 };
 
 export default function BlogDetail() {
   const { slug } = useParams();
 
-  console.log("SLUG:", slug);
-
-  const post = slug ? posts[slug] : undefined;
+  const post = slug ? posts[slug] : null;
 
   if (!post) {
     return (
       <div style={{ padding: 40 }}>
         <h1>Blog not found</h1>
-        <p>Slug received: {slug}</p>
+        <p>Slug: {slug}</p>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: 800,
-        margin: "0 auto",
-        padding: 40,
-        fontFamily: "Arial",
-      }}
-    >
-      <h1 style={{ color: "#14532d", marginBottom: 20 }}>
-        {post.title}
-      </h1>
+    <div style={{ maxWidth: 850, margin: "0 auto", padding: 40 }}>
+      <h1 style={{ color: "#14532d" }}>{post.title}</h1>
 
-      <div
+      <pre
         style={{
-          fontSize: 18,
-          lineHeight: 1.8,
           whiteSpace: "pre-wrap",
-          color: "#333",
+          fontSize: 17,
+          lineHeight: 1.8,
         }}
       >
         {post.content}
-      </div>
+      </pre>
     </div>
   );
 }
