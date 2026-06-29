@@ -112,14 +112,13 @@ export default function App() {
 
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetail />} />
+<Route path="/bookings" element={<Bookings />} />
+<Route path="/booking/:id" element={<BookingDetail />} />
 
-          <Route path="/bookings" element={<Bookings />} />
-          <Route path="/booking/:id" element={<BookingDetail />} 
-            <Route path="/businesses" element={<Businesses />} />
+<Route path="/businesses" element={<Businesses />} />
 <Route path="/services" element={<Services />} />
-         
 
-          <Route path="/profile" element={<Profile />} />
+<Route path="/profile" element={<Profile />} />
           <Route path="/add-property" element={<AddProperty />} />
           
   <Route path="/blog" element={<Blog />} />
