@@ -1,51 +1,39 @@
 import { useParams } from "react-router-dom";
 
-const posts: Record<string, { title: string; content: string }> = {
+const posts: Record<string, any> = {
   "dog-friendly-cornwall-guide": {
     title: "Dog Friendly Cornwall Guide",
     content:
-      "Cornwall is one of the UK's best destinations for dog owners. Beaches, pubs, cottages and coastal walks make it perfect for dogs.",
+      "Cornwall is perfect for dog owners. Beaches, cliffs, pubs, walking trails...",
   },
 
   "best-dog-friendly-beaches-cornwall": {
     title: "Best Dog Friendly Beaches in Cornwall",
     content:
-      "Perranporth, Watergate Bay and Fistral Beach are among the most dog-friendly beaches in Cornwall.",
+      "Perranporth, Watergate Bay and Fistral Beach are top dog beaches...",
   },
 
   "top-dog-friendly-cottages-cornwall": {
-    title: "Top 10 Dog Friendly Holiday Cottages in Cornwall",
+    title: "Top Dog Friendly Cottages in Cornwall",
     content:
-      "Cornwall offers cottages with enclosed gardens, sea views and dog-friendly stays.",
-  },
-
-  "save-money-cornwall-holiday": {
-    title: "How To Save Money on a Cornwall Dog Friendly Holiday",
-    content:
-      "Book early, travel off-season, and compare cottages to save money.",
+      "Cornwall has hundreds of cottages with enclosed gardens and sea views...",
   },
 };
 
 export default function BlogDetail() {
   const { slug } = useParams();
 
-  if (!slug || !posts[slug]) {
-    return (
-      <div style={{ textAlign: "center", marginTop: 50 }}>
-        <h1>Blog post not found</h1>
-      </div>
-    );
+  const post = slug ? posts[slug] : null;
+
+  if (!post) {
+    return <h1 style={{ padding: 40 }}>Not found</h1>;
   }
 
-  const post = posts[slug];
-
   return (
-    <div style={{ maxWidth: 900, margin: "40px auto", padding: "0 20px" }}>
-      <h1 style={{ color: "#14532d", marginBottom: 20 }}>
-        {post.title}
-      </h1>
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: 40 }}>
+      <h1 style={{ color: "#14532d" }}>{post.title}</h1>
 
-      <p style={{ fontSize: 18, lineHeight: 1.8, color: "#333" }}>
+      <p style={{ fontSize: 18, lineHeight: 1.8 }}>
         {post.content}
       </p>
     </div>
