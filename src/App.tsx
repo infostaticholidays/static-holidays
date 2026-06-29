@@ -117,9 +117,10 @@ export default function App() {
 
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-property" element={<AddProperty />} />
-          <Route path="/blog" element={<Blog />} />
-
-<Route path="/blog/:slug" element={<BlogDetail />} />
+          <Routes>
+  <Route path="/blog" element={<Blog />} />
+  <Route path="/blog/:slug" element={<BlogDetail />} />
+</Routes>
 
           {/* ACCOUNT */}
           <Route path="/account" element={<Account />} />
