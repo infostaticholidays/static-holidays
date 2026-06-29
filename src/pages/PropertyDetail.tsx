@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import ReviewsList from "../components/ReviewsList";
+<p>{property.description}</p>
+
+<ReviewsList propertyId={property.id} />
 
 export default function PropertyDetail() {
   const { id } = useParams();
