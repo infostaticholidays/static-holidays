@@ -13,6 +13,7 @@ import Shop from "./pages/Shop";
 import ShopDetail from "./pages/ShopDetail";
 
 import HolidayOwners from "./pages/HolidayOwners";
+import HostDashboard from "./pages/HostDashboard";
 
 import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
@@ -133,6 +134,7 @@ export default function App() {
             path="/property-calendar/:propertyId"
             element={<PropertyCalendar />}
           />
+          <Route path="/host-dashboard" element={<HostDashboard />} />
 
           {/* 404 */}
           <Route path="*" element={<h1>404 Page not found</h1>} />
