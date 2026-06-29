@@ -19,6 +19,7 @@ import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 
 import Bookings from "./pages/Bookings";
+
 import BookingDetail from "./pages/BookingDetail";
 
 import Profile from "./pages/Profile";
@@ -32,6 +33,7 @@ import Account from "./pages/Account";
 import PropertyCalendar from "./pages/PropertyCalendar";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
+import GuestReviewForm from "../components/GuestReviewForm";
 
 
 export default function App() {
