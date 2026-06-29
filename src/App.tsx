@@ -119,11 +119,7 @@ export default function App() {
           <Route path="/add-property" element={<AddProperty />} />
           <Route path="/blog" element={<Blog />} />
 
-<Route
-  path="/blog/cornwall-dog-friendly"
-  element={<CornwallBlog />}
-/>
-          <Route path="/blog/:slug" element={<BlogDetail />} />
+<Route path="/blog/:slug" element={<BlogDetail />} />
 
           {/* ACCOUNT */}
           <Route path="/account" element={<Account />} />
