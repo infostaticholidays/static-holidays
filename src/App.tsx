@@ -126,6 +126,8 @@ export default function App() {
   element={<CornwallBlog />}
 />
 
+<Route path="/blog/:id" element={<BlogDetail />} />
+
           {/* ACCOUNT */}
           <Route path="/account" element={<Account />} />
 
