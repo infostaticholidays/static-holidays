@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../supabaseClient";
-
+import { supabase } from "../lib/supabase";
 type Props = {
   bookingId: string;
   propertyId: string;
