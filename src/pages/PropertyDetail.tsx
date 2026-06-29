@@ -232,6 +232,7 @@ export default function PropertyDetail() {
       </h2>
 
       <p>{property.description}</p>
+      <ReviewsList propertyId={property.id} />
 
       {/* FAVOURITE */}
       <button
