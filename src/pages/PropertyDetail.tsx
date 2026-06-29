@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import ReviewsList from "../components/ReviewsList";
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -294,7 +295,7 @@ export default function PropertyDetail() {
             <p>
               Total: <b>£{totalPrice}</b>
             </p>
-
+<ReviewsList />
             <button
               onClick={createBooking}
               disabled={bookingLoading}
