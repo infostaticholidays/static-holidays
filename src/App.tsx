@@ -30,7 +30,7 @@ import Account from "./pages/Account";
 import PropertyCalendar from "./pages/PropertyCalendar";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
-import CornwallBlog from "./pages/CornwallBlog";
+
 
 export default function App() {
   return (
@@ -117,10 +117,10 @@ export default function App() {
 
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-property" element={<AddProperty />} />
-          <Routes>
+          
   <Route path="/blog" element={<Blog />} />
   <Route path="/blog/:slug" element={<BlogDetail />} />
-</Routes>
+
 
           {/* ACCOUNT */}
           <Route path="/account" element={<Account />} />
