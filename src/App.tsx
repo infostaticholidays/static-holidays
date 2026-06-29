@@ -22,7 +22,7 @@ import BookingDetail from "./pages/BookingDetail";
 
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
-import GuestAccount from "./pages/GuestAccount";
+
 
 import Account from "./pages/Account";
 
@@ -112,7 +112,7 @@ export default function App() {
 
           <Route path="/bookings" element={<Bookings />} />
           <Route path="/booking/:id" element={<BookingDetail />} />
-          <Route path="/guest-account" element={<GuestAccount />} />
+         
 
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-property" element={<AddProperty />} />
