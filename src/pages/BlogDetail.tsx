@@ -1,31 +1,35 @@
 import { useParams } from "react-router-dom";
 
-const posts = {
-  1: {
+const posts: Record<string, { title: string; content: string }> = {
+  "dog-friendly-cornwall-guide": {
+    title: "Dog Friendly Cornwall Guide",
+    content:
+      "Cornwall is one of the UK's best destinations for dog owners. Beaches, pubs, cottages and coastal walks make it perfect for dogs.",
+  },
+
+  "best-dog-friendly-beaches-cornwall": {
+    title: "Best Dog Friendly Beaches in Cornwall",
+    content:
+      "Perranporth, Watergate Bay and Fistral Beach are among the most dog-friendly beaches in Cornwall.",
+  },
+
+  "top-dog-friendly-cottages-cornwall": {
     title: "Top 10 Dog Friendly Holiday Cottages in Cornwall",
     content:
-      "Cornwall is one of the UK's best destinations for dog owners. It offers beaches, countryside walks, and plenty of pet-friendly accommodation options. This guide covers the best cottages where dogs are welcome and what to expect when booking."
+      "Cornwall offers cottages with enclosed gardens, sea views and dog-friendly stays.",
   },
 
-  2: {
-    title: "Best UK Beach Holidays for Families",
+  "save-money-cornwall-holiday": {
+    title: "How To Save Money on a Cornwall Dog Friendly Holiday",
     content:
-      "Family holidays are all about fun, safety and great beaches. The UK has many coastal destinations that are perfect for children, offering shallow waters, amusement parks, and safe swimming areas."
+      "Book early, travel off-season, and compare cottages to save money.",
   },
-
-  3: {
-    title: "How To Save Money On Holiday Accommodation",
-    content:
-      "Booking early and comparing prices can save hundreds. You should also consider off-peak travel, flexible dates, and direct booking with owners to get the best deals."
-  }
 };
 
 export default function BlogDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
 
-  const post = posts[id as keyof typeof posts];
-
-  if (!post) {
+  if (!slug || !posts[slug]) {
     return (
       <div style={{ textAlign: "center", marginTop: 50 }}>
         <h1>Blog post not found</h1>
@@ -33,25 +37,15 @@ export default function BlogDetail() {
     );
   }
 
+  const post = posts[slug];
+
   return (
-    <div
-      style={{
-        maxWidth: 900,
-        margin: "40px auto",
-        padding: "0 20px"
-      }}
-    >
+    <div style={{ maxWidth: 900, margin: "40px auto", padding: "0 20px" }}>
       <h1 style={{ color: "#14532d", marginBottom: 20 }}>
         {post.title}
       </h1>
 
-      <p
-        style={{
-          fontSize: 18,
-          lineHeight: 1.8,
-          color: "#333"
-        }}
-      >
+      <p style={{ fontSize: 18, lineHeight: 1.8, color: "#333" }}>
         {post.content}
       </p>
     </div>
