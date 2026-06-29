@@ -39,14 +39,11 @@ export default function Login() {
     }
 
     // ✅ FINAL ROUTING (NO DASHBOARDS)
-    if (profile?.role === "guest") {
-      navigate("/guest-account");
-    } else if (profile?.role === "host") {
-      navigate("/owner-account");
-    } else {
-      navigate("/");
-    }
-  }
+    if (profile?.role === "host") {
+  navigate("/host-dashboard");
+} else {
+  navigate("/account");
+}
 
   return (
     <div style={{ padding: 40 }}>
