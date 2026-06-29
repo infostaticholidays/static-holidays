@@ -34,6 +34,7 @@ export default function Blog() {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
           gap: 20,
+          marginTop: 20,
         }}
       >
         {posts.map((post) => (
@@ -47,16 +48,22 @@ export default function Blog() {
                 borderRadius: 12,
                 overflow: "hidden",
                 boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                background: "white",
               }}
             >
               <img
                 src={post.image}
-                style={{ width: "100%", height: 200, objectFit: "cover" }}
+                alt={post.title}
+                style={{
+                  width: "100%",
+                  height: 200,
+                  objectFit: "cover",
+                }}
               />
 
               <div style={{ padding: 15 }}>
-                <h2>{post.title}</h2>
-                <p>{post.excerpt}</p>
+                <h2 style={{ marginBottom: 10 }}>{post.title}</h2>
+                <p style={{ color: "#555" }}>{post.excerpt}</p>
               </div>
             </div>
           </Link>
