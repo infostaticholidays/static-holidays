@@ -41,6 +41,23 @@ setProfile(profileData);
       setLoading(false);
       return;
     }
+    async function toggleNewsletter(value) {
+  if (!user) return;
+
+  setProfile((prev) => ({
+    ...prev,
+    newsletter: value,
+  }));
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ newsletter: value })
+    .eq("id", user.id);
+
+  if (error) {
+    alert(error.message);
+  }
+}
   
     // ❤️ FAVOURITES
     const { data, error } = await supabase
