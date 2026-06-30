@@ -10,6 +10,13 @@ export default function Account() {
   const [trip, setTrip] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
+  const averageRating =
+  reviews.length > 0
+    ? (
+        reviews.reduce((sum, review) => sum + Number(review.rating), 0) /
+        reviews.length
+      ).toFixed(1)
+    : "0.0";
 
   useEffect(() => {
     loadUser();
