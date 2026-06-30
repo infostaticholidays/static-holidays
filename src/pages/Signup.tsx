@@ -1,101 +1,104 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useNavigate } from "react-router-dom";
 
-export default function Account() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [favourites, setFavourites] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("guest");
+  const [loading, setLoading] = useState(false);
 
-  // ✅ LOAD USER ON PAGE LOAD
-  useEffect(() => {
-    loadUser();
-  }, []);
+  const navigate = useNavigate();
 
-  async function loadUser() {
-    const { data: auth } = await supabase.auth.getUser();
-    const currentUser = auth?.user;
+  async function handleSignup() {
+    try {
+      setLoading(true);
 
-    if (!currentUser) {
+      // 1. Create auth user
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      const user = data.user;
+
+      if (!user) {
+        alert("User was not created.");
+        return;
+      }
+
+      // 2. Create profile row (THIS powers Account page)
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: user.id,
+            email: email,
+            role: role,
+            newsletter: false,
+          },
+        ]);
+
+      if (profileError) {
+        console.error(profileError);
+        alert(profileError.message);
+        return;
+      }
+
+      // 3. Auto login user (important fix)
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      // 4. Go to account page
+      navigate("/account");
+
+    } catch (err) {
+      console.error(err);
+      alert("Unexpected error occurred.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setUser(currentUser);
-
-    // PROFILE
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .single();
-
-    setProfile(profileData);
-
-    // FAVOURITES
-    const { data: favData } = await supabase
-      .from("favourites")
-      .select("*")
-      .eq("user_id", currentUser.id);
-
-    setFavourites(favData || []);
-
-    setLoading(false);
-  }
-
-  // ✅ NEWSLETTER TOGGLE (ONLY ONCE)
-  async function toggleNewsletter(value: boolean) {
-    if (!user) return;
-
-    setProfile((prev: any) => ({
-      ...prev,
-      newsletter: value,
-    }));
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({ newsletter: value })
-      .eq("id", user.id);
-
-    if (error) alert(error.message);
   }
 
   return (
-    <div style={{ padding: 40, maxWidth: 900, margin: "0 auto" }}>
-      <h1>👤 My Account</h1>
+    <div style={{ padding: 40 }}>
+      <h1>Sign Up</h1>
 
-      {/* ACCOUNT INFO */}
-      <div style={{ background: "#f5f5f5", padding: 20 }}>
-        <h2>Account Information</h2>
-        <p>Email: {user?.email}</p>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <label>
-          <input
-            type="checkbox"
-            checked={profile?.newsletter || false}
-            onChange={(e) => toggleNewsletter(e.target.checked)}
-          />
-          Subscribe to newsletter
-        </label>
-      </div>
+      <br /><br />
 
-      {/* FAVOURITES */}
-      <div style={{ marginTop: 20 }}>
-        <h2>❤️ Favourites</h2>
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : favourites.length === 0 ? (
-          <p>No favourites yet</p>
-        ) : (
-          favourites.map((fav) => (
-            <div key={fav.id} style={{ background: "#fff", margin: 10, padding: 10 }}>
-              <p>{fav.title || "Property"}</p>
-            </div>
-          ))
-        )}
-      </div>
+      <br /><br />
+
+      <select value={role} onChange={(e) => setRole(e.target.value)}>
+        <option value="guest">Guest</option>
+        <option value="host">Holiday Owner</option>
+      </select>
+
+      <br /><br />
+
+      <button onClick={handleSignup} disabled={loading}>
+        {loading ? "Creating Account..." : "Create Account"}
+      </button>
     </div>
   );
 }
