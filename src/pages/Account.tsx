@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 
 export default function Account() {
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [favourites, setFavourites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
