@@ -138,34 +138,43 @@ export default function Account() {
     <div style={{ padding: 40, maxWidth: 900, margin: "0 auto" }}>
       <h1>👤 My Account</h1>
 
-      {/* ACCOUNT */}
-      <div style={{ background: "#f5f5f5", padding: 20 }}>
-        <h2>Account Information</h2>
-        <p>Email: {user?.email}</p>
+     {/* ACCOUNT */}
+<div style={{ background: "#f5f5f5", padding: 20 }}>
+  <h2>Account Information</h2>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={profile?.newsletter || false}
-            onChange={(e) => toggleNewsletter(e.target.checked)}
-          />
-          Subscribe to newsletter
-        </label>
-      </div>
+  <p>Email: {user?.email}</p>
 
-      {/* TRIP */}
-      <div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
-        <h2>🏖️ My Next Trip</h2>
+  <p>Full name: {profile?.full_name || "Not set"}</p>
+  <p>Phone: {profile?.phone || "Not set"}</p>
 
-        {!trip ? (
-          <p>No trip booked yet.</p>
-        ) : (
-          <>
-            <p>Destination: {trip.destination}</p>
-            <p>Countdown: {timeLeft}</p>
-          </>
-        )}
-      </div>
+  <p>
+    Address: {profile?.address || "Not set"}
+    {profile?.address && (
+      <>
+        {" "}
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            profile.address
+          )}`}
+          target="_blank"
+          rel="noreferrer"
+          style={{ marginLeft: 8, color: "blue" }}
+        >
+          View on map
+        </a>
+      </>
+    )}
+  </p>
+
+  <label>
+    <input
+      type="checkbox"
+      checked={profile?.newsletter || false}
+      onChange={(e) => toggleNewsletter(e.target.checked)}
+    />
+    Subscribe to newsletter
+  </label>
+</div>
 
       {/* FAVOURITES */}
       <div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
