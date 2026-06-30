@@ -199,6 +199,41 @@ setLoading(false);
           })
         )}
       </div>
+      {/* REVIEWS */}
+<div
+  style={{
+    background: "#f5f5f5",
+    padding: 20,
+    borderRadius: 10,
+    marginTop: 20,
+  }}
+>
+  <h2>⭐ My Reviews</h2>
+
+  {reviews.length === 0 ? (
+    <p>You don't have any reviews yet.</p>
+  ) : (
+    reviews.map((review) => (
+      <div
+        key={review.id}
+        style={{
+          background: "white",
+          padding: 15,
+          borderRadius: 10,
+          marginTop: 15,
+        }}
+      >
+        <h3>{review.rating} ⭐</h3>
+
+        <p>{review.review_text}</p>
+
+        <small>
+          {new Date(review.created_at).toLocaleDateString("en-GB")}
+        </small>
+      </div>
+    ))
+  )}
+</div>
 
       {/* LOGOUT */}
       <div style={{ marginTop: 30 }}>
