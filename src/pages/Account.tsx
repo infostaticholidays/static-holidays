@@ -26,14 +26,7 @@ export default function Account() {
       setLoading(false);
       return;
     }
-    const averageRating =
-  reviews.length > 0
-    ? (
-        reviews.reduce((sum, review) => sum + Number(review.rating), 0) /
-        reviews.length
-      ).toFixed(1)
-    : "0.0";
-
+  
     // ❤️ FAVOURITES
     const { data, error } = await supabase
       .from("favourites")
