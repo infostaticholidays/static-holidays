@@ -247,15 +247,24 @@ setLoading(false);
       >
         <h3>{review.rating} ⭐</h3>
 
-        <p>{review.review_text}</p>
+       <h3
+  style={{
+    color: "#f59e0b",
+    marginBottom: 10,
+  }}
+>
+  {"⭐".repeat(Number(review.rating))}
 
-        <small>
-          {new Date(review.created_at).toLocaleDateString("en-GB")}
-        </small>
-      </div>
-    ))
-  )}
-</div>
+  <span
+    style={{
+      color: "#666",
+      fontSize: 14,
+      marginLeft: 10,
+    }}
+  >
+    {review.rating}/5
+  </span>
+</h3>
 
       {/* LOGOUT */}
       <div style={{ marginTop: 30 }}>
