@@ -10,6 +10,7 @@ export default function Account() {
   const [trip, setTrip] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
+  const [editing, setEditing] = useState(false);
 
   const averageRating =
     reviews.length > 0
