@@ -181,7 +181,34 @@ const { data: tripData, error } = await supabase
   </label>
 </div>
 
-      {/* FAVOURITES */}
+{/* TRIP */}
+<div
+  style={{
+    background: "#f5f5f5",
+    padding: 20,
+    marginTop: 20,
+  }}
+>
+  <h2>🏖️ My Next Trip</h2>
+
+  {!trip ? (
+    <p>No trip booked yet.</p>
+  ) : (
+    <>
+      <p>
+        <strong>Destination:</strong> {trip.destination}
+      </p>
+
+      <p>
+        <strong>Countdown:</strong> {timeLeft}
+      </p>
+    </>
+  )}
+</div>
+
+{/* FAVOURITES */}
+
+      
       <div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
         <h2>❤️ My Favourite Properties</h2>
 
