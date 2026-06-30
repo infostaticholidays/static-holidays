@@ -6,6 +6,10 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("guest");
+  const [firstName, setFirstName] = useState("");
+const [lastName, setLastName] = useState("");
+const [phone, setPhone] = useState("");
+const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
