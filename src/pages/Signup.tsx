@@ -36,20 +36,19 @@ export default function Signup() {
         return;
       }
 
-      // 2. Create profile row
       const { error: profileError } = await supabase
-        .from("profiles")
-        .insert([
-          {
-            id: user.id,
-            email,
-            role,
-            full_name: fullName,
-            phone,
-            address,
-            newsletter: false,
-          },
-        ]);
+  .from("profiles")
+  .insert([
+    {
+      id: data.user.id,
+      email,
+      role,
+      full_name: "",
+      phone: "",
+      address: "",
+      newsletter: false,
+    },
+  ]);
 
       if (profileError) {
         console.error(profileError);
