@@ -64,24 +64,13 @@ export default function Account() {
     setFavourites(favData || []);
 
    {/* TRIP */}
-<div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
-  <h2>🏖️ My Next Trip</h2>
-
-  {!trip ? (
-    <p>No trip booked yet.</p>
-  ) : (
-    <>
-      <p>Destination: {trip.destination}</p>
-
-      <p>
-        Start date:{" "}
-        {trip.start_date ? new Date(trip.start_date).toLocaleDateString() : "Not set"}
-      </p>
-
-      <p>Countdown: {timeLeft || "Calculating..."}</p>
-    </>
-  )}
-</div>
+const { data: tripData, error } = await supabase
+  .from("trips")
+  .select("*")
+  .eq("user_id", user.id)
+  .order("start_date", { ascending: true })
+  .limit(1)
+  .single();
 
     // REVIEWS
     const { data: reviewData } = await supabase
