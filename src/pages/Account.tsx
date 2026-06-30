@@ -5,6 +5,23 @@ import { supabase } from "../lib/supabase";
 export default function Account() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  async function toggleNewsletter(value: boolean) {
+  if (!user) return;
+
+  setProfile((prev: any) => ({
+    ...prev,
+    newsletter: value,
+  }));
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ newsletter: value })
+    .eq("id", user.id);
+
+  if (error) {
+    alert(error.message);
+  }
+}
   const [favourites, setFavourites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
