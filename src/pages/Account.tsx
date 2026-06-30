@@ -58,7 +58,6 @@ export default function Account() {
     .eq("id", user.id)
     .single();
 
-  setProfile(profileData);
 
 setProfile(profileData);
 
