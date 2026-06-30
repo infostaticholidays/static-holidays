@@ -70,7 +70,6 @@ export default function Account() {
 const { data: reviewData, error: reviewError } = await supabase
   .from("reviews")
   .select("*")
-  .eq("reviewed_user_id", user.id)
   .order("created_at", { ascending: false });
 
 if (reviewError) {
