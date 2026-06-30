@@ -7,13 +7,11 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("guest");
 
-  // ✅ NEW FIELDS
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   async function handleSignup() {
@@ -38,20 +36,17 @@ export default function Signup() {
         return;
       }
 
-      // 2. Save profile data
+      // 2. Create profile row
       const { error: profileError } = await supabase
         .from("profiles")
         .insert([
           {
             id: user.id,
-            email: email,
-            role: role,
-
-            // ✅ NEW DATA
+            email,
+            role,
             full_name: fullName,
-            phone: phone,
-            address: address,
-
+            phone,
+            address,
             newsletter: false,
           },
         ]);
@@ -68,7 +63,7 @@ export default function Signup() {
         password,
       });
 
-      // 4. Redirect
+      // 4. Go to account
       navigate("/account");
 
     } catch (err) {
@@ -83,57 +78,21 @@ export default function Signup() {
     <div style={{ padding: 40 }}>
       <h1>Sign Up</h1>
 
-      {/* EMAIL */}
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
+      <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <br /><br />
 
-      {/* PASSWORD */}
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
+      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
       <br /><br />
 
-      {/* FULL NAME */}
-      <input
-        type="text"
-        placeholder="Full Name"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-      />
-
+      <input placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
       <br /><br />
 
-      {/* PHONE */}
-      <input
-        type="text"
-        placeholder="Phone Number"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-      />
-
+      <input placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} />
       <br /><br />
 
-      {/* ADDRESS (Google Maps friendly text) */}
-      <input
-        type="text"
-        placeholder="Address (e.g. 10 Downing St, London)"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-      />
-
+      <input placeholder="Address (e.g. 10 Downing St, London)" value={address} onChange={(e) => setAddress(e.target.value)} />
       <br /><br />
 
-      {/* ROLE */}
       <select value={role} onChange={(e) => setRole(e.target.value)}>
         <option value="guest">Guest</option>
         <option value="host">Holiday Owner</option>
@@ -141,7 +100,6 @@ export default function Signup() {
 
       <br /><br />
 
-      {/* SUBMIT */}
       <button onClick={handleSignup} disabled={loading}>
         {loading ? "Creating Account..." : "Create Account"}
       </button>
