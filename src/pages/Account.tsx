@@ -29,6 +29,13 @@ export default function Account() {
     } = await supabase.auth.getUser();
 
     setUser(user);
+    const { data: profileData } = await supabase
+  .from("profiles")
+  .select("*")
+  .eq("id", user.id)
+  .single();
+
+setProfile(profileData);
 
     if (!user) {
       setLoading(false);
