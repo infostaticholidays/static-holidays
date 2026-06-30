@@ -217,7 +217,20 @@ setLoading(false);
     marginTop: 20,
   }}
 >
-  <h2>⭐ My Reviews</h2>
+<h2>⭐ My Reviews</h2>
+
+{reviews.length > 0 && (
+  <>
+    <h3
+      style={{
+        color: "#16a34a",
+        marginTop: 10,
+      }}
+    >
+      ⭐★★★★ {averageRating} ({reviews.length} reviews)
+    </h3>
+  </>
+)}
 
   {reviews.length === 0 ? (
     <p>You don't have any reviews yet.</p>
