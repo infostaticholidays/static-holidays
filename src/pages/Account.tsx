@@ -9,6 +9,7 @@ export default function Account() {
 
   const [trip, setTrip] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState("");
+  const [reviews, setReviews] = useState<any[]>([]);
 
   useEffect(() => {
     loadUser();
