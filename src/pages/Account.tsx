@@ -55,12 +55,24 @@ export default function Account() {
     console.log("tripData:", tripData);
     console.log("tripError:", tripError);
 
-    if (!tripError) {
-      setTrip(tripData || null);
-    }
+   if (!tripError) {
+  setTrip(tripData || null);
+}
 
-    setLoading(false);
-  }
+// ⭐ Load reviews
+const { data: reviewData, error: reviewError } = await supabase
+  .from("reviews")
+  .select("*")
+  .eq("reviewed_user_id", user.id)
+  .order("created_at", { ascending: false });
+
+if (reviewError) {
+  console.error(reviewError);
+} else {
+  setReviews(reviewData || []);
+}
+
+setLoading(false);
 
   // ⏳ COUNTDOWN (FIXED - SINGLE useEffect ONLY)
   useEffect(() => {
