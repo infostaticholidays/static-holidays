@@ -194,7 +194,17 @@ setLoading(false);
         <h2>Account Information</h2>
         <p><strong>Email:</strong> {user?.email || "Not logged in"}</p>
         <p><strong>User ID:</strong> {user?.id || "N/A"}</p>
-      </div>
+    
+      <div style={{ marginTop: 15 }}>
+  <label>
+    <input
+      type="checkbox"
+      checked={profile?.newsletter || false}
+      onChange={(e) => toggleNewsletter(e.target.checked)}
+    />
+    Subscribe to newsletter
+  </label>
+</div>
 
       {/* TRIP */}
       <div style={{ background: "#f5f5f5", padding: 20, borderRadius: 10, marginTop: 20 }}>
