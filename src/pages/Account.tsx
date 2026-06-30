@@ -104,6 +104,12 @@ const { data: tripData, error } = await supabase
 
     if (error) alert(error.message);
   }
+  <br />
+<br />
+
+<button onClick={() => setEditing(!editing)}>
+  {editing ? "Cancel" : "Edit Profile"}
+</button>
 
   // COUNTDOWN
   useEffect(() => {
