@@ -40,17 +40,25 @@ export default function Account() {
     loadUser();
   }, []);
 
-  async function loadUser() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+ async function loadUser() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    setUser(user);
-    const { data: profileData } = await supabase
-  .from("profiles")
-  .select("*")
-  .eq("id", user.id)
-  .single();
+  if (!user) {
+    setLoading(false);
+    return;
+  }
+
+  setUser(user);
+
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  setProfile(profileData);
 
 setProfile(profileData);
 
