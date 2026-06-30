@@ -58,6 +58,37 @@ const [address, setAddress] = useState("");
       setLoading(false);
     }
   }
+  <input
+  placeholder="First name"
+  value={firstName}
+  onChange={(e) => setFirstName(e.target.value)}
+/>
+
+<br /><br />
+
+<input
+  placeholder="Last name"
+  value={lastName}
+  onChange={(e) => setLastName(e.target.value)}
+/>
+
+<br /><br />
+
+<input
+  placeholder="Phone"
+  value={phone}
+  onChange={(e) => setPhone(e.target.value)}
+/>
+
+<br /><br />
+
+<input
+  placeholder="Address"
+  value={address}
+  onChange={(e) => setAddress(e.target.value)}
+/>
+
+<br /><br />
 
   return (
     <div style={{ padding: 40 }}>
