@@ -71,6 +71,11 @@ const { data: tripData, error } = await supabase
   .order("start_date", { ascending: true })
   .limit(1)
   .single();
+    if (error) {
+  console.error(error);
+} else {
+  setTrip(tripData);
+}
 
     // REVIEWS
     const { data: reviewData } = await supabase
