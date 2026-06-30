@@ -265,6 +265,16 @@ setLoading(false);
     {review.rating}/5
   </span>
 </h3>
+        <p>{review.review_text}</p>
+
+<small>
+  {new Date(review.created_at).toLocaleDateString("en-GB")}
+</small>
+
+</div>
+))
+)}
+</div>
 
       {/* LOGOUT */}
       <div style={{ marginTop: 30 }}>
