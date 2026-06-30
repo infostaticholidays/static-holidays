@@ -73,6 +73,8 @@ if (reviewError) {
 }
 
 setLoading(false);
+}
+
 
   // ⏳ COUNTDOWN (FIXED - SINGLE useEffect ONLY)
   useEffect(() => {
