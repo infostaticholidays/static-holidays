@@ -8,6 +8,7 @@ export default function Account() {
   const [favourites, setFavourites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [trip, setTrip] = useState<any>(null);
+  const [previousTrips, setPreviousTrips] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
