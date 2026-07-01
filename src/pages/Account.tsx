@@ -3,16 +3,18 @@ import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 export default function Account() {
-  console.log("CURRENT TRIP:", trip);
-  const [user, setUser] = useState<any>(null);
+const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [favourites, setFavourites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [trip, setTrip] = useState<any>(null);
   const [previousTrips, setPreviousTrips] = useState<any[]>([]);
+
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
+
+   console.log("CURRENT TRIP:", trip);
 
   const averageRating =
     reviews.length > 0
