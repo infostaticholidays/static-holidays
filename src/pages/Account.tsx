@@ -80,7 +80,7 @@ const upcoming = (tripData || []).filter((trip) => {
 });
 
 setPreviousTrips(previous);
-setUpcomingTrips(upcoming);
+
 
    {/* TRIP */}
 const { data: tripData } = await supabase
