@@ -48,40 +48,7 @@ const [user, setUser] = useState<any>(null);
       .single();
 
     setProfile(profileData);
-    <div
-  style={{
-    background: "#f5f5f5",
-    padding: 20,
-    borderRadius: 10,
-    marginTop: 20,
-  }}
->
-  <h2>🧳 Previous Stays</h2>
-
-  {previousTrips.length === 0 ? (
-    <p>No previous holidays yet.</p>
-  ) : (
-    previousTrips.map((trip) => (
-      <div
-        key={trip.id}
-        style={{
-          background: "white",
-          padding: 15,
-          borderRadius: 10,
-          marginTop: 15,
-        }}
-      >
-        <h3>{trip.destination}</h3>
-
-        <p>
-          {new Date(trip.start_date).toLocaleDateString("en-GB")} -{" "}
-          {new Date(trip.end_date).toLocaleDateString("en-GB")}
-        </p>
-      </div>
-    ))
-  )}
-</div>
-
+    
     // FAVOURITES
     const { data: favData } = await supabase
       .from("favourites")
