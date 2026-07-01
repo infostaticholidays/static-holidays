@@ -64,22 +64,26 @@ export default function Account() {
       .eq("user_id", user.id);
 
     setFavourites(favData || []);
-    const { data: tripData } = await supabase
+   const { data: tripsData, error } = await supabase
   .from("trips")
   .select("*")
-  .eq("user_id", user.id);
+  .eq("user_id", user.id)
+  .order("start_date", { ascending: true });
 
-const today = new Date();
+if (!error && tripsData) {
+  const today = new Date();
 
-const previous = (tripData || []).filter((trip) => {
-  return new Date(trip.end_date) < today;
-});
+  const nextTrip = tripsData.find(
+    (trip) => new Date(trip.start_date) >= today
+  );
 
-const upcoming = (tripData || []).filter((trip) => {
-  return new Date(trip.end_date) >= today;
-});
+  const previous = tripsData.filter(
+    (trip) => new Date(trip.end_date) < today
+  );
 
-setPreviousTrips(previous);
+  setTrip(nextTrip || null);
+  setPreviousTrips(previous);
+}
 
 
    {/* TRIP */}
