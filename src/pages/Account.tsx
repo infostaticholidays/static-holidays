@@ -70,15 +70,24 @@ const { data: tripData, error } = await supabase
   .from("trips")
   .select("*")
   .eq("user_id", user.id)
-  .order("start_date", { ascending: true })
-  .limit(1)
-  .single();
-    if (error) {
-  console.error(error);
-} else {
-  setTrip(tripData);
-}
+  .order("start_date", { ascending: true });
 
+if (error) {
+  console.error(error);
+} else if (tripData) {
+  const today = new Date();
+
+  const nextTrip = tripData.find(
+    (trip) => new Date(trip.start_date) >= today
+  );
+
+  const previous = tripData.filter(
+    (trip) => new Date(trip.end_date) < today
+  );
+
+  setTrip(nextTrip || null);
+  setPreviousTrips(previous);
+}
     // REVIEWS
     const { data: reviewData } = await supabase
       .from("reviews")
