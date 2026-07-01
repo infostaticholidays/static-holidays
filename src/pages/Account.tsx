@@ -67,7 +67,7 @@ const [user, setUser] = useState<any>(null);
       .eq("user_id", user.id);
 
     setFavourites(favData || []);
-  const { data: tripsData, error } = await supabase
+const { data: tripsData, error } = await supabase
   .from("trips")
   .select("*")
   .eq("user_id", user.id)
@@ -76,12 +76,10 @@ const [user, setUser] = useState<any>(null);
 if (!error && tripsData) {
   const today = new Date();
 
-  // 🕒 previous trips
   const previous = tripsData.filter(
     (trip) => new Date(trip.end_date) < today
   );
 
-  // 🏖️ upcoming trips (future OR active)
   const upcoming = tripsData
     .filter((trip) => new Date(trip.end_date) >= today)
     .sort(
@@ -91,26 +89,8 @@ if (!error && tripsData) {
     );
 
   setPreviousTrips(previous);
-  setTrip(upcoming[0] || null); // 👈 THIS is your countdown trip
+  setTrip(upcoming[0] || null);
 }
-   {/* TRIP */}
-const { data: tripData } = await supabase
-  .from("trips")
-  .select("*")
-  .eq("user_id", user.id);
-
-const today = new Date();
-
-const previous = (tripData || []).filter((trip) => {
-  return new Date(trip.end_date) < today;
-});
-
-const upcoming = (tripData || []).filter((trip) => {
-  return new Date(trip.end_date) >= today;
-});
-
-setPreviousTrips(previous);
-setUpcomingTrips(upcoming);
     // REVIEWS
     const { data: reviewData } = await supabase
       .from("reviews")
