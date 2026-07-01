@@ -72,6 +72,7 @@ const { data: tripsData, error } = await supabase
   .select("*")
   .eq("user_id", user.id)
   .order("start_date", { ascending: true });
+console.log("Trips:", tripsData);
 
 if (!error && tripsData) {
   const today = new Date();
