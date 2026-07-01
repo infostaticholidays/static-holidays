@@ -83,26 +83,23 @@ setPreviousTrips(previous);
 setUpcomingTrips(upcoming);
 
    {/* TRIP */}
-const { data: tripsData, error } = await supabase
+const { data: tripData } = await supabase
   .from("trips")
   .select("*")
-  .eq("user_id", user.id)
-  .order("start_date", { ascending: true });
+  .eq("user_id", user.id);
 
-if (!error && tripsData) {
-  const today = new Date();
+const today = new Date();
 
-  const nextTrip = tripsData.find(
-    (trip) => new Date(trip.start_date) >= today
-  );
+const previous = (tripData || []).filter((trip) => {
+  return new Date(trip.end_date) < today;
+});
 
-  const previous = tripsData.filter(
-    (trip) => new Date(trip.end_date) < today
-  );
+const upcoming = (tripData || []).filter((trip) => {
+  return new Date(trip.end_date) >= today;
+});
 
-  setTrip(nextTrip || null);
-  setPreviousTrips(previous);
-}
+setPreviousTrips(previous);
+setUpcomingTrips(upcoming);
     // REVIEWS
     const { data: reviewData } = await supabase
       .from("reviews")
