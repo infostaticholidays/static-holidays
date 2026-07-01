@@ -71,6 +71,7 @@ const { data: tripData, error } = await supabase
   .select("*")
   .eq("user_id", user.id)
   .order("start_date", { ascending: true });
+    console.log("Trips:", tripData);
 
 if (error) {
   console.error(error);
