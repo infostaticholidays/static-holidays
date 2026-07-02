@@ -106,10 +106,17 @@ const gross = bookings.reduce(
 const commission = gross * commissionRate;
 const net = gross - commission;
 
-  <p>Gross Earnings: £{gross}</p>
-<p>Commission: £{commission}</p>
-<p><b>Net Earnings: £{net}</b></p>
-  {/* ---------------- MESSAGES ---------------- */}
+  const commissionRate =
+  profile?.subscription_plan === "elite"
+    ? 0.01
+    : profile?.subscription_plan === "super"
+    ? 0.05
+    : 0.12;
+
+const gross = bookings.reduce(
+  (sum, b) => sum + (b.total_price
+
+/* ---------------- MESSAGES ---------------- */}
 <div style={card}>
   <h2>💬 Messages</h2>
 
