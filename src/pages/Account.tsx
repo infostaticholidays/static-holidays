@@ -14,6 +14,27 @@ const [user, setUser] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
+  useEffect(() => {
+  const checkRole = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role === "owner" || profile?.role === "admin") {
+      navigate("/host-dashboard");
+    }
+  };
+
+  checkRole();
+}, []);
 
    console.log("CURRENT TRIP:", trip);
 
