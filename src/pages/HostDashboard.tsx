@@ -154,6 +154,22 @@ export default function HostDashboard() {
         <p>ID Verified: {profile?.id_verified ? "Yes" : "No"}</p>
         <p>Insurance Verified: {profile?.insurance_verified ? "Yes" : "No"}</p>
       </div>
+      <div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
+  <h2>💳 Subscription Plan</h2>
+
+  <p>Current Plan: {profile?.subscription_plan || "Host (Free)"}</p>
+
+  <p>Commission Rate:</p>
+  <ul>
+    <li>Host (Free): 12%</li>
+    <li>Super Host: 5%</li>
+    <li>Elite Host: 1%</li>
+  </ul>
+
+  <button onClick={() => navigate("/upgrade-plan")}>
+    Upgrade Plan
+  </button>
+</div>
 
       {/* ---------------- EARNINGS ---------------- */}
       <div style={card}>
