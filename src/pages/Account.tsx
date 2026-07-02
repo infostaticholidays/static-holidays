@@ -39,13 +39,7 @@ const [user, setUser] = useState<any>(null);
     }
 
     setUser(user);
-    const navigate = useNavigate();
 
-useEffect(() => {
-  checkRole();
-}, []);
-
-async function checkRole() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
