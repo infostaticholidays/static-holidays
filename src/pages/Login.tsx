@@ -38,11 +38,12 @@ export default function Login() {
       return;
     }
 
-  if (profile?.role === "owner" || profile?.role === "admin") {
-  navigate("/owner-dashboard");
-} else {
-  navigate("/account");
-}
+    if (profile?.role === "owner" || profile?.role === "admin") {
+      navigate("/owner-dashboard");
+    } else {
+      navigate("/account");
+    }
+  } // ✅ THIS WAS MISSING
 
   return (
     <div style={{ padding: 40 }}>
