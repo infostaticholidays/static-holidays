@@ -9,6 +9,7 @@ const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [trip, setTrip] = useState<any>(null);
   const [previousTrips, setPreviousTrips] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
