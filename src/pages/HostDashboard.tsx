@@ -113,8 +113,7 @@ const net = gross - commission;
     ? 0.05
     : 0.12;
 
-const gross = bookings.reduce(
-  (sum, b) => sum + (b.total_price
+
 
 /* ---------------- MESSAGES ---------------- */}
 <div style={card}>
