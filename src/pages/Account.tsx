@@ -1,63 +1,50 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+mport { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 export default function Account() {
-const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [favourites, setFavourites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [trip, setTrip] = useState<any>(null);
   const [previousTrips, setPreviousTrips] = useState<any[]>([]);
-  const navigate = useNavigate();
-
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
-  const [editing, setEditing] = useState(false);
 
-  
-  const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  const navigate = useNavigate();
 
-    if (!user) return;
-const { data: profileData }  = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
 
-    if (profile?.role === "owner" || profile?.role === "admin") {
-      navigate("/host-dashboard");
-    }
-  };
 
+useEffect(() => {
   checkRole();
 }, []);
 
-   console.log("CURRENT TRIP:", trip);
+async function checkRole() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const averageRating =
-    reviews.length > 0
-      ? (
-          reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-          reviews.length
-        ).toFixed(1)
-      : "0.0";
+  if (!user) return;
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-const { data: profileData }  = await supabase
+  const { data: profileData, error } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role === "owner" || profile?.role === "admin") {
-    navigate("/host-dashboard");
+  if (error) {
+    console.error(error);
+    return;
   }
+
+  // OWNER / ADMIN → send to host dashboard
+  if (profileData?.role === "owner" || profileData?.role === "admin") {
+    navigate("/host-dashboard");
+    return;
+  }
+
+  // GUEST → stay on account page
 }
 
     // PROFILE
