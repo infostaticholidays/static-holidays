@@ -5,10 +5,10 @@ import { supabase } from "../lib/supabase";
 export default function HostDashboard() {
   const [properties, setProperties] = useState<any[]>([]);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    loadProperties();
-  }, []);
+useEffect(() => {
+  checkUser();
+  loadProperties();
+}, []);
   async function checkUser() {
   const {
     data: { user },
