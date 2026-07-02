@@ -6,61 +6,59 @@ export default function Account() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [favourites, setFavourites] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [trip, setTrip] = useState<any>(null);
   const [previousTrips, setPreviousTrips] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
+  // ----------------------------
+  // MAIN DATA LOADER
+  // ----------------------------
+  async function loadAccount() {
+    setLoading(true);
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-useEffect(() => {
-  checkRole();
-}, []);
+    if (!user) {
+      navigate("/");
+      return;
+    }
 
-async function checkRole() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    setUser(user);
 
-  if (!user) return;
-
-  const { data: profileData, error } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  // OWNER / ADMIN → send to host dashboard
-  if (profileData?.role === "owner" || profileData?.role === "admin") {
-    navigate("/host-dashboard");
-    return;
-  }
-
-  // GUEST → stay on account page
-}
-
-    // PROFILE
-    const { data: profileData } = await supabase
+    // PROFILE (includes role)
+    const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .single();
 
+    if (profileError) {
+      console.error(profileError);
+      return;
+    }
+
     setProfile(profileData);
-    
+
+    // ROLE ROUTING (OWNER / ADMIN)
+    if (profileData?.role === "owner" || profileData?.role === "admin") {
+      navigate("/host-dashboard");
+      return;
+    }
+
+    // ----------------------------
+    // GUEST DATA ONLY
+    // ----------------------------
+
     // FAVOURITES
     const { data: favData } = await supabase
       .from("favourites")
-      .select(
-        `
+      .select(`
         id,
         properties (
           id,
@@ -69,36 +67,37 @@ async function checkRole() {
           images,
           price_per_night
         )
-      `
-      )
+      `)
       .eq("user_id", user.id);
 
     setFavourites(favData || []);
-const { data: tripsData, error } = await supabase
-  .from("trips")
-  .select("*")
-  .eq("user_id", user.id)
-  .order("start_date", { ascending: true });
-console.log("Trips:", tripsData);
 
-if (!error && tripsData) {
-  const today = new Date();
+    // TRIPS
+    const { data: tripsData } = await supabase
+      .from("trips")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("start_date", { ascending: true });
 
-  const previous = tripsData.filter(
-    (trip) => new Date(trip.end_date) < today
-  );
+    if (tripsData) {
+      const today = new Date();
 
-  const upcoming = tripsData
-    .filter((trip) => new Date(trip.end_date) >= today)
-    .sort(
-      (a, b) =>
-        new Date(a.start_date).getTime() -
-        new Date(b.start_date).getTime()
-    );
+      const previous = tripsData.filter(
+        (t) => new Date(t.end_date) < today
+      );
 
-  setPreviousTrips(previous);
-  setTrip(upcoming[0] || null);
-}
+      const upcoming = tripsData
+        .filter((t) => new Date(t.end_date) >= today)
+        .sort(
+          (a, b) =>
+            new Date(a.start_date).getTime() -
+            new Date(b.start_date).getTime()
+        );
+
+      setPreviousTrips(previous);
+      setTrip(upcoming[0] || null);
+    }
+
     // REVIEWS
     const { data: reviewData } = await supabase
       .from("reviews")
@@ -110,25 +109,16 @@ if (!error && tripsData) {
     setLoading(false);
   }
 
-  // NEWSLETTER TOGGLE
-  async function toggleNewsletter(value: boolean) {
-    if (!user) return;
+  // ----------------------------
+  // INIT
+  // ----------------------------
+  useEffect(() => {
+    loadAccount();
+  }, []);
 
-    setProfile((prev: any) => ({
-      ...prev,
-      newsletter: value,
-    }));
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({ newsletter: value })
-      .eq("id", user.id);
-
-    if (error) alert(error.message);
-  }
-
-
+  // ----------------------------
   // COUNTDOWN
+  // ----------------------------
   useEffect(() => {
     if (!trip?.start_date) return;
 
@@ -152,86 +142,103 @@ if (!error && tripsData) {
     return () => clearInterval(timer);
   }, [trip]);
 
+  // ----------------------------
+  // NEWSLETTER TOGGLE
+  // ----------------------------
+  async function toggleNewsletter(value: boolean) {
+    if (!user) return;
+
+    setProfile((prev: any) => ({
+      ...prev,
+      newsletter: value,
+    }));
+
+    await supabase
+      .from("profiles")
+      .update({ newsletter: value })
+      .eq("id", user.id);
+  }
+
+  // ----------------------------
+  // REMOVE FAVOURITE
+  // ----------------------------
   async function removeFavourite(id: string) {
     await supabase.from("favourites").delete().eq("id", id);
     setFavourites((prev) => prev.filter((f) => f.id !== id));
   }
 
+  // ----------------------------
+  // LOGOUT
+  // ----------------------------
   async function handleLogout() {
     await supabase.auth.signOut();
     window.location.href = "/";
+  }
+
+  // ----------------------------
+  // LOADING STATE
+  // ----------------------------
+  if (loading) {
+    return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
   return (
     <div style={{ padding: 40, maxWidth: 900, margin: "0 auto" }}>
       <h1>👤 My Account</h1>
 
-     {/* ACCOUNT */}
-<div style={{ background: "#f5f5f5", padding: 20 }}>
-  <h2>Account Information</h2>
+      {/* ACCOUNT INFO */}
+      <div style={{ background: "#f5f5f5", padding: 20 }}>
+        <h2>Account Information</h2>
 
-  <p>Email: {user?.email}</p>
+        <p>Email: {user?.email}</p>
+        <p>Full name: {profile?.full_name || "Not set"}</p>
+        <p>Phone: {profile?.phone || "Not set"}</p>
 
-  <p>Full name: {profile?.full_name || "Not set"}</p>
-  <p>Phone: {profile?.phone || "Not set"}</p>
+        <p>
+          Address: {profile?.address || "Not set"}
+          {profile?.address && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                profile.address
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{ marginLeft: 8, color: "blue" }}
+            >
+              View on map
+            </a>
+          )}
+        </p>
 
-  <p>
-    Address: {profile?.address || "Not set"}
-    {profile?.address && (
-      <>
-        {" "}
-        <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-            profile.address
-          )}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{ marginLeft: 8, color: "blue" }}
-        >
-          View on map
-        </a>
-      </>
-    )}
-  </p>
+        <label>
+          <input
+            type="checkbox"
+            checked={profile?.newsletter || false}
+            onChange={(e) => toggleNewsletter(e.target.checked)}
+          />
+          Subscribe to newsletter
+        </label>
+      </div>
 
-  <label>
-    <input
-      type="checkbox"
-      checked={profile?.newsletter || false}
-      onChange={(e) => toggleNewsletter(e.target.checked)}
-    />
-    Subscribe to newsletter
-  </label>
-</div>
+      {/* TRIP */}
+      <div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
+        <h2>🏖️ My Next Trip</h2>
 
-{/* TRIP */}
-<div
-  style={{
-    background: "#f5f5f5",
-    padding: 20,
-    marginTop: 20,
-  }}
->
-  <h2>🏖️ My Next Trip</h2>
+        {!trip ? (
+          <p>No trip booked yet.</p>
+        ) : (
+          <>
+            <p>
+              <strong>Destination:</strong> {trip.destination}
+            </p>
+            <p>
+              <strong>Countdown:</strong> {timeLeft}
+            </p>
+          </>
+        )}
+      </div>
 
-  {!trip ? (
-    <p>No trip booked yet.</p>
-  ) : (
-    <>
-      <p>
-        <strong>Destination:</strong> {trip.destination}
-      </p>
-
-      <p>
-        <strong>Countdown:</strong> {timeLeft}
-      </p>
-    </>
-  )}
-</div>
-
-{/* FAVOURITES */}
-
-      
+      {/* FAVOURITES */}
       <div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
         <h2>❤️ My Favourite Properties</h2>
 
