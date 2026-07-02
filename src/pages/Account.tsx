@@ -14,9 +14,9 @@ const [user, setUser] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
-  useEffect(() => {
-  const checkRole = async () => {
-    const {
+
+  
+  const {
       data: { user },
     } = await supabase.auth.getUser();
 
