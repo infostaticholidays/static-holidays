@@ -50,23 +50,6 @@ const [user, setUser] = useState<any>(null);
     loadUser();
   }, []);
 
-  async function loadUser() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    setUser(user);
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return;
 
   const { data: profile } = await supabase
     .from("profiles")
