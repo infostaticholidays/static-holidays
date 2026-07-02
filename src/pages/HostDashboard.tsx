@@ -5,8 +5,8 @@ import { supabase } from "../lib/supabase";
 export default function HostDashboard() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [conversations, setConversations] = useState<any[]>([]);
 
+  const [conversations, setConversations] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -16,14 +16,13 @@ export default function HostDashboard() {
   const navigate = useNavigate();
 
   // -----------------------------
-  // LOAD HOST DATA
+  // LOAD DASHBOARD
   // -----------------------------
   async function loadDashboard() {
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: auth } = await supabase.auth.getUser();
+    const user = auth.user;
 
     if (!user) {
       navigate("/login");
@@ -31,24 +30,8 @@ export default function HostDashboard() {
     }
 
     setUser(user);
-    const { data: conv } = await supabase
-  .from("conversations")
-  .select("*")
-  .eq("host_id", user.id);
 
-setConversations(conv || []);
-
-    const { data: rev } = await supabase
-  .from("reviews")
-  .select("*")
-  .eq("host_id", user.id);
-
-setReviews(rev || []);
-
-
-    
-
-    // PROFILE (HOST CHECK + VERIFICATION STATUS)
+    // PROFILE
     const { data: profileData } = await supabase
       .from("profiles")
       .select("*")
@@ -81,6 +64,22 @@ setReviews(rev || []);
 
     setBookings(bookingsData || []);
 
+    // MESSAGES
+    const { data: conv } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("host_id", user.id);
+
+    setConversations(conv || []);
+
+    // REVIEWS
+    const { data: rev } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("host_id", user.id);
+
+    setReviews(rev || []);
+
     setLoading(false);
   }
 
@@ -91,72 +90,27 @@ setReviews(rev || []);
   // -----------------------------
   // EARNINGS
   // -----------------------------
- const commissionRate =
-  profile?.subscription_plan === "elite"
-    ? 0.01
-    : profile?.subscription_plan === "super"
-    ? 0.05
-    : 0.12;
-
-const gross = bookings.reduce(
-  (sum, b) => sum + (b.total_price || 0),
-  0
-);
-
-const commission = gross * commissionRate;
-const net = gross - commission;
-
   const commissionRate =
-  profile?.subscription_plan === "elite"
-    ? 0.01
-    : profile?.subscription_plan === "super"
-    ? 0.05
-    : 0.12;
+    profile?.subscription_plan === "elite"
+      ? 0.01
+      : profile?.subscription_plan === "super"
+      ? 0.05
+      : 0.12;
 
+  const gross = bookings.reduce(
+    (sum, b) => sum + (b.total_price || 0),
+    0
+  );
 
+  const commission = gross * commissionRate;
+  const net = gross - commission;
 
-/* ---------------- MESSAGES ---------------- */}
-<div style={card}>
-  <h2>💬 Messages</h2>
+  const totalEarned = net;
 
-  {conversations.length === 0 ? (
-    <p>No messages yet</p>
-  ) : (
-    conversations.map((c) => (
-      <div key={c.id} style={item}>
-        <p>Booking ID: {c.booking_id}</p>
-
-        <button
-          onClick={() => navigate(`/messages/${c.booking_id}`)}
-        >
-          Open Chat
-        </button>
-      </div>
-    ))
-  )}
-</div>
-
-  {/* ---------------- REVIEWS ---------------- */}
-<div style={card}>
-  <h2>⭐ Reviews</h2>
-
-  {reviews.length === 0 ? (
-    <p>No reviews yet</p>
-  ) : (
-    reviews.map((r) => (
-      <div key={r.id} style={item}>
-        <p>⭐ {r.rating}</p>
-        <p>{r.review_text}</p>
-      </div>
-    ))
-  )}
-</div>
-
-  // -----------------------------
-  // APPROVAL GATE
-  // -----------------------------
-  const isVerified =
-    profile?.id_verified && profile?.insurance_verified;
+  const potentialMonthly = properties.reduce(
+    (sum, p) => sum + (p.price_per_night || 0) * 30,
+    0
+  );
 
   // -----------------------------
   // DELETE PROPERTY
@@ -174,96 +128,103 @@ const net = gross - commission;
     return <div style={{ padding: 40 }}>Loading dashboard...</div>;
   }
 
+  const isVerified =
+    profile?.id_verified && profile?.insurance_verified;
+
   return (
     <div style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
       <h1>🏡 Host Dashboard</h1>
 
-      {/* ---------------- VERIFICATION BANNER ---------------- */}
+      {/* ---------------- VERIFICATION ---------------- */}
       {!isVerified && (
         <div style={warningBox}>
           <h3>⚠️ Account Not Verified</h3>
-          <p>
-            You must upload ID + Insurance before listing properties.
-          </p>
-
-          <button
-            style={btn}
-            onClick={() => navigate("/host-verification")}
-          >
+          <p>Upload ID + Insurance before listing properties.</p>
+          <button style={btn} onClick={() => navigate("/host-verification")}>
             Upload Documents
           </button>
         </div>
       )}
 
-      {/* ---------------- PLAN + ACCOUNT ---------------- */}
+      {/* ---------------- ACCOUNT ---------------- */}
       <div style={card}>
         <h2>💳 Account</h2>
-
-        <p>
-          <strong>Plan:</strong>{" "}
-          {profile?.subscription_plan || "Free"}
-        </p>
-
-        <p>
-          <strong>Newsletter:</strong>{" "}
-          {profile?.newsletter ? "Subscribed" : "Not subscribed"}
-        </p>
-
-        <p>
-          <strong>ID Verified:</strong>{" "}
-          {profile?.id_verified ? "Yes" : "No"}
-        </p>
-
-        <p>
-          <strong>Insurance Verified:</strong>{" "}
-          {profile?.insurance_verified ? "Yes" : "No"}
-        </p>
+        <p>Plan: {profile?.subscription_plan || "Free"}</p>
+        <p>Newsletter: {profile?.newsletter ? "Yes" : "No"}</p>
+        <p>ID Verified: {profile?.id_verified ? "Yes" : "No"}</p>
+        <p>Insurance Verified: {profile?.insurance_verified ? "Yes" : "No"}</p>
       </div>
 
       {/* ---------------- EARNINGS ---------------- */}
       <div style={card}>
         <h2>💰 Earnings</h2>
-
-        <p>Total Earned: £{totalEarned}</p>
+        <p>Gross: £{gross}</p>
+        <p>Commission: £{commission}</p>
+        <p>
+          <b>Net: £{net}</b>
+        </p>
         <p>Potential Monthly: £{potentialMonthly}</p>
+      </div>
+
+      {/* ---------------- MESSAGES ---------------- */}
+      <div style={card}>
+        <h2>💬 Messages</h2>
+
+        {conversations.length === 0 ? (
+          <p>No messages yet</p>
+        ) : (
+          conversations.map((c) => (
+            <div key={c.id} style={item}>
+              <p>Booking: {c.booking_id}</p>
+              <button onClick={() => navigate(`/messages/${c.booking_id}`)}>
+                Open Chat
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ---------------- REVIEWS ---------------- */}
+      <div style={card}>
+        <h2>⭐ Reviews</h2>
+
+        {reviews.length === 0 ? (
+          <p>No reviews yet</p>
+        ) : (
+          reviews.map((r) => (
+            <div key={r.id} style={item}>
+              <p>⭐ {r.rating}</p>
+              <p>{r.review_text}</p>
+            </div>
+          ))
+        )}
       </div>
 
       {/* ---------------- PROPERTIES ---------------- */}
       <div style={card}>
         <h2>🏡 Properties</h2>
 
-        {/* BLOCK ADD PROPERTY IF NOT VERIFIED */}
         <button
-          style={{
-            ...btn,
-            opacity: isVerified ? 1 : 0.5,
-            cursor: isVerified ? "pointer" : "not-allowed",
-          }}
+          style={{ ...btn, opacity: isVerified ? 1 : 0.5 }}
           disabled={!isVerified}
           onClick={() => navigate("/add-property")}
         >
           ➕ Add Property
         </button>
 
-        {properties.length === 0 ? (
-          <p style={{ marginTop: 10 }}>No properties yet</p>
-        ) : (
-          properties.map((p) => (
-            <div key={p.id} style={item}>
-              <h3>{p.title}</h3>
-              <p>{p.location}</p>
-              <p>£{p.price_per_night}/night</p>
+        {properties.map((p) => (
+          <div key={p.id} style={item}>
+            <h3>{p.title}</h3>
+            <p>{p.location}</p>
+            <p>£{p.price_per_night}/night</p>
 
-              <button onClick={() => navigate(`/calendar/${p.id}`)}>
-                📅 Calendar
-              </button>
+            <button onClick={() => navigate(`/calendar/${p.id}`)}>
+              📅 Calendar
+            </button>
 
-              <button onClick={() => deleteProperty(p.id)}>
-                🗑 Delete
-              </button>
-            </div>
-          ))
-        )}
+            <button onClick={() => deleteProperty(p.id)}>🗑 Delete</button>
+          </div>
+        ))}
       </div>
 
       {/* ---------------- BOOKINGS ---------------- */}
@@ -275,7 +236,9 @@ const net = gross - commission;
         ) : (
           bookings.map((b) => (
             <div key={b.id} style={item}>
-              <p>{b.start_date} → {b.end_date}</p>
+              <p>
+                {b.start_date} → {b.end_date}
+              </p>
               <p>£{b.total_price}</p>
             </div>
           ))
@@ -284,15 +247,9 @@ const net = gross - commission;
     </div>
   );
 }
-  <button onClick={() => navigate(`/calendar/${b.property_id}`)}>
-  Calendar
-</button>
-
-<button onClick={() => navigate(`/messages/${b.id}`)}>
-  Message Guest
-</button>
 
 // ---------------- STYLES ----------------
+
 const card = {
   background: "#f5f5f5",
   padding: 20,
