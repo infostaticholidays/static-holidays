@@ -14,9 +14,9 @@ export default function Account() {
 
   const navigate = useNavigate();
 
-  // ----------------------------
-  // MAIN DATA LOADER
-  // ----------------------------
+  // -----------------------------
+  // LOAD ACCOUNT
+  // -----------------------------
   async function loadAccount() {
     setLoading(true);
 
@@ -31,29 +31,32 @@ export default function Account() {
 
     setUser(user);
 
-    // PROFILE (includes role)
-    const { data: profileData, error: profileError } = await supabase
+    // PROFILE (role check here)
+    const { data: profileData, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .single();
 
-    if (profileError) {
-      console.error(profileError);
+    if (error) {
+      console.error(error);
       return;
     }
 
     setProfile(profileData);
 
-    // ROLE ROUTING (OWNER / ADMIN)
-    if (profileData?.role === "owner" || profileData?.role === "admin") {
-      navigate("/host-dashboard");
+    // 🔥 HOST REDIRECT (FIXED TO "host")
+    const isHost =
+      profileData?.role === "host" || profileData?.role === "admin";
+
+    if (isHost) {
+      navigate("/host-dashboard", { replace: true });
       return;
     }
 
-    // ----------------------------
-    // GUEST DATA ONLY
-    // ----------------------------
+    // -----------------------------
+    // GUEST DATA ONLY BELOW
+    // -----------------------------
 
     // FAVOURITES
     const { data: favData } = await supabase
@@ -109,16 +112,13 @@ export default function Account() {
     setLoading(false);
   }
 
-  // ----------------------------
-  // INIT
-  // ----------------------------
   useEffect(() => {
     loadAccount();
   }, []);
 
-  // ----------------------------
+  // -----------------------------
   // COUNTDOWN
-  // ----------------------------
+  // -----------------------------
   useEffect(() => {
     if (!trip?.start_date) return;
 
@@ -142,9 +142,9 @@ export default function Account() {
     return () => clearInterval(timer);
   }, [trip]);
 
-  // ----------------------------
+  // -----------------------------
   // NEWSLETTER TOGGLE
-  // ----------------------------
+  // -----------------------------
   async function toggleNewsletter(value: boolean) {
     if (!user) return;
 
@@ -159,34 +159,29 @@ export default function Account() {
       .eq("id", user.id);
   }
 
-  // ----------------------------
+  // -----------------------------
   // REMOVE FAVOURITE
-  // ----------------------------
+  // -----------------------------
   async function removeFavourite(id: string) {
     await supabase.from("favourites").delete().eq("id", id);
     setFavourites((prev) => prev.filter((f) => f.id !== id));
   }
 
-  // ----------------------------
+  // -----------------------------
   // LOGOUT
-  // ----------------------------
+  // -----------------------------
   async function handleLogout() {
     await supabase.auth.signOut();
     window.location.href = "/";
   }
 
-  // ----------------------------
-  // LOADING STATE
-  // ----------------------------
-  if (loading) {
-    return <div style={{ padding: 40 }}>Loading...</div>;
-  }
+  if (loading) return <div style={{ padding: 40 }}>Loading...</div>;
 
   return (
     <div style={{ padding: 40, maxWidth: 900, margin: "0 auto" }}>
       <h1>👤 My Account</h1>
 
-      {/* ACCOUNT INFO */}
+      {/* ACCOUNT */}
       <div style={{ background: "#f5f5f5", padding: 20 }}>
         <h2>Account Information</h2>
 
@@ -203,7 +198,7 @@ export default function Account() {
               )}`}
               target="_blank"
               rel="noreferrer"
-              style={{ marginLeft: 8, color: "blue" }}
+              style={{ marginLeft: 8 }}
             >
               View on map
             </a>
