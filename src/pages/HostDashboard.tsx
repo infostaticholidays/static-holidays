@@ -9,6 +9,26 @@ export default function HostDashboard() {
   useEffect(() => {
     loadProperties();
   }, []);
+  async function checkUser() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || (profile.role !== "owner" && profile.role !== "admin")) {
+    navigate("/account");
+  }
+}
 
  async function loadProperties() {
   const {
