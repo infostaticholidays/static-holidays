@@ -10,19 +10,28 @@ export default function HostDashboard() {
     loadProperties();
   }, []);
 
-  async function loadProperties() {
-    const { data, error } = await supabase
-      .from("properties")
-      .select("*")
-      .order("created_at", { ascending: false });
+ async function loadProperties() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setProperties(data || []);
+  if (!user) {
+    navigate("/login");
+    return;
   }
+
+  const { data, error } = await supabase
+    .from("properties")
+    .select("*")
+    .eq("owner_id", user.id); 
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  setProperties(data || []);
+}
 
   async function deleteProperty(id: string) {
     const confirmed = window.confirm(
