@@ -5,9 +5,11 @@ import { supabase } from "../lib/supabase";
 export default function HostDashboard() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [conversations, setConversations] = useState<any[]>([]);
 
   const [properties, setProperties] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -29,6 +31,22 @@ export default function HostDashboard() {
     }
 
     setUser(user);
+    const { data: conv } = await supabase
+  .from("conversations")
+  .select("*")
+  .eq("host_id", user.id);
+
+setConversations(conv || []);
+
+    const { data: rev } = await supabase
+  .from("reviews")
+  .select("*")
+  .eq("host_id", user.id);
+
+setReviews(rev || []);
+
+
+    
 
     // PROFILE (HOST CHECK + VERIFICATION STATUS)
     const { data: profileData } = await supabase
@@ -73,15 +91,60 @@ export default function HostDashboard() {
   // -----------------------------
   // EARNINGS
   // -----------------------------
-  const totalEarned = bookings.reduce(
-    (sum, b) => sum + (b.total_price || 0),
-    0
-  );
+ const commissionRate =
+  profile?.subscription_plan === "elite"
+    ? 0.01
+    : profile?.subscription_plan === "super"
+    ? 0.05
+    : 0.12;
 
-  const potentialMonthly = properties.reduce(
-    (sum, p) => sum + (p.price_per_night || 0) * 30,
-    0
-  );
+const gross = bookings.reduce(
+  (sum, b) => sum + (b.total_price || 0),
+  0
+);
+
+const commission = gross * commissionRate;
+const net = gross - commission;
+
+  <p>Gross Earnings: £{gross}</p>
+<p>Commission: £{commission}</p>
+<p><b>Net Earnings: £{net}</b></p>
+  {/* ---------------- MESSAGES ---------------- */}
+<div style={card}>
+  <h2>💬 Messages</h2>
+
+  {conversations.length === 0 ? (
+    <p>No messages yet</p>
+  ) : (
+    conversations.map((c) => (
+      <div key={c.id} style={item}>
+        <p>Booking ID: {c.booking_id}</p>
+
+        <button
+          onClick={() => navigate(`/messages/${c.booking_id}`)}
+        >
+          Open Chat
+        </button>
+      </div>
+    ))
+  )}
+</div>
+
+  {/* ---------------- REVIEWS ---------------- */}
+<div style={card}>
+  <h2>⭐ Reviews</h2>
+
+  {reviews.length === 0 ? (
+    <p>No reviews yet</p>
+  ) : (
+    reviews.map((r) => (
+      <div key={r.id} style={item}>
+        <p>⭐ {r.rating}</p>
+        <p>{r.review_text}</p>
+      </div>
+    ))
+  )}
+</div>
 
   // -----------------------------
   // APPROVAL GATE
@@ -215,6 +278,13 @@ export default function HostDashboard() {
     </div>
   );
 }
+  <button onClick={() => navigate(`/calendar/${b.property_id}`)}>
+  Calendar
+</button>
+
+<button onClick={() => navigate(`/messages/${b.id}`)}>
+  Message Guest
+</button>
 
 // ---------------- STYLES ----------------
 const card = {
