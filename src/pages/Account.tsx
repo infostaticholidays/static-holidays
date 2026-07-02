@@ -39,6 +39,29 @@ const [user, setUser] = useState<any>(null);
     }
 
     setUser(user);
+    const navigate = useNavigate();
+
+useEffect(() => {
+  checkRole();
+}, []);
+
+async function checkRole() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role === "owner" || profile?.role === "admin") {
+    navigate("/host-dashboard");
+  }
+}
 
     // PROFILE
     const { data: profileData } = await supabase
