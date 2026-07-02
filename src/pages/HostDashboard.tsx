@@ -3,267 +3,247 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 export default function HostDashboard() {
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+
   const [properties, setProperties] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
-useEffect(() => {
-  checkUser();
-  loadProperties();
-}, []);
-  async function checkUser() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    navigate("/login");
-    return;
-  }
+  // -----------------------------
+  // LOAD HOST DATA
+  // -----------------------------
+  async function loadDashboard() {
+    setLoading(true);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!profile || (profile.role !== "owner" && profile.role !== "admin")) {
-    navigate("/account");
-  }
-}
-
- async function loadProperties() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    navigate("/login");
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("properties")
-    .select("*")
-    .eq("owner_id", user.id); 
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  setProperties(data || []);
-}
-
-  async function deleteProperty(id: string) {
-    const confirmed = window.confirm(
-      "Delete this property?"
-    );
-
-    if (!confirmed) return;
-
-    const { error } = await supabase
-      .from("properties")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      alert(error.message);
+    if (!user) {
+      navigate("/login");
       return;
     }
 
-    loadProperties();
+    setUser(user);
+
+    // PROFILE (HOST CHECK + VERIFICATION STATUS)
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (!profileData || profileData.role !== "host") {
+      navigate("/account");
+      return;
+    }
+
+    setProfile(profileData);
+
+    // PROPERTIES
+    const { data: props } = await supabase
+      .from("properties")
+      .select("*")
+      .eq("owner_id", user.id);
+
+    setProperties(props || []);
+
+    // BOOKINGS
+    const { data: bookingsData } = await supabase
+      .from("bookings")
+      .select("*")
+      .in(
+        "property_id",
+        (props || []).map((p) => p.id)
+      );
+
+    setBookings(bookingsData || []);
+
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  // -----------------------------
+  // EARNINGS
+  // -----------------------------
+  const totalEarned = bookings.reduce(
+    (sum, b) => sum + (b.total_price || 0),
+    0
+  );
+
+  const potentialMonthly = properties.reduce(
+    (sum, p) => sum + (p.price_per_night || 0) * 30,
+    0
+  );
+
+  // -----------------------------
+  // APPROVAL GATE
+  // -----------------------------
+  const isVerified =
+    profile?.id_verified && profile?.insurance_verified;
+
+  // -----------------------------
+  // DELETE PROPERTY
+  // -----------------------------
+  async function deleteProperty(id: string) {
+    const ok = window.confirm("Delete property?");
+    if (!ok) return;
+
+    await supabase.from("properties").delete().eq("id", id);
+
+    setProperties((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  if (loading) {
+    return <div style={{ padding: 40 }}>Loading dashboard...</div>;
   }
 
   return (
-    <div
-      style={{
-        padding: "40px",
-        fontFamily: "Arial",
-        maxWidth: "1200px",
-        margin: "0 auto",
-      }}
-    >
-      <h1 style={{ color: "#14532d" }}>
-        Host Dashboard
-      </h1>
+    <div style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
+      <h1>🏡 Host Dashboard</h1>
 
-      <p>
-        Manage your holiday properties, bookings and guests.
-      </p>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit,minmax(250px,1fr))",
-          gap: "20px",
-          marginTop: "30px",
-        }}
-      >
-        <div style={card}>
-          <h2>🏡 Properties</h2>
-
+      {/* ---------------- VERIFICATION BANNER ---------------- */}
+      {!isVerified && (
+        <div style={warningBox}>
+          <h3>⚠️ Account Not Verified</h3>
           <p>
-            {properties.length} Properties Listed
+            You must upload ID + Insurance before listing properties.
           </p>
 
-          <ul
-            style={{
-              listStyle: "none",
-              padding: 0,
-            }}
+          <button
+            style={btn}
+            onClick={() => navigate("/host-verification")}
           >
-            {properties.map((property) => (
-              <li
-                key={property.id}
-                style={{
-                  padding: "12px 0",
-                  borderBottom:
-                    "1px solid #ddd",
-                }}
-              >
-                <div>
-                  <strong>
-                    {property.title ||
-                      "Untitled Property"}
-                  </strong>
-
-                  <p
-                    style={{
-                      margin: "5px 0",
-                      color: "#666",
-                    }}
-                  >
-                    📍{" "}
-                    {property.location ||
-                      "No location"}
-                  </p>
-                </div>
-
-                <div
-                  style={{
-                    marginTop: "8px",
-                  }}
-                >
-                  <button
-                    style={calendarBtn}
-                    onClick={() =>
-                      navigate(
-                        `/calendar/${property.id}`
-                      )
-                    }
-                  >
-                    📅 Calendar
-                  </button>
-
-                  <button
-                    style={editBtn}
-                    onClick={() =>
-                      alert(
-                        "Edit page coming next"
-                      )
-                    }
-                  >
-                    ✏️ Edit
-                  </button>
-
-                  <button
-                    style={deleteBtn}
-                    onClick={() =>
-                      deleteProperty(
-                        property.id
-                      )
-                    }
-                  >
-                    🗑 Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+            Upload Documents
+          </button>
         </div>
+      )}
 
-        <div style={card}>
-          <h2>📅 Bookings</h2>
-          <p>0 Upcoming Bookings</p>
-        </div>
+      {/* ---------------- PLAN + ACCOUNT ---------------- */}
+      <div style={card}>
+        <h2>💳 Account</h2>
 
-        <div style={card}>
-          <h2>💬 Messages</h2>
-          <p>0 New Messages</p>
-        </div>
+        <p>
+          <strong>Plan:</strong>{" "}
+          {profile?.subscription_plan || "Free"}
+        </p>
 
-        <div style={card}>
-          <h2>🛡 Verification</h2>
-          <p>Pending</p>
-        </div>
+        <p>
+          <strong>Newsletter:</strong>{" "}
+          {profile?.newsletter ? "Subscribed" : "Not subscribed"}
+        </p>
+
+        <p>
+          <strong>ID Verified:</strong>{" "}
+          {profile?.id_verified ? "Yes" : "No"}
+        </p>
+
+        <p>
+          <strong>Insurance Verified:</strong>{" "}
+          {profile?.insurance_verified ? "Yes" : "No"}
+        </p>
       </div>
 
-      <div style={{ marginTop: "30px" }}>
-        <button
-          style={btn}
-          onClick={() => {
-            window.history.pushState(
-              {},
-              "",
-              "/add-property"
-            );
+      {/* ---------------- EARNINGS ---------------- */}
+      <div style={card}>
+        <h2>💰 Earnings</h2>
 
-            window.dispatchEvent(
-              new PopStateEvent(
-                "popstate"
-              )
-            );
+        <p>Total Earned: £{totalEarned}</p>
+        <p>Potential Monthly: £{potentialMonthly}</p>
+      </div>
+
+      {/* ---------------- PROPERTIES ---------------- */}
+      <div style={card}>
+        <h2>🏡 Properties</h2>
+
+        {/* BLOCK ADD PROPERTY IF NOT VERIFIED */}
+        <button
+          style={{
+            ...btn,
+            opacity: isVerified ? 1 : 0.5,
+            cursor: isVerified ? "pointer" : "not-allowed",
           }}
+          disabled={!isVerified}
+          onClick={() => navigate("/add-property")}
         >
           ➕ Add Property
         </button>
+
+        {properties.length === 0 ? (
+          <p style={{ marginTop: 10 }}>No properties yet</p>
+        ) : (
+          properties.map((p) => (
+            <div key={p.id} style={item}>
+              <h3>{p.title}</h3>
+              <p>{p.location}</p>
+              <p>£{p.price_per_night}/night</p>
+
+              <button onClick={() => navigate(`/calendar/${p.id}`)}>
+                📅 Calendar
+              </button>
+
+              <button onClick={() => deleteProperty(p.id)}>
+                🗑 Delete
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ---------------- BOOKINGS ---------------- */}
+      <div style={card}>
+        <h2>📅 Bookings</h2>
+
+        {bookings.length === 0 ? (
+          <p>No bookings yet</p>
+        ) : (
+          bookings.map((b) => (
+            <div key={b.id} style={item}>
+              <p>{b.start_date} → {b.end_date}</p>
+              <p>£{b.total_price}</p>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 }
 
+// ---------------- STYLES ----------------
 const card = {
+  background: "#f5f5f5",
+  padding: 20,
+  marginBottom: 20,
+  borderRadius: 10,
+};
+
+const item = {
   background: "white",
-  padding: "20px",
-  borderRadius: "12px",
-  boxShadow:
-    "0 4px 10px rgba(0,0,0,0.1)",
+  padding: 10,
+  marginTop: 10,
+  borderRadius: 8,
 };
 
 const btn = {
   background: "#16a34a",
   color: "white",
   border: "none",
-  padding: "14px 24px",
-  borderRadius: "8px",
+  padding: "10px 16px",
+  borderRadius: 8,
   cursor: "pointer",
 };
 
-const calendarBtn = {
-  background: "#2563eb",
-  color: "white",
-  border: "none",
-  padding: "6px 12px",
-  borderRadius: "6px",
-  marginRight: "8px",
-  cursor: "pointer",
-};
-
-const editBtn = {
-  background: "#14532d",
-  color: "white",
-  border: "none",
-  padding: "6px 12px",
-  borderRadius: "6px",
-  marginRight: "8px",
-  cursor: "pointer",
-};
-
-const deleteBtn = {
-  background: "#dc2626",
-  color: "white",
-  border: "none",
-  padding: "6px 12px",
-  borderRadius: "6px",
-  cursor: "pointer",
+const warningBox = {
+  background: "#fff3cd",
+  padding: 15,
+  borderRadius: 10,
+  marginBottom: 20,
+  border: "1px solid #ffeeba",
 };
