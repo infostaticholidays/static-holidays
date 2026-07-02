@@ -21,8 +21,7 @@ const [user, setUser] = useState<any>(null);
     } = await supabase.auth.getUser();
 
     if (!user) return;
-
-    const { data: profile } = await supabase
+const { data: profileData }  = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
