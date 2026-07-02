@@ -29,6 +29,7 @@ import Services from "./pages/Services";
 
 
 import Account from "./pages/Account";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import PropertyCalendar from "./pages/PropertyCalendar";
 import Blog from "./pages/Blog";
