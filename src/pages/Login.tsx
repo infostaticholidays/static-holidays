@@ -38,12 +38,11 @@ export default function Login() {
       return;
     }
 
-    if (profile?.role === "host") {
-      navigate("/host-dashboard");
-    } else {
-      navigate("/account");
-    }
-  }
+  if (profile?.role === "owner" || profile?.role === "admin") {
+  navigate("/owner-dashboard");
+} else {
+  navigate("/account");
+}
 
   return (
     <div style={{ padding: 40 }}>
