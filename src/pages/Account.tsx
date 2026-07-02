@@ -49,8 +49,7 @@ const { data: profileData }  = await supabase
     loadUser();
   }, []);
 
-
-  const { data: profile } = await supabase
+const { data: profileData }  = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
