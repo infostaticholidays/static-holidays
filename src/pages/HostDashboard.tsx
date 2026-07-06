@@ -133,7 +133,19 @@ export default function HostDashboard() {
 
   return (
     <div style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
-      <h1>🏡 Host Dashboard</h1>
+  <h1>
+  🏡 {profile?.full_name
+    ? `${profile.full_name}'s Dashboard`
+    : "Host Dashboard"}
+</h1>
+
+<p style={{ fontSize: "18px", marginBottom: "30px" }}>
+  Welcome back{" "}
+  <strong>
+    {profile?.full_name?.split(" ")[0] || "Host"}
+  </strong>{" "}
+  👋
+</p>
 
       {/* ---------------- VERIFICATION ---------------- */}
       {!isVerified && (
