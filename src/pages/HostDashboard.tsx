@@ -128,16 +128,16 @@ export default function HostDashboard() {
     return <div style={{ padding: 40 }}>Loading dashboard...</div>;
   }
 
-  const isVerified =
-    profile?.id_verified && profile?.insurance_verified;
+ 
+const isVerified =
+  profile?.id_verified && profile?.insurance_verified;
 
-   <button onClick={() => navigate("/host-compliance")}>
-    📋 Compliance Centre
-  </button>
+<button onClick={() => navigate("/host-compliance")}>
+  📋 Compliance Centre
+</button>
 </div>
-   </div>
-);
-  
+
+return (
 
   return (
     <div style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
