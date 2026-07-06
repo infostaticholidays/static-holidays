@@ -135,7 +135,8 @@ export default function HostDashboard() {
     📋 Compliance Centre
   </button>
 </div>
-  
+   </div>
+);
   
 
   return (
