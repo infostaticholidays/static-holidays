@@ -35,7 +35,7 @@ import PropertyCalendar from "./pages/PropertyCalendar";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import GuestReviewForm from "../components/GuestReviewForm";
-import HostVerification from "./pages/HostVerification";
+import HostCompliance from "./pages/HostCompliance";
 
 
 export default function App() {
@@ -128,6 +128,10 @@ export default function App() {
           
   <Route path="/blog" element={<Blog />} />
   <Route path="/blog/:slug" element={<BlogDetail />} />
+        
+<Routes>
+  <Route path="/host-compliance" element={<HostCompliance />} />
+</Routes>
 
 
           {/* ACCOUNT */}
