@@ -165,34 +165,38 @@ export default function HostCompliance() {
   // DOCUMENT ROW COMPONENT
   // -------------------------
   function DocumentRow({ title, type }: any) {
-    const existing = documents.find(
-      (d) => d.document_type === type
-    );
+  const existing = documents.find(
+    (d) => d.document_type === type
+  );
 
-    return (
-      <div style={row}>
-        <div>
-          <strong>{title}</strong>
+  return (
+    <div style={row}>
+      <div>
+        <strong>{title}</strong>
 
-          <p style={{ margin: 0, fontSize: 12 }}>
-            Status:{" "}
-            {existing?.status || "Pending"}
-          </p>
-        </div>
-
-        <input
-          type="file"
-          accept=".pdf,.jpg,.jpeg,.png"
-          onChange={(e) =>
-            uploadDocument(
-              type,
-              e.target.files?.[0]
-            )
-          }
-        />
+        <p>
+          Status: {existing?.status || "Pending"}
+        </p>
       </div>
-    );
-  }
+
+      <input
+        type="file"
+        accept=".pdf,.jpg,.jpeg,.png"
+        onChange={(e) =>
+          uploadDocument(type, e.target.files?.[0])
+        }
+      />
+    </div>
+  );
+}
+
+
+if (loading) {
+  return <div style={{ padding: 40 }}>Loading...</div>;
+}
+
+return (
+  <div style={{ maxWidth: 1000, padding: 40 }}>
       {/* HEADER */}
       <h1>
         📋 {profile?.full_name
