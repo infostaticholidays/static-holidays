@@ -133,6 +133,38 @@ export default function HostCompliance() {
   }
 
   return (
+      // -------------------------
+  // DOCUMENT ROW COMPONENT
+  // -------------------------
+  function DocumentRow({ title, type }: any) {
+    const existing = documents.find(
+      (d) => d.document_type === type
+    );
+
+    return (
+      <div style={row}>
+        <div>
+          <strong>{title}</strong>
+
+          <p style={{ margin: 0, fontSize: 12 }}>
+            Status:{" "}
+            {existing?.status || "Pending"}
+          </p>
+        </div>
+
+        <input
+          type="file"
+          accept=".pdf,.jpg,.jpeg,.png"
+          onChange={(e) =>
+            uploadDocument(
+              type,
+              e.target.files?.[0]
+            )
+          }
+        />
+      </div>
+    );
+  }
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: 40 }}>
 
       {/* HEADER */}
