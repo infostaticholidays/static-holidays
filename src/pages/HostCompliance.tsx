@@ -198,6 +198,7 @@ if (loading) {
 return (
   <div style={{ maxWidth: 1000, padding: 40 }}>
       {/* HEADER */}
+   
       <h1>
         📋 {profile?.full_name
           ? `${profile.full_name}'s Compliance Centre`
