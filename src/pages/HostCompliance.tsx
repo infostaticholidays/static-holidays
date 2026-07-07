@@ -152,20 +152,45 @@ export default function HostCompliance() {
       <div style={card}>
         <h2>🛡 Insurance</h2>
 
-        <DocumentRow title="Public Liability (£2m)" />
-        <DocumentRow title="Holiday Let Insurance" />
-      </div>
+      
+      <DocumentRow
+  title="Public Liability (£2m)"
+  type="public_liability"
+/>
+
+<DocumentRow
+  title="Holiday Let Insurance"
+  type="holiday_insurance"
+/>
 
       {/* SAFETY */}
       <div style={card}>
         <h2>🔥 Safety Certificates</h2>
 
-        <DocumentRow title="Gas Safety (CP12)" />
-        <DocumentRow title="EICR Certificate" />
-        <DocumentRow title="PAT Testing" />
-        <DocumentRow title="Fire Risk Assessment" />
-        <DocumentRow title="Smoke/CO Alarm Proof" />
-      </div>
+     <DocumentRow
+  title="Gas Safety (CP12)"
+  type="gas_safety"
+/>
+
+<DocumentRow
+  title="EICR Certificate"
+  type="eicr"
+/>
+
+<DocumentRow
+  title="PAT Testing"
+  type="pat"
+/>
+
+<DocumentRow
+  title="Fire Risk Assessment"
+  type="fire_safety"
+/>
+
+<DocumentRow
+  title="Smoke/CO Alarm Proof"
+  type="smoke_alarm"
+/>
 
       {/* ACTION */}
    function DocumentRow({ title, type }: any) {
