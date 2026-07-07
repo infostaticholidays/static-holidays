@@ -160,7 +160,7 @@ export default function HostCompliance() {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
-  return (
+ return (
       // -------------------------
   // DOCUMENT ROW COMPONENT
   // -------------------------
@@ -193,8 +193,6 @@ export default function HostCompliance() {
       </div>
     );
   }
-    <div style={{ maxWidth: 1000, margin: "0 auto", padding: 40 }}>
-
       {/* HEADER */}
       <h1>
         📋 {profile?.full_name
