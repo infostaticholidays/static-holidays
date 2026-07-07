@@ -133,10 +133,20 @@ export default function HostCompliance() {
       <div style={card}>
         <h2>👤 Owner Verification</h2>
 
-        <DocumentRow title="Passport / Driving Licence" />
-        <DocumentRow title="Proof of Address" />
-        <DocumentRow title="Ownership Proof" />
-      </div>
+   <DocumentRow
+  title="Passport / Driving Licence"
+  type="passport"
+/>
+
+<DocumentRow
+  title="Proof of Address"
+  type="proof_address"
+/>
+
+<DocumentRow
+  title="Ownership Proof"
+  type="ownership"
+/>
 
       {/* INSURANCE */}
       <div style={card}>
