@@ -111,7 +111,7 @@ export default function App() {
           <Route path="/adverts" element={<Adverts />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/:id" element={<ShopDetail />} />
-          <Route path="/host-verification" element={<HostVerification />} />
+      
 
           <Route path="/holidayowners" element={<HolidayOwners />} />
 
