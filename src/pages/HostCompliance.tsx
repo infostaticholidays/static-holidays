@@ -158,22 +158,30 @@ export default function HostCompliance() {
       </div>
 
       {/* ACTION */}
-   <div style={card}>
-  <h3>Passport / Driving Licence</h3>
+   function DocumentRow({ title, type }: any) {
+  return (
+    <div style={row}>
+      <div>
+        <strong>{title}</strong>
 
-  <p>Status: Pending</p>
+        <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
+          Status: Pending
+        </p>
+      </div>
 
-  <input
-    type="file"
-    accept=".pdf,.jpg,.jpeg,.png"
-    onChange={(e) =>
-      uploadDocument(
-        "passport",
-        e.target.files?.[0]
-      )
-    }
-  />
-</div>
+      <input
+        type="file"
+        accept=".pdf,.jpg,.jpeg,.png"
+        onChange={(e) =>
+          uploadDocument(
+            type,
+            e.target.files?.[0]
+          )
+        }
+      />
+    </div>
+  );
+}
 
 // -------------------------
 // SIMPLE DOCUMENT ROW
