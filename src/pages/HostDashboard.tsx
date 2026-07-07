@@ -161,29 +161,27 @@ return (
 
       {/* ---------------- ACCOUNT ---------------- */}
       <div style={card}>
-        <h2>💳 Account</h2>
-        <p>Plan: {profile?.subscription_plan || "Free"}</p>
-        <p>Newsletter: {profile?.newsletter ? "Yes" : "No"}</p>
-        <p>ID Verified: {profile?.id_verified ? "Yes" : "No"}</p>
-        <p>Insurance Verified: {profile?.insurance_verified ? "Yes" : "No"}</p>
-      </div>
-      <div style={{ background: "#f5f5f5", padding: 20, marginTop: 20 }}>
-  <h2>💳 Subscription Plan</h2>
+  <h2>💳 Account</h2>
 
-  <p>Current Plan: {profile?.subscription_plan || "Host (Free)"}</p>
+  <p><strong>Plan:</strong> {profile?.subscription_plan || "Host (Free)"}</p>
 
-  <p>Commission Rate:</p>
-  <ul>
-    <li>Host (Free): 12%</li>
-    <li>Super Host: 5%</li>
-    <li>Elite Host: 1%</li>
-  </ul>
+  <p><strong>Newsletter:</strong> {profile?.newsletter ? "Yes" : "No"}</p>
 
-  <button onClick={() => navigate("/upgrade-plan")}>
-    Upgrade Plan
+  <p><strong>ID Verified:</strong> {profile?.id_verified ? "✅ Yes" : "❌ No"}</p>
+
+  <p><strong>Insurance Verified:</strong> {profile?.insurance_verified ? "✅ Yes" : "❌ No"}</p>
+
+  <button
+    style={{
+      ...btn,
+      marginTop: 15,
+      width: "100%",
+    }}
+    onClick={() => navigate("/host-compliance")}
+  >
+    📋 Compliance Centre
   </button>
 </div>
-
       {/* ---------------- EARNINGS ---------------- */}
       <div style={card}>
         <h2>💰 Earnings</h2>
