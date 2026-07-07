@@ -157,48 +157,17 @@ export default function HostCompliance() {
   );
 }
   if (loading) {
-    return <div style={{ padding: 40 }}>Loading...</div>;
+    return (
+      <div style={{ padding: 40 }}>
+        Loading...
+      </div>
+    );
   }
 
- return (
-      // -------------------------
-  // DOCUMENT ROW COMPONENT
-  // -------------------------
-  function DocumentRow({ title, type }: any) {
-  const existing = documents.find(
-    (d) => d.document_type === type
-  );
 
   return (
-    <div style={row}>
-      <div>
-        <strong>{title}</strong>
+    <div style={{ maxWidth: 1000, margin: "0 auto", padding: 40 }}>
 
-        <p>
-          Status: {existing?.status || "Pending"}
-        </p>
-      </div>
-
-      <input
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png"
-        onChange={(e) =>
-          uploadDocument(type, e.target.files?.[0])
-        }
-      />
-    </div>
-  );
-}
-
-
-if (loading) {
-  return <div style={{ padding: 40 }}>Loading...</div>;
-}
-
-return (
-  <div style={{ maxWidth: 1000, padding: 40 }}>
-      {/* HEADER */}
-   
       <h1>
         📋 {profile?.full_name
           ? `${profile.full_name}'s Compliance Centre`
@@ -209,103 +178,124 @@ return (
         Complete your documents to start receiving bookings.
       </p>
 
-      {/* STATUS CARD */}
+
+      {/* STATUS */}
       <div style={card}>
         <h2>Overall Status</h2>
+
         <p>{status}</p>
 
-        {/* PROGRESS BAR */}
         <div style={barBg}>
           <div
             style={{
               width: `${progress}%`,
               height: "100%",
               background: "#16a34a",
-              transition: "0.3s",
             }}
           />
         </div>
 
         <p>
-          {progress}% complete ({approvedDocs} /{" "}
-          {requiredDocs.length})
+          {progress}% complete ({approvedDocs}/{requiredDocs.length})
         </p>
       </div>
 
-      {/* OWNER SECTION */}
+
+      {/* OWNER DOCUMENTS */}
       <div style={card}>
         <h2>👤 Owner Verification</h2>
 
-   <DocumentRow
-  title="Passport / Driving Licence"
-  type="passport"
-/>
+        <DocumentRow
+          title="Passport / Driving Licence"
+          type="passport"
+        />
 
-<DocumentRow
-  title="Proof of Address"
-  type="proof_address"
-/>
+        <DocumentRow
+          title="Proof of Address"
+          type="proof_address"
+        />
 
-<DocumentRow
-  title="Ownership Proof"
-  type="ownership"
-/>
+        <DocumentRow
+          title="Ownership Proof"
+          type="ownership"
+        />
+
+      </div>
+
 
       {/* INSURANCE */}
       <div style={card}>
+
         <h2>🛡 Insurance</h2>
 
-      
-      <DocumentRow
-  title="Public Liability (£2m)"
-  type="public_liability"
-/>
+        <DocumentRow
+          title="Public Liability (£2m)"
+          type="public_liability"
+        />
 
-<DocumentRow
-  title="Holiday Let Insurance"
-  type="holiday_insurance"
-/>
+        <DocumentRow
+          title="Holiday Let Insurance"
+          type="holiday_insurance"
+        />
+
+      </div>
+
 
       {/* SAFETY */}
       <div style={card}>
+
         <h2>🔥 Safety Certificates</h2>
 
-     <DocumentRow
-  title="Gas Safety (CP12)"
-  type="gas_safety"
-/>
+        <DocumentRow
+          title="Gas Safety (CP12)"
+          type="gas_safety"
+        />
 
-<DocumentRow
-  title="EICR Certificate"
-  type="eicr"
-/>
+        <DocumentRow
+          title="EICR Certificate"
+          type="eicr"
+        />
 
-<DocumentRow
-  title="PAT Testing"
-  type="pat"
-/>
+        <DocumentRow
+          title="PAT Testing"
+          type="pat"
+        />
 
-<DocumentRow
-  title="Fire Risk Assessment"
-  type="fire_safety"
-/>
+        <DocumentRow
+          title="Fire Risk Assessment"
+          type="fire_safety"
+        />
 
-<DocumentRow
-  title="Smoke/CO Alarm Proof"
-  type="smoke_alarm"
-/>
+        <DocumentRow
+          title="Smoke/CO Alarm Proof"
+          type="smoke_alarm"
+        />
 
-      {/* ACTION */}
-   function DocumentRow({ title, type }: any) {
+      </div>
+
+
+    </div>
+  );
+}
+
+
+// -------------------------
+// DOCUMENT ROW COMPONENT
+// -------------------------
+
+function DocumentRow({ title, type }: any) {
+
   return (
     <div style={row}>
+
       <div>
         <strong>{title}</strong>
 
-        <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
+        <p style={{ margin: 0, fontSize: 12 }}>
           Status: Pending
         </p>
       </div>
+
 
       <input
         type="file"
@@ -317,28 +307,10 @@ return (
           )
         }
       />
+
     </div>
   );
 }
-
-// -------------------------
-// SIMPLE DOCUMENT ROW
-// -------------------------
-function DocumentRow({ title }: { title: string }) {
-  return (
-    <div style={row}>
-      <div>
-        <strong>{title}</strong>
-        <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
-          Status: Pending
-        </p>
-      </div>
-
-      <button style={smallBtn}>Upload</button>
-    </div>
-  );
-}
-
 // -------------------------
 // STYLES
 // -------------------------
