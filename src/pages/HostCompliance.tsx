@@ -78,15 +78,14 @@ export default function HostCompliance() {
     }
 
 
-    await supabase
-      .from("host_documents")
-      .insert({
-        host_id: user.id,
-        document_type: type,
-        file_path: filePath,
-        status: "pending",
-      });
-
+   await supabase
+  .from("host_documents")
+  .insert({
+    host_id: user.id,
+    document_type: type,
+    file_url: filePath,
+    status: "pending",
+  });
 
     alert("Document uploaded successfully");
 
