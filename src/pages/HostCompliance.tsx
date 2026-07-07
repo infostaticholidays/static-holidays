@@ -9,6 +9,7 @@ export default function HostCompliance() {
 
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
 
   // -------------------------
   // LOAD USER + PROFILE
@@ -54,6 +55,45 @@ export default function HostCompliance() {
   useEffect(() => {
     loadData();
   }, []);
+
+    // -------------------------
+  // UPLOAD DOCUMENT
+  // -------------------------
+
+   async function uploadDocument(type: string, file?: File) {
+
+    if (!file || !user) return;
+
+    const filePath = `${user.id}/${type}-${Date.now()}-${file.name}`;
+
+
+    const { error: uploadError } = await supabase.storage
+      .from("host-documents")
+      .upload(filePath, file);
+
+
+    if (uploadError) {
+      alert(uploadError.message);
+      return;
+    }
+
+
+    await supabase
+      .from("host_documents")
+      .insert({
+        host_id: user.id,
+        document_type: type,
+        file_path: filePath,
+        status: "pending",
+      });
+
+
+    alert("Document uploaded successfully");
+
+    loadData();
+  }
+
+
 
   // -------------------------
   // PROGRESS CALCULATION
