@@ -132,14 +132,7 @@ export default function HostDashboard() {
 const isVerified =
   profile?.id_verified && profile?.insurance_verified;
 
-<button onClick={() => navigate("/host-compliance")}>
-  📋 Compliance Centre
-</button>
-</div>
-
 return (
-
-  return (
     <div style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
   <h1>
   🏡 {profile?.full_name
