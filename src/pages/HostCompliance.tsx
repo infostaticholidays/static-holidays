@@ -158,19 +158,22 @@ export default function HostCompliance() {
       </div>
 
       {/* ACTION */}
-      <div style={card}>
-        <h2>Next Step</h2>
+   <div style={card}>
+  <h3>Passport / Driving Licence</h3>
 
-        <button
-          style={btn}
-          onClick={() => navigate("/upload-document")}
-        >
-          Upload Documents
-        </button>
-      </div>
-    </div>
-  );
-}
+  <p>Status: Pending</p>
+
+  <input
+    type="file"
+    accept=".pdf,.jpg,.jpeg,.png"
+    onChange={(e) =>
+      uploadDocument(
+        "passport",
+        e.target.files?.[0]
+      )
+    }
+  />
+</div>
 
 // -------------------------
 // SIMPLE DOCUMENT ROW
