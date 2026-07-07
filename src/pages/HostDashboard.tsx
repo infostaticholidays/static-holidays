@@ -153,9 +153,9 @@ return (
         <div style={warningBox}>
           <h3>⚠️ Account Not Verified</h3>
           <p>Upload ID + Insurance before listing properties.</p>
-          <button style={btn} onClick={() => navigate("/host-verification")}>
-            Upload Documents
-          </button>
+          <button style={btn} onClick={() => navigate("/host-compliance")}>
+  Upload Documents
+</button>
         </div>
       )}
 
