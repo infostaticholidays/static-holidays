@@ -129,9 +129,11 @@ export default function App() {
   <Route path="/blog" element={<Blog />} />
   <Route path="/blog/:slug" element={<BlogDetail />} />
         
-<Routes>
-  <Route path="/host-compliance" element={<HostCompliance />} />
-</Routes>
+<Route
+  path="/host-compliance"
+  element={<HostCompliance />}
+/>
+
 
 
           {/* ACCOUNT */}
