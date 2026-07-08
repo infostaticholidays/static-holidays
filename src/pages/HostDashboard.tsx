@@ -164,17 +164,15 @@ return (
   <h2>💳 Account</h2>
 
   <p>
-  Plan:{" "}
-  <strong>
+    <strong>Plan:</strong>{" "}
     {profile?.subscription_plan === "elite"
       ? "👑 Elite Host"
       : profile?.subscription_plan === "super"
       ? "⭐ Super Host"
       : "🟢 Host (Free)"}
-  </strong>
-</p>
-<div style={{ marginTop: 15 }}>
-  <label>
+  </p>
+
+  <label style={{ display: "block", marginTop: 15 }}>
     <input
       type="checkbox"
       checked={profile?.newsletter || false}
@@ -193,32 +191,12 @@ return (
       }}
     />
 
-    Receive our newsletter
+    {" "}Receive our newsletter
   </label>
-</div>
-        <p>
-  Current Plan:{" "}
-  <strong>
-    {profile?.subscription_plan === "elite"
-      ? "👑 Elite Host"
-      : profile?.subscription_plan === "super"
-      ? "⭐ Super Host"
-      : "🟢 Host (Free)"}
-  </strong>
-</p>
-  <div
-    style={{
-      marginTop: 15,
-      padding: 15,
-      background: "#fff8dc",
-      borderRadius: 8,
-    }}
-  >
-    ⭐ Upgrade to Super Host or Elite Host for the chance to have your property featured in our newsletter and across our social media channels.
-  </div>
-) : (
-  <div style={{ marginTop: 10 }}>
-    <label>
+
+  {profile?.subscription_plan === "super" ||
+  profile?.subscription_plan === "elite" ? (
+    <label style={{ display: "block", marginTop: 15 }}>
       <input
         type="checkbox"
         checked={profile?.featured_marketing || false}
@@ -239,21 +217,33 @@ return (
         }}
       />
 
-      I would like my property to be considered for
-      newsletters and social media promotion.
+      {" "}I'd like my property to be considered for newsletters and social media promotion.
     </label>
-  </div>
-)}
-  <p><strong>ID Verified:</strong> {profile?.id_verified ? "✅ Yes" : "❌ No"}</p>
+  ) : (
+    <div
+      style={{
+        marginTop: 15,
+        padding: 15,
+        background: "#fff8dc",
+        borderRadius: 8,
+      }}
+    >
+      ⭐ Upgrade to Super Host or Elite Host to be eligible for newsletter and social media promotion.
+    </div>
+  )}
 
-  <p><strong>Insurance Verified:</strong> {profile?.insurance_verified ? "✅ Yes" : "❌ No"}</p>
+  <p style={{ marginTop: 15 }}>
+    <strong>ID Verified:</strong>{" "}
+    {profile?.id_verified ? "✅ Yes" : "❌ No"}
+  </p>
+
+  <p>
+    <strong>Insurance Verified:</strong>{" "}
+    {profile?.insurance_verified ? "✅ Yes" : "❌ No"}
+  </p>
 
   <button
-    style={{
-      ...btn,
-      marginTop: 15,
-      width: "100%",
-    }}
+    style={{ ...btn, width: "100%", marginTop: 15 }}
     onClick={() => navigate("/host-compliance")}
   >
     📋 Compliance Centre
