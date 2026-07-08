@@ -187,8 +187,18 @@ return (
     Receive our newsletter
   </label>
 </div>
-
-        {profile?.subscription_plan !== "free" && (
+{profile?.subscription_plan === "free" ? (
+  <div
+    style={{
+      marginTop: 15,
+      padding: 15,
+      background: "#fff8dc",
+      borderRadius: 8,
+    }}
+  >
+    ⭐ Upgrade to Super Host or Elite Host for the chance to have your property featured in our newsletter and across our social media channels.
+  </div>
+) : (
   <div style={{ marginTop: 10 }}>
     <label>
       <input
