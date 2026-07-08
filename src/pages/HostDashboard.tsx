@@ -187,6 +187,35 @@ return (
     Receive our newsletter
   </label>
 </div>
+
+        {profile?.subscription_plan !== "free" && (
+  <div style={{ marginTop: 10 }}>
+    <label>
+      <input
+        type="checkbox"
+        checked={profile?.featured_marketing || false}
+        onChange={async (e) => {
+          const checked = e.target.checked;
+
+          await supabase
+            .from("profiles")
+            .update({
+              featured_marketing: checked,
+            })
+            .eq("id", user.id);
+
+          setProfile({
+            ...profile,
+            featured_marketing: checked,
+          });
+        }}
+      />
+
+      I would like my property to be considered for
+      newsletters and social media promotion.
+    </label>
+  </div>
+)}
   <p><strong>ID Verified:</strong> {profile?.id_verified ? "✅ Yes" : "❌ No"}</p>
 
   <p><strong>Insurance Verified:</strong> {profile?.insurance_verified ? "✅ Yes" : "❌ No"}</p>
