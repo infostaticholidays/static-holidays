@@ -164,9 +164,29 @@ return (
   <h2>💳 Account</h2>
 
   <p><strong>Plan:</strong> {profile?.subscription_plan || "Host (Free)"}</p>
+<div style={{ marginTop: 15 }}>
+  <label>
+    <input
+      type="checkbox"
+      checked={profile?.newsletter || false}
+      onChange={async (e) => {
+        const checked = e.target.checked;
 
-  <p><strong>Newsletter:</strong> {profile?.newsletter ? "Yes" : "No"}</p>
+        await supabase
+          .from("profiles")
+          .update({ newsletter: checked })
+          .eq("id", user.id);
 
+        setProfile({
+          ...profile,
+          newsletter: checked,
+        });
+      }}
+    />
+
+    Receive our newsletter
+  </label>
+</div>
   <p><strong>ID Verified:</strong> {profile?.id_verified ? "✅ Yes" : "❌ No"}</p>
 
   <p><strong>Insurance Verified:</strong> {profile?.insurance_verified ? "✅ Yes" : "❌ No"}</p>
