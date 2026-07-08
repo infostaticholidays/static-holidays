@@ -195,25 +195,43 @@ if (approvedDocs === requiredDocs.length) {
 
 
       {/* STATUS */}
-      <div style={card}>
-        <h2>Overall Status</h2>
+      <h2>Overall Status</h2>
 
-        <p>{status}</p>
+<p>{status}</p>
 
-        <div style={barBg}>
-          <div
-            style={{
-              width: `${progress}%`,
-              height: "100%",
-              background: "#16a34a",
-            }}
-          />
-        </div>
+<h3>Documents Uploaded</h3>
 
-        <p>
-          {progress}% complete ({approvedDocs}/{requiredDocs.length})
-        </p>
-      </div>
+<div style={barBg}>
+  <div
+    style={{
+      width: `${uploadProgress}%`,
+      height: "100%",
+      background: "#2563eb",
+    }}
+  />
+</div>
+
+<p>
+  {uploadedDocs}/{requiredDocs.length} uploaded
+</p>
+
+<h3 style={{ marginTop: 25 }}>
+  Documents Approved
+</h3>
+
+<div style={barBg}>
+  <div
+    style={{
+      width: `${approvalProgress}%`,
+      height: "100%",
+      background: "#16a34a",
+    }}
+  />
+</div>
+
+<p>
+  {approvedDocs}/{requiredDocs.length} approved
+</p>
 
 
       {/* OWNER DOCUMENTS */}
