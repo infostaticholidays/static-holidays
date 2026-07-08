@@ -109,20 +109,36 @@ export default function HostCompliance() {
     "smoke_alarm",
   ];
 
-  const approvedDocs = documents.filter(
-    (d) => d.status === "approved"
-  ).length;
+ // Documents uploaded
+const uploadedDocs = documents.length;
 
-  const progress = Math.round(
-    (approvedDocs / requiredDocs.length) * 100
-  );
+// Documents approved
+const approvedDocs = documents.filter(
+  (d) => d.status === "approved"
+).length;
 
-  const status =
-    progress === 100
-      ? "🟢 Verified"
-      : progress >= 50
-      ? "🟡 In Progress"
-      : "🔴 Not Verified";
+// Upload progress
+const uploadProgress = Math.round(
+  (uploadedDocs / requiredDocs.length) * 100
+);
+
+// Approval progress
+const approvalProgress = Math.round(
+  (approvedDocs / requiredDocs.length) * 100
+);
+
+ let status = "🔴 Not Verified";
+
+if (
+  uploadedDocs === requiredDocs.length &&
+  approvedDocs < requiredDocs.length
+) {
+  status = "🟡 Awaiting Review";
+}
+
+if (approvedDocs === requiredDocs.length) {
+  status = "🟢 Verified";
+}
 
   // -------------------------
   // UI
