@@ -198,6 +198,16 @@ if (approvedDocs === requiredDocs.length) {
       <h2>Overall Status</h2>
 
 <p>{status}</p>
+      <p style={{ color: "#666" }}>
+  {status === "🔴 Not Verified" &&
+    "Upload all required documents to begin verification."}
+
+  {status === "🟡 Awaiting Review" &&
+    "All required documents have been uploaded and are awaiting admin review."}
+
+  {status === "🟢 Verified" &&
+    "Congratulations! Your account has been fully verified."}
+</p>
 
 <h3>Documents Uploaded</h3>
 
