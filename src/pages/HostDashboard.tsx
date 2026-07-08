@@ -196,7 +196,16 @@ return (
     Receive our newsletter
   </label>
 </div>
-{profile?.subscription_plan === "free" ? (
+        <p>
+  Current Plan:{" "}
+  <strong>
+    {profile?.subscription_plan === "elite"
+      ? "👑 Elite Host"
+      : profile?.subscription_plan === "super"
+      ? "⭐ Super Host"
+      : "🟢 Host (Free)"}
+  </strong>
+</p>
   <div
     style={{
       marginTop: 15,
