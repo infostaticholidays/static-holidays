@@ -125,9 +125,13 @@ navigate(`/property-calendar/${data.id}`);
 
 <br /><br />
 
+<label>Bathrooms</label>
+
+<br />
+
 <input
   type="number"
-  placeholder="Bathrooms"
+  min="1"
   value={bathrooms}
   onChange={(e) => setBathrooms(Number(e.target.value))}
 />
