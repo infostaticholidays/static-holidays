@@ -4,17 +4,7 @@ import { supabase } from "../lib/supabase";
 
 export default function AddProperty() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-
-  const [petFriendly, setPetFriendly] = useState(false);
-  const [pool, setPool] = useState("none");
-  const [hotTub, setHotTub] = useState(false);
-  const [wifi, setWifi] = useState(false);
-  const [parking, setParking] = useState(false);
-  const [seaView, setSeaView] = useState(false);
-  const [wheelchairFriendly, setWheelchairFriendly] = useState(false);
-  nst [name, setName] = useState("");
+const [name, setName] = useState("");
 const [location, setLocation] = useState("");
 
 const [propertyType, setPropertyType] = useState("");
@@ -24,6 +14,13 @@ const [bathrooms, setBathrooms] = useState(1);
 const [sleeps, setSleeps] = useState(2);
 const [description, setDescription] = useState("");
 
+const [petFriendly, setPetFriendly] = useState(false);
+const [pool, setPool] = useState("none");
+const [hotTub, setHotTub] = useState(false);
+const [wifi, setWifi] = useState(false);
+const [parking, setParking] = useState(false);
+const [seaView, setSeaView] = useState(false);
+const [wheelchairFriendly, setWheelchairFriendly] = useState(false);
   async function submit() {
     const {
       data: { user },
