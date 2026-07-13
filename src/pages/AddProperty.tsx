@@ -35,19 +35,30 @@ const [wheelchairFriendly, setWheelchairFriendly] = useState(false);
   .from("properties")
   .insert([
     {
-      owner_id: user.id,
-      title: name,
-      location: location,
+{
+  owner_id: user.id,
 
-      pet_friendly: petFriendly,
-      has_pool: pool !== "none",
-      has_hot_tub: hotTub,
+  title: name,
+  description: description,
 
-      wifi,
-      parking,
-      sea_view: seaView,
-      wheelchair_friendly: wheelchairFriendly,
-    },
+  property_type: propertyType,
+  holiday_park: holidayPark,
+
+  location: location,
+
+  bedrooms: bedrooms,
+  bathrooms: bathrooms,
+  sleeps: sleeps,
+
+  pet_friendly: petFriendly,
+  has_pool: pool !== "none",
+  has_hot_tub: hotTub,
+
+  wifi,
+  parking,
+  sea_view: seaView,
+  wheelchair_friendly: wheelchairFriendly,
+}
   ])
   .select()
   .single();
