@@ -42,7 +42,8 @@ export default function AddProperty() {
         wheelchair_friendly: wheelchairFriendly,
       },
     ]);
-
+.select()
+.single();
     if (error) {
       console.error("SUPABASE ERROR:", error);
       alert(error.message);
