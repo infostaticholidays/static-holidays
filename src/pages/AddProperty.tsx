@@ -73,6 +73,13 @@ navigate(`/property-calendar/${data.id}`);
   return (
     <div style={{ padding: 40 }}>
       <h1>Add Property</h1>
+      <input
+  placeholder="Property Name"
+  value={name}
+  onChange={(e) => setName(e.target.value)}
+/>
+
+<br /><br />
 
   <input
   placeholder="Location"
