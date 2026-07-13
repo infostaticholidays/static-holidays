@@ -28,22 +28,24 @@ export default function AddProperty() {
    const { data, error } = await supabase
   .from("properties")
   .insert([
-        owner_id: user.id,
-        title: name,
-        location: location,
+    {
+      owner_id: user.id,
+      title: name,
+      location: location,
 
-        pet_friendly: petFriendly,
-        has_pool: pool !== "none",
-        has_hot_tub: hotTub,
+      pet_friendly: petFriendly,
+      has_pool: pool !== "none",
+      has_hot_tub: hotTub,
 
-        wifi,
-        parking,
-        sea_view: seaView,
-        wheelchair_friendly: wheelchairFriendly,
-      },
-    ]);
-.select()
-.single();
+      wifi,
+      parking,
+      sea_view: seaView,
+      wheelchair_friendly: wheelchairFriendly,
+    },
+  ])
+  .select()
+  .single();
+    
     if (error) {
       console.error("SUPABASE ERROR:", error);
       alert(error.message);
