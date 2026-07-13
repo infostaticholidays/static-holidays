@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 export default function AddProperty() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
 
