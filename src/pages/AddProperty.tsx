@@ -25,8 +25,9 @@ export default function AddProperty() {
       return;
     }
 
-    const { error } = await supabase.from("properties").insert([
-      {
+   const { data, error } = await supabase
+  .from("properties")
+  .insert([
         owner_id: user.id,
         title: name,
         location: location,
