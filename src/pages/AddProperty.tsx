@@ -97,11 +97,18 @@ navigate(`/property-calendar/${data.id}`);
 
 <br /><br />
 
+<label>Bedrooms</label>
+
+<br />
+
 <input
-  placeholder="Holiday Park"
-  value={holidayPark}
-  onChange={(e) => setHolidayPark(e.target.value)}
+  type="number"
+  min="1"
+  value={bedrooms}
+  onChange={(e) => setBedrooms(Number(e.target.value))}
 />
+
+<br /><br />
 
 <br /><br />
 
