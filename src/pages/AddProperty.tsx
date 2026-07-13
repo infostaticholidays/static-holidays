@@ -49,8 +49,7 @@ export default function AddProperty() {
       alert(error.message);
       return;
     }
-
-    alert("Property saved successfully!");
+navigate(`/property-calendar/${data.id}`);
 
     setName("");
     setLocation("");
