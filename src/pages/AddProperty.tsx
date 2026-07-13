@@ -74,25 +74,69 @@ navigate(`/property-calendar/${data.id}`);
     <div style={{ padding: 40 }}>
       <h1>Add Property</h1>
 
-      <input
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+  <input
+  placeholder="Location"
+  value={location}
+  onChange={(e) => setLocation(e.target.value)}
+/>
 
-      <br /><br />
+<br /><br />
 
-      <input
-        placeholder="Location"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-      />
+<input
+  placeholder="Property Type"
+  value={propertyType}
+  onChange={(e) => setPropertyType(e.target.value)}
+/>
 
-      <br /><br />
+<br /><br />
 
-      <button onClick={submit}>
-        Save Property
-      </button>
+<input
+  placeholder="Holiday Park"
+  value={holidayPark}
+  onChange={(e) => setHolidayPark(e.target.value)}
+/>
+
+<br /><br />
+
+<input
+  type="number"
+  placeholder="Bedrooms"
+  value={bedrooms}
+  onChange={(e) => setBedrooms(Number(e.target.value))}
+/>
+
+<br /><br />
+
+<input
+  type="number"
+  placeholder="Bathrooms"
+  value={bathrooms}
+  onChange={(e) => setBathrooms(Number(e.target.value))}
+/>
+
+<br /><br />
+
+<input
+  type="number"
+  placeholder="Sleeps"
+  value={sleeps}
+  onChange={(e) => setSleeps(Number(e.target.value))}
+/>
+
+<br /><br />
+
+<textarea
+  placeholder="Description"
+  value={description}
+  onChange={(e) => setDescription(e.target.value)}
+  rows={5}
+/>
+
+<br /><br />
+
+<button onClick={submit}>
+  Save Property
+</button>
     </div>
   );
 }
