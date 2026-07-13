@@ -14,6 +14,15 @@ export default function AddProperty() {
   const [parking, setParking] = useState(false);
   const [seaView, setSeaView] = useState(false);
   const [wheelchairFriendly, setWheelchairFriendly] = useState(false);
+  nst [name, setName] = useState("");
+const [location, setLocation] = useState("");
+
+const [propertyType, setPropertyType] = useState("");
+const [holidayPark, setHolidayPark] = useState("");
+const [bedrooms, setBedrooms] = useState(1);
+const [bathrooms, setBathrooms] = useState(1);
+const [sleeps, setSleeps] = useState(2);
+const [description, setDescription] = useState("");
 
   async function submit() {
     const {
