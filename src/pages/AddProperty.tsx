@@ -138,20 +138,15 @@ navigate(`/property-calendar/${data.id}`);
 
 <br /><br />
 
+<label>Sleeps</label>
+
+<br />
+
 <input
   type="number"
-  placeholder="Sleeps"
+  min="1"
   value={sleeps}
   onChange={(e) => setSleeps(Number(e.target.value))}
-/>
-
-<br /><br />
-
-<textarea
-  placeholder="Description"
-  value={description}
-  onChange={(e) => setDescription(e.target.value)}
-  rows={5}
 />
 
 <br /><br />
