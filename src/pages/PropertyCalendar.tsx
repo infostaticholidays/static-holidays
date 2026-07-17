@@ -43,12 +43,28 @@ export default function PropertyCalendar() {
           marginBottom: 30,
         }}
       >
-        <h2>2026 Calendar</h2>
+<h2>Availability & Pricing</h2>
 
-        <p>
-          Select dates to block, change prices and create special offers.
-        </p>
-      </div>
+<p>
+Manage your property's availability, nightly prices, seasonal pricing and special offers.
+</p>
+
+<div
+  style={{
+    display: "flex",
+    gap: 15,
+    marginTop: 20,
+    flexWrap: "wrap",
+  }}
+>
+  <button style={greenBtn}>🚫 Block Dates</button>
+
+  <button style={greenBtn}>💷 Change Prices</button>
+
+  <button style={greenBtn}>🔥 Special Offers</button>
+
+  <button style={greenBtn}>📅 Sync Calendar</button>
+</div>
 
       <div
         style={{
