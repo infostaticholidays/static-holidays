@@ -16,6 +16,14 @@ const months = [
   "December",
 ];
 
+const getDaysInMonth = (year: number, month: number) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
+const getFirstDayOfMonth = (year: number, month: number) => {
+  return new Date(year, month, 1).getDay();
+};
+
 export default function PropertyCalendar() {
   const { propertyId } = useParams();
   const navigate = useNavigate();
