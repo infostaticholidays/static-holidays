@@ -95,11 +95,32 @@ Manage your property's availability, nightly prices, seasonal pricing and specia
                 color: "#777",
               }}
             >
-              Calendar coming soon...
-            </div>
-          </div>
-        ))}
-      </div>
+       <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(7,1fr)",
+    gap: 4,
+    marginTop: 10,
+  }}
+>
+  {Array.from({ length: 35 }).map((_, i) => (
+    <div
+      key={i}
+      style={{
+        height: 32,
+        border: "1px solid #ddd",
+        borderRadius: 4,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        background: "white",
+      }}
+    >
+      {i + 1 <= 31 ? i + 1 : ""}
+    </div>
+  ))}
+</div>
 
       <button
         onClick={() => navigate("/host-dashboard")}
