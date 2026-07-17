@@ -35,7 +35,6 @@ const [wheelchairFriendly, setWheelchairFriendly] = useState(false);
   .from("properties")
   .insert([
     {
-{
   owner_id: user.id,
 
   title: name,
