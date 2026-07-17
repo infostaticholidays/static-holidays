@@ -45,12 +45,37 @@ export default function PropertyCalendar() {
           marginBottom: 30,
         }}
       >
-        <h2>Availability & Pricing</h2>
+     <h2>Availability & Pricing</h2>
 
-        <p>
-          Manage your property's availability, nightly prices, seasonal pricing
-          and special offers.
-        </p>
+<p>
+Manage your property's availability, seasonal pricing, blocked dates and special offers.
+</p>
+
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 20,
+  }}
+>
+  <button
+    style={greenBtn}
+    onClick={() => setYear(year - 1)}
+  >
+    ← Previous Year
+  </button>
+
+  <h2>{year}</h2>
+
+  <button
+    style={greenBtn}
+    onClick={() => setYear(year + 1)}
+  >
+    Next Year →
+  </button>
+</div>
 
         <div
           style={{
