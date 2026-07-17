@@ -312,9 +312,9 @@ return (
             <p>{p.location}</p>
             <p>£{p.price_per_night}/night</p>
 
-            <button onClick={() => navigate(`/calendar/${p.id}`)}>
-              📅 Calendar
-            </button>
+        <button onClick={() => navigate(`/property-calendar/${p.id}`)}>
+  📅 Calendar
+</button>
 
             <button onClick={() => deleteProperty(p.id)}>🗑 Delete</button>
           </div>
