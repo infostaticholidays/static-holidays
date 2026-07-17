@@ -19,6 +19,7 @@ const months = [
 export default function PropertyCalendar() {
   const { propertyId } = useParams();
   const navigate = useNavigate();
+  const [year, setYear] = useState(new Date().getFullYear());
 
   return (
     <div
