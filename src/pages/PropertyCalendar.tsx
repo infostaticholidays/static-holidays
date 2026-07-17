@@ -124,38 +124,41 @@ Manage your property's availability, seasonal pricing, blocked dates and special
         background: "white",
       }}
     >
-      <h3
-        style={{
-          textAlign: "center",
-          marginBottom: 15,
-          color: "#14532d",
-        }}
-      >
-        {month} {year}
-      </h3>
-
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: 5,
-          textAlign: "center",
-        }}
-      >
-
-        {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(day => (
+             {Array.from({ length: days }).map((_, day) => (
           <div
             key={day}
             style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color:"#666"
+              padding: 8,
+              borderRadius: 6,
+              background:"#f8faf8",
+              cursor:"pointer",
             }}
           >
-            {day}
+            {day + 1}
           </div>
         ))}
+
+      </div>
+    </div>
+  );
+})}
+
+</div>
+
+<button
+  onClick={() => navigate("/host-dashboard")}
+  style={{
+    marginTop: 40,
+    background: "#14532d",
+    color: "white",
+    border: "none",
+    padding: "12px 20px",
+    borderRadius: 8,
+    cursor: "pointer",
+  }}
+>
+  ← Back to Dashboard
+</button>
 
 
         {Array.from({ length: firstDay }).map((_, i) => (
