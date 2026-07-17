@@ -43,28 +43,30 @@ export default function PropertyCalendar() {
           marginBottom: 30,
         }}
       >
-<h2>Availability & Pricing</h2>
+        <h2>Availability & Pricing</h2>
 
-<p>
-Manage your property's availability, nightly prices, seasonal pricing and special offers.
-</p>
+        <p>
+          Manage your property's availability, nightly prices, seasonal pricing
+          and special offers.
+        </p>
 
-<div
-  style={{
-    display: "flex",
-    gap: 15,
-    marginTop: 20,
-    flexWrap: "wrap",
-  }}
->
-  <button style={greenBtn}>🚫 Block Dates</button>
+        <div
+          style={{
+            display: "flex",
+            gap: 15,
+            marginTop: 20,
+            flexWrap: "wrap",
+          }}
+        >
+          <button style={greenBtn}>🚫 Block Dates</button>
 
-  <button style={greenBtn}>💷 Change Prices</button>
+          <button style={greenBtn}>💷 Change Prices</button>
 
-  <button style={greenBtn}>🔥 Special Offers</button>
+          <button style={greenBtn}>🔥 Special Offers</button>
 
-  <button style={greenBtn}>📅 Sync Calendar</button>
-</div>
+          <button style={greenBtn}>📅 Sync Calendar</button>
+        </div>
+      </div>
 
       <div
         style={{
@@ -81,46 +83,39 @@ Manage your property's availability, nightly prices, seasonal pricing and specia
               border: "1px solid #ddd",
               borderRadius: 10,
               padding: 20,
-              minHeight: 180,
             }}
           >
             <h3>{month}</h3>
 
             <div
               style={{
-                height: 120,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#777",
+                display: "grid",
+                gridTemplateColumns: "repeat(7,1fr)",
+                gap: 4,
+                marginTop: 10,
               }}
             >
-       <div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "repeat(7,1fr)",
-    gap: 4,
-    marginTop: 10,
-  }}
->
-  {Array.from({ length: 35 }).map((_, i) => (
-    <div
-      key={i}
-      style={{
-        height: 32,
-        border: "1px solid #ddd",
-        borderRadius: 4,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        background: "white",
-      }}
-    >
-      {i + 1 <= 31 ? i + 1 : ""}
-    </div>
-  ))}
-</div>
+              {Array.from({ length: 35 }).map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    height: 32,
+                    border: "1px solid #ddd",
+                    borderRadius: 4,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    background: "white",
+                  }}
+                >
+                  {i + 1 <= 31 ? i + 1 : ""}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
 
       <button
         onClick={() => navigate("/host-dashboard")}
@@ -139,3 +134,12 @@ Manage your property's availability, nightly prices, seasonal pricing and specia
     </div>
   );
 }
+
+const greenBtn = {
+  background: "#14532d",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: 8,
+  cursor: "pointer",
+};
