@@ -110,16 +110,77 @@ Manage your property's availability, seasonal pricing, blocked dates and special
           gap: 20,
         }}
       >
-        {months.map((month) => (
+      {months.map((month, index) => {
+  const days = getDaysInMonth(year, index);
+  const firstDay = getFirstDayOfMonth(year, index);
+
+  return (
+    <div
+      key={month}
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: 12,
+        padding: 15,
+        background: "white",
+      }}
+    >
+      <h3
+        style={{
+          textAlign: "center",
+          marginBottom: 15,
+          color: "#14532d",
+        }}
+      >
+        {month} {year}
+      </h3>
+
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: 5,
+          textAlign: "center",
+        }}
+      >
+
+        {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(day => (
           <div
-            key={month}
+            key={day}
             style={{
-              background: "white",
-              border: "1px solid #ddd",
-              borderRadius: 10,
-              padding: 20,
+              fontSize: 12,
+              fontWeight: "bold",
+              color:"#666"
             }}
           >
+            {day}
+          </div>
+        ))}
+
+
+        {Array.from({ length: firstDay }).map((_, i) => (
+          <div key={"empty-"+i}></div>
+        ))}
+
+
+        {Array.from({ length: days }).map((_, day) => (
+          <div
+            key={day}
+            style={{
+              padding: 8,
+              borderRadius: 6,
+              background:"#f8faf8",
+              cursor:"pointer",
+            }}
+          >
+            {day + 1}
+          </div>
+        ))}
+
+      </div>
+    </div>
+  );
+})}
      <h3
   style={{
     textAlign: "center",
