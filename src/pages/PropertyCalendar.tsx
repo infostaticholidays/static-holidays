@@ -112,7 +112,15 @@ Manage your property's availability, seasonal pricing, blocked dates and special
               padding: 20,
             }}
           >
-            <h3>{month}</h3>
+     <h3
+  style={{
+    textAlign: "center",
+    marginBottom: 15,
+    color: "#14532d",
+  }}
+>
+  {month} {year}
+</h3>
 
             <div
               style={{
