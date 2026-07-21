@@ -25,10 +25,9 @@ export default function PropertyCalendar() {
   const navigate = useNavigate();
 
   const [year, setYear] = useState(new Date().getFullYear());
-  const [year, setYear] = useState(new Date().getFullYear());
 
-const [blockedDates, setBlockedDates] = useState<string[]>([]);
-const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   return (
     <div
@@ -50,7 +49,6 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
           background: "#f5f5f5",
           padding: 20,
           borderRadius: 12,
-          marginTop: 20,
           marginBottom: 30,
         }}
       >
@@ -87,31 +85,49 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
           </button>
         </div>
 
+
         <div
           style={{
             display: "flex",
             gap: 15,
             flexWrap: "wrap",
           }}
-        <button
-  style={greenBtn}
-  disabled={!selectedDate}
-  onClick={() => {
-    if (!selectedDate) return;
+        >
 
-    setBlockedDates([
-      ...blockedDates,
-      selectedDate
-    ]);
-  }}
->
-  🚫 Block Selected Date
-</button>
-          <button style={greenBtn}>💷 Change Prices</button>
-          <button style={greenBtn}>🔥 Special Offers</button>
-          <button style={greenBtn}>📅 Sync Calendar</button>
+          <button
+            style={greenBtn}
+            disabled={!selectedDate}
+            onClick={() => {
+
+              if (!selectedDate) return;
+
+              setBlockedDates([
+                ...blockedDates,
+                selectedDate,
+              ]);
+
+            }}
+          >
+            🚫 Block Selected Date
+          </button>
+
+
+          <button style={greenBtn}>
+            💷 Change Prices
+          </button>
+
+          <button style={greenBtn}>
+            🔥 Special Offers
+          </button>
+
+          <button style={greenBtn}>
+            📅 Sync Calendar
+          </button>
+
         </div>
+
       </div>
+
 
       <div
         style={{
@@ -120,10 +136,14 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
           gap: 20,
         }}
       >
+
         {months.map((month, index) => {
+
           const days = getDaysInMonth(year, index);
 
+
           return (
+
             <div
               key={month}
               style={{
@@ -133,15 +153,16 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
                 background: "#fff",
               }}
             >
+
               <h3
                 style={{
                   textAlign: "center",
-                  marginBottom: 15,
                   color: "#14532d",
                 }}
               >
                 {month} {year}
               </h3>
+
 
               <div
                 style={{
@@ -150,61 +171,109 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
                   gap: 5,
                 }}
               >
-               {Array.from({ length: days }).map((_, day) => {
 
-  const date = `${year}-${String(index + 1).padStart(2,"0")}-${String(day + 1).padStart(2,"0")}`;
+                {Array.from({ length: days }).map((_, day) => {
 
-  const isBlocked = blockedDates.includes(date);
 
-  return (
-    <div
-      key={date}
-      onClick={() => setSelectedDate(date)}
-      style={{
-        height:36,
-        border:"1px solid #ddd",
-        borderRadius:6,
-        display:"flex",
-        alignItems:"center",
-        justifyContent:"center",
-        cursor:"pointer",
+                  const date =
+                    `${year}-${String(index + 1).padStart(2,"0")}-${String(day + 1).padStart(2,"0")}`;
 
-        background: isBlocked
-          ? "#dc2626"
-          : selectedDate === date
-          ? "#14532d"
-          : "#f8faf8",
 
-        color:
-          isBlocked || selectedDate === date
-            ? "white"
-            : "black",
-      }}
-    >
-      {day + 1}
-    </div>
+                  const isBlocked =
+                    blockedDates.includes(date);
 
-                  <div
-                    key={day}
-                    style={{
-                      height: 36,
-                      border: "1px solid #ddd",
-                      borderRadius: 6,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: "#f8faf8",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {day + 1}
-                  </div>
-                ))}
+
+                  return (
+
+                    <div
+                      key={date}
+                      onClick={() => setSelectedDate(date)}
+                      style={{
+
+                        height: 36,
+
+                        border: "1px solid #ddd",
+
+                        borderRadius: 6,
+
+                        display: "flex",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        cursor: "pointer",
+
+
+                        background:
+
+                          isBlocked
+
+                          ? "#dc2626"
+
+                          : selectedDate === date
+
+                          ? "#14532d"
+
+                          : "#f8faf8",
+
+
+                        color:
+
+                          isBlocked ||
+                          selectedDate === date
+
+                          ? "white"
+
+                          : "black",
+
+                      }}
+                    >
+
+                      {day + 1}
+
+                    </div>
+
+                  );
+
+                })}
+
+
               </div>
+
             </div>
+
           );
+
         })}
+
+
       </div>
+
+
+      {selectedDate && (
+
+        <div
+          style={{
+            marginTop: 30,
+            padding: 20,
+            borderRadius: 10,
+            background: "#fff",
+            border: "1px solid #ddd",
+          }}
+        >
+
+          Selected date:
+
+          <strong>
+            {" "}
+            {selectedDate}
+          </strong>
+
+        </div>
+
+      )}
+
 
       <button
         onClick={() => navigate("/host-dashboard")}
@@ -220,15 +289,25 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
       >
         ← Back to Dashboard
       </button>
+
+
     </div>
   );
 }
 
+
 const greenBtn = {
+
   background: "#14532d",
+
   color: "white",
+
   border: "none",
+
   padding: "10px 18px",
+
   borderRadius: 8,
+
   cursor: "pointer",
+
 };
