@@ -150,7 +150,40 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
                   gap: 5,
                 }}
               >
-                {Array.from({ length: days }).map((_, day) => (
+               {Array.from({ length: days }).map((_, day) => {
+
+  const date = `${year}-${String(index + 1).padStart(2,"0")}-${String(day + 1).padStart(2,"0")}`;
+
+  const isBlocked = blockedDates.includes(date);
+
+  return (
+    <div
+      key={date}
+      onClick={() => setSelectedDate(date)}
+      style={{
+        height:36,
+        border:"1px solid #ddd",
+        borderRadius:6,
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"center",
+        cursor:"pointer",
+
+        background: isBlocked
+          ? "#dc2626"
+          : selectedDate === date
+          ? "#14532d"
+          : "#f8faf8",
+
+        color:
+          isBlocked || selectedDate === date
+            ? "white"
+            : "black",
+      }}
+    >
+      {day + 1}
+    </div>
+
                   <div
                     key={day}
                     style={{
