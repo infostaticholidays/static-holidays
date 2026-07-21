@@ -27,8 +27,8 @@ export default function PropertyCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
 
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-
+const [rangeStart, setRangeStart] = useState<string | null>(null);
+const [rangeEnd, setRangeEnd] = useState<string | null>(null);
   return (
     <div
       style={{
