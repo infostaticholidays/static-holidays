@@ -25,6 +25,10 @@ export default function PropertyCalendar() {
   const navigate = useNavigate();
 
   const [year, setYear] = useState(new Date().getFullYear());
+  const [year, setYear] = useState(new Date().getFullYear());
+
+const [blockedDates, setBlockedDates] = useState<string[]>([]);
+const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   return (
     <div
