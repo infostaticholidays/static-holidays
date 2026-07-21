@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+
 const months = [
   "January",
   "February",
@@ -16,445 +17,893 @@ const months = [
   "December",
 ];
 
-const getDaysInMonth = (year: number, month: number) => {
+
+const getDaysInMonth = (year:number, month:number) => {
+
   return new Date(year, month + 1, 0).getDate();
+
 };
 
-const formatDate = (date: string) => {
+
+
+const formatDate = (date:string) => {
+
   const d = new Date(date);
 
   return d.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+
+    day:"numeric",
+    month:"long",
+    year:"numeric",
+
   });
+
 };
 
 
-export default function PropertyCalendar() {
 
-  const { propertyId } = useParams();
-  const navigate = useNavigate();
 
+export default function PropertyCalendar(){
 
-  const [year, setYear] = useState(
-    new Date().getFullYear()
-  );
 
+const { propertyId } = useParams();
 
-  const [blockedDates, setBlockedDates] = useState<string[]>([]);
+const navigate = useNavigate();
 
 
-  const [rangeStart, setRangeStart] = useState<string | null>(null);
 
-  const [rangeEnd, setRangeEnd] = useState<string | null>(null);
+const [year,setYear] =
+useState(new Date().getFullYear());
 
 
 
-  const handleDateClick = (date:string) => {
+const [blockedDates,setBlockedDates] =
+useState<string[]>([]);
 
-    if (!rangeStart || rangeEnd) {
 
-      setRangeStart(date);
-      setRangeEnd(null);
 
-    } else {
+const [rangeStart,setRangeStart] =
+useState<string | null>(null);
 
-      setRangeEnd(date);
 
-    }
 
-  };
+const [rangeEnd,setRangeEnd] =
+useState<string | null>(null);
 
 
 
-  const blockRange = () => {
+// NEW - nightly prices
 
-    if (!rangeStart || !rangeEnd) return;
+const [prices,setPrices] =
+useState<Record<string,number>>({});
 
 
-    const start = new Date(rangeStart);
-    const end = new Date(rangeEnd);
 
+const [nightlyPrice,setNightlyPrice] =
+useState("");
 
-    const dates:string[] = [];
 
 
-    while(start <= end) {
 
-      dates.push(
-        start.toISOString().split("T")[0]
-      );
+const handleDateClick = (date:string)=>{
 
-      start.setDate(
-        start.getDate() + 1
-      );
 
-    }
+if(!rangeStart || rangeEnd){
 
 
-    setBlockedDates([
-      ...blockedDates,
-      ...dates
-    ]);
+setRangeStart(date);
 
-  };
+setRangeEnd(null);
 
 
+}else{
 
-  return (
 
-    <div
-      style={{
-        maxWidth:1400,
-        margin:"40px auto",
-        padding:30,
-        fontFamily:"Arial, sans-serif",
-      }}
-    >
+setRangeEnd(date);
 
 
-      <h1>
-        📅 Property Calendar
-      </h1>
+}
 
 
-      <p>
-        <strong>Property ID:</strong> {propertyId}
-      </p>
+};
 
 
 
-      <div
-        style={{
-          background:"#f5f5f5",
-          padding:20,
-          borderRadius:12,
-          marginBottom:30,
-        }}
-      >
 
-        <h2>
-          Availability & Pricing
-        </h2>
 
+const blockRange = ()=>{
 
-        <p>
-          Manage availability, prices, blocked dates and special offers.
-        </p>
 
+if(!rangeStart || !rangeEnd)
+return;
 
 
-        <div
-          style={{
-            display:"flex",
-            justifyContent:"space-between",
-            alignItems:"center",
-          }}
-        >
 
+const start = new Date(rangeStart);
 
-          <button
-            style={greenBtn}
-            onClick={() => setYear(year - 1)}
-          >
-            ← Previous Year
-          </button>
+const end = new Date(rangeEnd);
 
 
-          <h2>
-            {year}
-          </h2>
 
+const dates:string[]=[];
 
-          <button
-            style={greenBtn}
-            onClick={() => setYear(year + 1)}
-          >
-            Next Year →
-          </button>
 
 
-        </div>
+while(start <= end){
 
 
+dates.push(
+start.toISOString().split("T")[0]
+);
 
-        <div
-          style={{
-            marginTop:20,
-            display:"flex",
-            gap:15,
-          }}
-        >
 
 
-          <button
-            style={greenBtn}
-            disabled={!rangeStart || !rangeEnd}
-            onClick={blockRange}
-          >
-            🚫 Block Selected Dates
-          </button>
+start.setDate(
+start.getDate()+1
+);
 
 
 
-          <button style={greenBtn}>
-            💷 Change Prices
-          </button>
+}
 
 
-          <button style={greenBtn}>
-            🔥 Special Offers
-          </button>
 
+setBlockedDates([
 
-          <button style={greenBtn}>
-            📅 Sync Calendar
-          </button>
+...blockedDates,
 
+...dates
 
-        </div>
+]);
 
 
-      </div>
 
+};
 
 
 
 
-      <div
-        style={{
-          display:"grid",
-          gridTemplateColumns:"repeat(3,1fr)",
-          gap:20,
-        }}
-      >
 
 
-      {months.map((month,index)=>{
+const savePrice = ()=>{
 
 
-        const days =
-          getDaysInMonth(year,index);
+if(!rangeStart || !rangeEnd)
+return;
 
 
 
-        return (
+const start =
+new Date(rangeStart);
 
-          <div
-            key={month}
-            style={{
-              border:"1px solid #ddd",
-              borderRadius:12,
-              padding:15,
-              background:"#fff",
-            }}
-          >
 
+const end =
+new Date(rangeEnd);
 
-            <h3
-              style={{
-                textAlign:"center",
-                color:"#14532d",
-              }}
-            >
-              {month} {year}
-            </h3>
 
 
+const newPrices = {
+...prices
+};
 
 
-            <div
-              style={{
-                display:"grid",
-                gridTemplateColumns:"repeat(7,1fr)",
-                gap:5,
-              }}
-            >
 
 
+while(start <= end){
 
-            {Array.from({length:days}).map((_,day)=>{
 
 
-              const date =
-              `${year}-${String(index+1).padStart(2,"0")}-${String(day+1).padStart(2,"0")}`;
+const date =
+start.toISOString()
+.split("T")[0];
 
 
 
-              const isBlocked =
-              blockedDates.includes(date);
+newPrices[date] =
+Number(nightlyPrice);
 
 
 
-              const isSelected =
-              rangeStart === date;
+start.setDate(
+start.getDate()+1
+);
 
 
 
-              const isInRange =
-              rangeStart &&
-              rangeEnd &&
-              date >= rangeStart &&
-              date <= rangeEnd;
+}
 
 
 
-              return (
+setPrices(newPrices);
 
-                <div
 
-                  key={date}
 
-                  onClick={() => handleDateClick(date)}
+};
 
-                  style={{
 
-                    height:36,
 
-                    border:"1px solid #ddd",
 
-                    borderRadius:6,
 
-                    display:"flex",
 
-                    alignItems:"center",
+return (
 
-                    justifyContent:"center",
+<div
 
-                    cursor:"pointer",
+style={{
 
+maxWidth:1400,
 
-                    background:
+margin:"40px auto",
 
-                    isBlocked
+padding:30,
 
-                    ? "#dc2626"
+fontFamily:"Arial, sans-serif",
 
-                    : isInRange
+}}
 
-                    ? "#fecaca"
+>
 
-                    : isSelected
 
-                    ? "#14532d"
 
-                    : "#f8faf8",
+<h1>
+📅 Property Calendar
+</h1>
 
 
-                    color:
 
-                    isBlocked || isSelected
+<p>
+<strong>Property ID:</strong> {propertyId}
+</p>
 
-                    ? "white"
 
-                    : "black",
 
-                  }}
 
-                >
 
-                  {day+1}
+<div
 
-                </div>
+style={{
 
-              );
+background:"#f5f5f5",
 
+padding:20,
 
-            })}
+borderRadius:12,
 
+marginBottom:30,
 
+}}
 
-            </div>
+>
 
 
-          </div>
+<h2>
+Availability & Pricing
+</h2>
 
-        );
 
 
-      })}
+<p>
+Manage availability, blocked dates, nightly prices and offers.
+</p>
 
 
 
-      </div>
 
 
+<div
 
+style={{
 
+display:"flex",
 
-      {rangeStart && (
+justifyContent:"space-between",
 
-        <div
-          style={{
-            marginTop:30,
-            padding:20,
-            background:"#fff",
-            border:"1px solid #ddd",
-            borderRadius:10,
-          }}
-        >
+alignItems:"center",
 
-          <h3>
-            Selected Dates
-          </h3>
+}}
 
+>
 
-          <p>
-            From:
-            <strong>
-              {" "}
-              {formatDate(rangeStart)}
-            </strong>
-          </p>
 
+<button
 
+style={greenBtn}
 
-          {rangeEnd && (
+onClick={()=>
+setYear(year-1)
+}
 
-            <p>
-              To:
-              <strong>
-                {" "}
-                {formatDate(rangeEnd)}
-              </strong>
-            </p>
+>
 
-          )}
+← Previous Year
 
+</button>
 
-        </div>
 
-      )}
 
 
+<h2>
+{year}
+</h2>
 
 
 
 
-      <button
-        onClick={() => navigate("/host-dashboard")}
-        style={{
-          marginTop:40,
-          background:"#14532d",
-          color:"white",
-          border:"none",
-          padding:"12px 20px",
-          borderRadius:8,
-          cursor:"pointer",
-        }}
-      >
+<button
 
-        ← Back to Dashboard
+style={greenBtn}
 
-      </button>
+onClick={()=>
+setYear(year+1)
+}
 
+>
 
+Next Year →
 
+</button>
 
-    </div>
 
-  );
+
+</div>
+
+
+
+
+
+
+<div
+
+style={{
+
+marginTop:20,
+
+display:"flex",
+
+gap:15,
+
+flexWrap:"wrap",
+
+}}
+
+>
+
+
+
+<button
+
+style={greenBtn}
+
+disabled={!rangeStart || !rangeEnd}
+
+onClick={blockRange}
+
+>
+
+🚫 Block Selected Dates
+
+</button>
+
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div
+
+style={{
+
+display:"grid",
+
+gridTemplateColumns:"repeat(3,1fr)",
+
+gap:20,
+
+}}
+
+>
+
+
+
+{months.map((month,index)=>{
+
+
+
+const days =
+getDaysInMonth(year,index);
+
+
+
+
+return (
+
+
+
+<div
+
+key={month}
+
+style={{
+
+border:"1px solid #ddd",
+
+borderRadius:12,
+
+padding:15,
+
+background:"#fff",
+
+}}
+
+>
+
+
+
+
+<h3
+
+style={{
+
+textAlign:"center",
+
+color:"#14532d",
+
+}}
+
+>
+
+{month} {year}
+
+</h3>
+
+
+
+
+
+
+<div
+
+style={{
+
+display:"grid",
+
+gridTemplateColumns:"repeat(7,1fr)",
+
+gap:5,
+
+}}
+
+>
+
+
+
+
+
+{Array.from({length:days}).map((_,day)=>{
+
+
+
+const date =
+
+`${year}-${String(index+1).padStart(2,"0")}-${String(day+1).padStart(2,"0")}`;
+
+
+
+
+
+const isBlocked =
+blockedDates.includes(date);
+
+
+
+
+const isStart =
+rangeStart === date;
+
+
+
+
+const isRange =
+
+rangeStart &&
+
+rangeEnd &&
+
+date >= rangeStart &&
+
+date <= rangeEnd;
+
+
+
+
+
+return (
+
+
+
+<div
+
+key={date}
+
+onClick={()=>
+handleDateClick(date)
+}
+
+style={{
+
+
+height:45,
+
+
+border:"1px solid #ddd",
+
+
+borderRadius:6,
+
+
+display:"flex",
+
+
+flexDirection:"column",
+
+
+alignItems:"center",
+
+
+justifyContent:"center",
+
+
+cursor:"pointer",
+
+
+
+background:
+
+
+isBlocked
+
+?
+
+"#dc2626"
+
+
+:
+
+
+isRange
+
+?
+
+"#fecaca"
+
+
+:
+
+
+isStart
+
+?
+
+"#14532d"
+
+
+:
+
+"#f8faf8",
+
+
+
+color:
+
+
+isBlocked || isStart
+
+?
+
+"white"
+
+:
+
+"black",
+
+
+fontSize:12,
+
+
+}}
+
+>
+
+
+<div>
+
+{day+1}
+
+</div>
+
+
+
+{
+
+prices[date] &&
+
+(
+
+<div>
+
+£{prices[date]}
+
+</div>
+
+)
+
+}
+
+
+
+</div>
+
+
+
+);
+
+
+
+})}
+
+
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+);
+
+
+
+})}
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+{rangeStart && (
+
+
+
+<div
+
+style={{
+
+marginTop:30,
+
+padding:20,
+
+background:"#fff",
+
+border:"1px solid #ddd",
+
+borderRadius:10,
+
+}}
+
+>
+
+
+
+<h3>
+Selected Dates
+</h3>
+
+
+
+<p>
+
+From:
+
+<strong>
+
+{" "}
+
+{formatDate(rangeStart)}
+
+</strong>
+
+</p>
+
+
+
+
+{rangeEnd && (
+
+
+
+<p>
+
+To:
+
+<strong>
+
+{" "}
+
+{formatDate(rangeEnd)}
+
+</strong>
+
+</p>
+
+
+
+)}
+
+
+
+
+
+{rangeEnd && (
+
+
+
+<div
+
+style={{
+
+marginTop:20,
+
+}}
+
+
+>
+
+
+
+<h3>
+
+Nightly Price
+
+</h3>
+
+
+
+<input
+
+
+type="number"
+
+
+placeholder="£ per night"
+
+
+value={nightlyPrice}
+
+
+onChange={(e)=>
+
+setNightlyPrice(e.target.value)
+
+}
+
+
+style={{
+
+padding:10,
+
+borderRadius:6,
+
+border:"1px solid #ccc",
+
+fontSize:16,
+
+}}
+
+
+
+/>
+
+
+
+<button
+
+style={greenBtn}
+
+onClick={savePrice}
+
+>
+
+💷 Save Price
+
+</button>
+
+
+
+</div>
+
+
+
+)}
+
+
+
+
+
+</div>
+
+
+
+)}
+
+
+
+
+
+
+
+
+
+<button
+
+onClick={()=>
+navigate("/host-dashboard")
+}
+
+style={{
+
+marginTop:40,
+
+background:"#14532d",
+
+color:"white",
+
+border:"none",
+
+padding:"12px 20px",
+
+borderRadius:8,
+
+cursor:"pointer",
+
+}}
+
+>
+
+← Back to Dashboard
+
+</button>
+
+
+
+
+
+</div>
+
+);
 
 }
 
@@ -463,16 +912,23 @@ export default function PropertyCalendar() {
 
 const greenBtn = {
 
-  background:"#14532d",
 
-  color:"white",
+background:"#14532d",
 
-  border:"none",
 
-  padding:"10px 18px",
+color:"white",
 
-  borderRadius:8,
 
-  cursor:"pointer",
+border:"none",
+
+
+padding:"10px 18px",
+
+
+borderRadius:8,
+
+
+cursor:"pointer",
+
 
 };
