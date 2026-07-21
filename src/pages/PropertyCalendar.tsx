@@ -140,6 +140,17 @@ const [rangeEnd, setRangeEnd] = useState<string | null>(null);
         {months.map((month, index) => {
 
           const days = getDaysInMonth(year, index);
+        const formatDate = (date: string) => {
+
+  const d = new Date(date);
+
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+};
 
 
           return (
