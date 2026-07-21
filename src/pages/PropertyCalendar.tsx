@@ -93,8 +93,20 @@ const [selectedDate, setSelectedDate] = useState<string | null>(null);
             gap: 15,
             flexWrap: "wrap",
           }}
-        >
-          <button style={greenBtn}>🚫 Block Dates</button>
+        <button
+  style={greenBtn}
+  disabled={!selectedDate}
+  onClick={() => {
+    if (!selectedDate) return;
+
+    setBlockedDates([
+      ...blockedDates,
+      selectedDate
+    ]);
+  }}
+>
+  🚫 Block Selected Date
+</button>
           <button style={greenBtn}>💷 Change Prices</button>
           <button style={greenBtn}>🔥 Special Offers</button>
           <button style={greenBtn}>📅 Sync Calendar</button>
