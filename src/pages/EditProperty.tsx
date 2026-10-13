@@ -184,6 +184,18 @@ const optionGridStyle: CSSProperties = {
   gap: 10,
 };
 
+const iconBoxStyle: CSSProperties = {
+  width: 42,
+  height: 42,
+  borderRadius: 12,
+  background: "#eaf4ec",
+  display: "grid",
+  placeItems: "center",
+  color: "#176b50",
+  fontSize: 20,
+  flexShrink: 0,
+};
+
 export default function EditProperty() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -289,7 +301,7 @@ export default function EditProperty() {
         if (imageError) {
           console.error("Could not load property photos:", imageError);
           setErrorMessage(
-            "Your property details loaded, but the photos could not be loaded. Check your photo permissions in Supabase."
+            "Your property details loaded, but your photos could not be loaded. Please check the property_images permissions in Supabase."
           );
         } else {
           const loadedPhotos = (imageRows ?? []) as PropertyPhoto[];
@@ -432,7 +444,7 @@ export default function EditProperty() {
 
       if (!updatedRows || updatedRows.length === 0) {
         throw new Error(
-          "No property was updated. Please check that you own this listing and have permission to edit it."
+          "No property was updated. Check that you own this listing and have permission to edit it."
         );
       }
 
@@ -453,24 +465,25 @@ export default function EditProperty() {
           .from("property-images")
           .getPublicUrl(storagePath);
 
-        const shouldBeInitialCover = photos.length === 0 && index === 0;
-
-        const { data: insertedPhoto, error: imageInsertError } = await supabase
-          .from("property_images")
-          .insert({
-            property_id: id,
-            owner_id: user.id,
-            storage_path: storagePath,
-            public_url: publicData.publicUrl,
-            is_cover: shouldBeInitialCover,
-            position: photos.length + index,
-          })
-          .select("id, public_url, storage_path, is_cover")
-          .single();
+        const { data: insertedPhoto, error: imageInsertError } =
+          await supabase
+            .from("property_images")
+            .insert({
+              property_id: id,
+              owner_id: user.id,
+              storage_path: storagePath,
+              public_url: publicData.publicUrl,
+              is_cover: photos.length === 0 && index === 0,
+              position: photos.length + index,
+            })
+            .select("id, public_url, storage_path, is_cover")
+            .single();
 
         if (imageInsertError) {
-          // Remove the uploaded object if its database record could not be created.
-          await supabase.storage.from("property-images").remove([storagePath]);
+          await supabase.storage
+            .from("property-images")
+            .remove([storagePath]);
+
           throw imageInsertError;
         }
 
@@ -507,7 +520,6 @@ export default function EditProperty() {
 
         if (coverError) throw coverError;
       } else if (allPhotos.length > 0) {
-        // Ensure the first photo becomes the cover if none was selected yet.
         const firstPhoto = allPhotos[0];
 
         const { error: unsetError } = await supabase
@@ -530,7 +542,6 @@ export default function EditProperty() {
         setCoverPhotoId(firstPhoto.id);
       }
 
-      // Reload saved photo rows so the page shows newly uploaded images.
       const { data: refreshedPhotos, error: refreshError } = await supabase
         .from("property_images")
         .select("id, public_url, storage_path, is_cover")
@@ -591,10 +602,7 @@ export default function EditProperty() {
           .remove([photo.storage_path]);
 
         if (storageError) {
-          console.error(
-            "Photo record deleted, but storage cleanup failed:",
-            storageError
-          );
+          console.error("Photo record deleted, but storage cleanup failed:", storageError);
         }
       }
 
@@ -603,7 +611,6 @@ export default function EditProperty() {
 
       if (coverPhotoId === photo.id) {
         const nextPhoto = remainingPhotos[0];
-
         setCoverPhotoId(nextPhoto?.id ?? "");
 
         if (nextPhoto) {
@@ -712,12 +719,14 @@ export default function EditProperty() {
   const coverPhoto =
     photos.find((photo) => photo.id === coverPhotoId) ?? photos[0];
 
-  const previewPrice =
+  const hasValidPrice =
     form.nightly_price.trim() !== "" &&
     Number.isFinite(Number(form.nightly_price)) &&
-    Number(form.nightly_price) >= 0
-      ? `£${Number(form.nightly_price).toLocaleString("en-GB")}`
-      : "Price not set";
+    Number(form.nightly_price) >= 0;
+
+  const previewPrice = hasValidPrice
+    ? `£${Number(form.nightly_price).toLocaleString("en-GB")}`
+    : "Price not set";
 
   return (
     <main
@@ -827,22 +836,14 @@ export default function EditProperty() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
+              gridTemplateColumns: "minmax(0, 1fr) minmax(260px, 320px)",
               gap: 22,
               alignItems: "start",
             }}
           >
             <div style={{ minWidth: 0 }}>
               <section style={cardStyle}>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 13,
-                    alignItems: "flex-start",
-                    marginBottom: 24,
-                  }}
-                >
+                <div style={{ display: "flex", gap: 13, alignItems: "flex-start", marginBottom: 24 }}>
                   <div style={iconBoxStyle}>⌂</div>
                   <div>
                     <h2 style={sectionHeadingStyle}>Property details</h2>
@@ -1063,27 +1064,12 @@ export default function EditProperty() {
                 </div>
 
                 {photos.length === 0 && (
-                  <div
-                    style={{
-                      padding: 22,
-                      background: "#f7f9f6",
-                      borderRadius: 12,
-                      color: "#758078",
-                      fontSize: 13,
-                      marginBottom: 15,
-                    }}
-                  >
+                  <div style={{ padding: 22, background: "#f7f9f6", borderRadius: 12, color: "#758078", fontSize: 13, marginBottom: 15 }}>
                     No saved photos were found for this property yet.
                   </div>
                 )}
 
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 175px), 1fr))",
-                    gap: 14,
-                  }}
-                >
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 175px), 1fr))", gap: 14 }}>
                   {photos.map((photo) => (
                     <div
                       key={photo.id}
@@ -1098,45 +1084,18 @@ export default function EditProperty() {
                         <img
                           src={photo.public_url}
                           alt="Property"
-                          style={{
-                            display: "block",
-                            width: "100%",
-                            height: 150,
-                            objectFit: "cover",
-                          }}
+                          style={{ display: "block", width: "100%", height: 150, objectFit: "cover" }}
                         />
 
                         {coverPhotoId === photo.id && (
-                          <span
-                            style={{
-                              position: "absolute",
-                              top: 9,
-                              left: 9,
-                              background: "#176b50",
-                              color: "#fff",
-                              padding: "5px 8px",
-                              borderRadius: 6,
-                              fontSize: 11,
-                              fontWeight: 750,
-                            }}
-                          >
+                          <span style={{ position: "absolute", top: 9, left: 9, background: "#176b50", color: "#fff", padding: "5px 8px", borderRadius: 6, fontSize: 11, fontWeight: 750 }}>
                             COVER PHOTO
                           </span>
                         )}
                       </div>
 
                       <div style={{ padding: 12 }}>
-                        <label
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                            fontSize: 12,
-                            color: "#34483c",
-                            marginBottom: 12,
-                            cursor: "pointer",
-                          }}
-                        >
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#34483c", marginBottom: 12, cursor: "pointer" }}>
                           <input
                             type="radio"
                             name="cover-photo"
@@ -1151,14 +1110,7 @@ export default function EditProperty() {
                           type="button"
                           disabled={saving}
                           onClick={() => void deletePhoto(photo)}
-                          style={{
-                            ...secondaryButtonStyle,
-                            width: "100%",
-                            color: "#a33427",
-                            borderColor: "#eed8d5",
-                            padding: "8px 10px",
-                            fontSize: 12,
-                          }}
+                          style={{ ...secondaryButtonStyle, width: "100%", color: "#a33427", borderColor: "#eed8d5", padding: "8px 10px", fontSize: 12 }}
                         >
                           Delete photo
                         </button>
@@ -1167,54 +1119,23 @@ export default function EditProperty() {
                   ))}
                 </div>
 
-                <label
-                  style={{
-                    display: "block",
-                    marginTop: 20,
-                    padding: 22,
-                    textAlign: "center",
-                    border: "1px dashed #b9cbbd",
-                    borderRadius: 12,
-                    background: "#f8faf7",
-                    cursor: "pointer",
-                    color: "#176b50",
-                    fontWeight: 700,
-                    fontSize: 13,
-                  }}
-                >
-                  <span style={{ display: "block", fontSize: 25, marginBottom: 8 }}>
-                    ＋
-                  </span>
+                <label style={{ display: "block", marginTop: 20, padding: 22, textAlign: "center", border: "1px dashed #b9cbbd", borderRadius: 12, background: "#f8faf7", cursor: "pointer", color: "#176b50", fontWeight: 700, fontSize: 13 }}>
+                  <span style={{ display: "block", fontSize: 25, marginBottom: 8 }}>＋</span>
                   Add photos to your listing
                   <span style={{ display: "block", color: "#758078", fontSize: 12, fontWeight: 400, marginTop: 5 }}>
                     Choose one or more image files
                   </span>
-
                   <input
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={(e) => setNewPhotos(Array.from(e.target.files ?? []))}
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      marginTop: 12,
-                      fontSize: 12,
-                      color: "#46564b",
-                    }}
+                    style={{ display: "block", width: "100%", marginTop: 12, fontSize: 12, color: "#46564b" }}
                   />
                 </label>
 
                 {newPhotos.length > 0 && (
-                  <p
-                    style={{
-                      color: "#176b50",
-                      background: "#eef7f0",
-                      borderRadius: 9,
-                      padding: 12,
-                      fontSize: 13,
-                    }}
-                  >
+                  <p style={{ color: "#176b50", background: "#eef7f0", borderRadius: 9, padding: 12, fontSize: 13 }}>
                     ✓ {newPhotos.length} new photo(s) selected. They will upload when you save.
                   </p>
                 )}
@@ -1224,10 +1145,7 @@ export default function EditProperty() {
                 <button
                   type="submit"
                   disabled={saving}
-                  style={{
-                    ...primaryButtonStyle,
-                    opacity: saving ? 0.7 : 1,
-                  }}
+                  style={{ ...primaryButtonStyle, opacity: saving ? 0.7 : 1 }}
                 >
                   {saving ? "Saving changes…" : "✓ Save property changes"}
                 </button>
@@ -1248,51 +1166,20 @@ export default function EditProperty() {
                   <img
                     src={coverPhoto.public_url}
                     alt="Your property cover"
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      height: 200,
-                      objectFit: "cover",
-                    }}
+                    style={{ display: "block", width: "100%", height: 200, objectFit: "cover" }}
                   />
                 ) : (
-                  <div
-                    style={{
-                      height: 165,
-                      background: "linear-gradient(135deg, #e4eee3, #f7f3e8)",
-                      display: "grid",
-                      placeItems: "center",
-                      color: "#68816e",
-                      fontSize: 13,
-                      textAlign: "center",
-                      padding: 15,
-                    }}
-                  >
+                  <div style={{ height: 165, background: "linear-gradient(135deg, #e4eee3, #f7f3e8)", display: "grid", placeItems: "center", color: "#68816e", fontSize: 13, textAlign: "center", padding: 15 }}>
                     Your property photo will appear here
                   </div>
                 )}
 
                 <div style={{ padding: 20 }}>
-                  <p
-                    style={{
-                      color: "#176b50",
-                      fontSize: 11,
-                      fontWeight: 800,
-                      letterSpacing: 1.2,
-                      margin: "0 0 9px",
-                    }}
-                  >
+                  <p style={{ color: "#176b50", fontSize: 11, fontWeight: 800, letterSpacing: 1.2, margin: "0 0 9px" }}>
                     LISTING PREVIEW
                   </p>
 
-                  <h2
-                    style={{
-                      fontSize: 21,
-                      letterSpacing: "-0.5px",
-                      margin: "0 0 8px",
-                      overflowWrap: "anywhere",
-                    }}
-                  >
+                  <h2 style={{ fontSize: 21, letterSpacing: "-0.5px", margin: "0 0 8px", overflowWrap: "anywhere" }}>
                     {form.title || "Your property name"}
                   </h2>
 
@@ -1300,31 +1187,14 @@ export default function EditProperty() {
                     ⌖ {form.location || "Add your property location"}
                   </p>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 10,
-                      flexWrap: "wrap",
-                      color: "#536358",
-                      fontSize: 12,
-                      paddingBottom: 16,
-                      borderBottom: "1px solid #edf0ed",
-                    }}
-                  >
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", color: "#536358", fontSize: 12, paddingBottom: 16, borderBottom: "1px solid #edf0ed" }}>
                     <span>🛏 {form.bedrooms} bedrooms</span>
                     <span>♧ Sleeps {form.sleeps}</span>
                   </div>
 
-                  <p
-                    style={{
-                      margin: "16px 0 0",
-                      fontSize: 21,
-                      fontWeight: 800,
-                      color: "#176b50",
-                    }}
-                  >
+                  <p style={{ margin: "16px 0 0", fontSize: 21, fontWeight: 800, color: "#176b50" }}>
                     {previewPrice}
-                    {previewPrice !== "Price not set" && (
+                    {hasValidPrice && (
                       <span style={{ fontSize: 12, fontWeight: 500, color: "#758078" }}>
                         {" "}/ night
                       </span>
@@ -1338,45 +1208,17 @@ export default function EditProperty() {
               </div>
 
               <div style={{ ...cardStyle, padding: 20 }}>
-                <h3 style={{ fontSize: 15, margin: "0 0 14px" }}>
-                  Listing checklist
-                </h3>
+                <h3 style={{ fontSize: 15, margin: "0 0 14px" }}>Listing checklist</h3>
 
                 {([
                   ["Property name", Boolean(form.title.trim())],
                   ["Location", Boolean(form.location.trim())],
                   ["Description", Boolean(form.description.trim())],
-                  [
-                    "Nightly price",
-                    form.nightly_price.trim() !== "" &&
-                      Number.isFinite(Number(form.nightly_price)) &&
-                      Number(form.nightly_price) >= 0,
-                  ],
+                  ["Nightly price", hasValidPrice],
                   ["Property photos", photos.length > 0 || newPhotos.length > 0],
                 ] as [string, boolean][]).map(([label, complete]) => (
-                  <div
-                    key={label}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 9,
-                      marginBottom: 12,
-                      fontSize: 12,
-                      color: complete ? "#176b50" : "#7c867e",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 19,
-                        height: 19,
-                        borderRadius: "50%",
-                        background: complete ? "#e5f4e8" : "#f0f2ef",
-                        display: "grid",
-                        placeItems: "center",
-                        fontSize: 11,
-                        flexShrink: 0,
-                      }}
-                    >
+                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 12, fontSize: 12, color: complete ? "#176b50" : "#7c867e" }}>
+                    <span style={{ width: 19, height: 19, borderRadius: "50%", background: complete ? "#e5f4e8" : "#f0f2ef", display: "grid", placeItems: "center", fontSize: 11, flexShrink: 0 }}>
                       {complete ? "✓" : "○"}
                     </span>
                     {label}
@@ -1384,15 +1226,7 @@ export default function EditProperty() {
                 ))}
               </div>
 
-              <div
-                style={{
-                  borderRadius: 14,
-                  background: "#eaf3eb",
-                  padding: 20,
-                  color: "#315640",
-                  marginBottom: 18,
-                }}
-              >
+              <div style={{ borderRadius: 14, background: "#eaf3eb", padding: 20, color: "#315640", marginBottom: 18 }}>
                 <p style={{ fontSize: 14, fontWeight: 750, margin: "0 0 8px" }}>
                   💡 A helpful tip
                 </p>
@@ -1412,23 +1246,10 @@ export default function EditProperty() {
           </div>
         </form>
 
-        <footer
-          style={{
-            borderTop: "1px solid #e2e8e2",
-            paddingTop: 22,
-            marginTop: 12,
-            color: "#89938b",
-            fontSize: 12,
-            textAlign: "center",
-          }}
-        >
+        <footer style={{ borderTop: "1px solid #e2e8e2", paddingTop: 22, marginTop: 12, color: "#89938b", fontSize: 12, textAlign: "center" }}>
           © 2026 Static Holidays
         </footer>
       </div>
     </main>
   );
-}
-
-function iconBoxStyle(): never {
-  throw new Error("This placeholder should not be used.");
 }
