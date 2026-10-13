@@ -198,6 +198,22 @@ export default function PropertyDetail() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
 
+  // NEW: track which month the guest is viewing.
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+
+  const bookingMonthLabel = calendarMonth.toLocaleDateString("en-GB", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const currentMonth = new Date();
+  const isCurrentMonth =
+    calendarMonth.getFullYear() === currentMonth.getFullYear() &&
+    calendarMonth.getMonth() === currentMonth.getMonth();
+
   const [bookingMessage, setBookingMessage] = useState("");
   const [bookingMessageType, setBookingMessageType] = useState<
     "success" | "error"
@@ -548,7 +564,6 @@ export default function PropertyDetail() {
         return;
       }
 
-      // Reload the selected calendar dates immediately before submission.
       const { data: freshCalendar, error: calendarCheckError } =
         await supabase
           .from("property_calendar_dates")
@@ -598,8 +613,6 @@ export default function PropertyDetail() {
         freshTotal += effectivePrice;
       }
 
-      // Check for overlapping requests/bookings.
-      // This query requires appropriate Supabase RLS permissions.
       const { data: overlaps, error: overlapError } = await supabase
         .from("bookings")
         .select("check_in, check_out, booking_status")
@@ -1270,6 +1283,76 @@ export default function PropertyDetail() {
                     marginBottom: 20,
                   }}
                 >
+                  {/* NEW: month navigation */}
+                  <div
+                    style={{
+                      gridColumn: "1 / -1",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 8,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      aria-label="Previous month"
+                      disabled={isCurrentMonth}
+                      onClick={() =>
+                        setCalendarMonth(
+                          (current) =>
+                            new Date(
+                              current.getFullYear(),
+                              current.getMonth() - 1,
+                              1
+                            )
+                        )
+                      }
+                      style={{
+                        ...secondaryButtonStyle,
+                        padding: "8px 11px",
+                        minWidth: 42,
+                        opacity: isCurrentMonth ? 0.4 : 1,
+                        cursor: isCurrentMonth ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      ←
+                    </button>
+
+                    <strong
+                      aria-live="polite"
+                      style={{
+                        fontSize: 14,
+                        color: "#203128",
+                        textAlign: "center",
+                      }}
+                    >
+                      {bookingMonthLabel}
+                    </strong>
+
+                    <button
+                      type="button"
+                      aria-label="Next month"
+                      onClick={() =>
+                        setCalendarMonth(
+                          (current) =>
+                            new Date(
+                              current.getFullYear(),
+                              current.getMonth() + 1,
+                              1
+                            )
+                        )
+                      }
+                      style={{
+                        ...secondaryButtonStyle,
+                        padding: "8px 11px",
+                        minWidth: 42,
+                      }}
+                    >
+                      →
+                    </button>
+                  </div>
+
                   {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
                     <div
                       key={`${day}-${index}`}
@@ -1286,7 +1369,8 @@ export default function PropertyDetail() {
                   ))}
 
                   {(() => {
-                    const start = new Date();
+                    // Use the month selected by the guest.
+                    const start = new Date(calendarMonth);
                     start.setDate(1);
                     start.setHours(12, 0, 0, 0);
 
@@ -1441,9 +1525,16 @@ export default function PropertyDetail() {
                 <input
                   type="date"
                   value={endDate}
-                  min={startDate ? localDateKey(new Date(
-                    new Date(`${startDate}T12:00:00Z`).getTime() + 86400000
-                  )) : today()}
+                  min={
+                    startDate
+                      ? localDateKey(
+                          new Date(
+                            new Date(`${startDate}T12:00:00Z`).getTime() +
+                              86400000
+                          )
+                        )
+                      : today()
+                  }
                   onChange={(event) => {
                     setEndDate(event.target.value);
                     setBookingMessage("");
