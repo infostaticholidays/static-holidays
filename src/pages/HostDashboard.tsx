@@ -1,526 +1,567 @@
-
-import { useEffect, useState } from "react";
-import type { CSSProperties } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
-type RecordData = Record<string, any>;
-type BillingPeriod = "monthly" | "yearly";
-type PaidPlan = "super" | "elite";
+type PlanId = "host" | "super" | "elite";
+type BillingInterval = "monthly" | "yearly";
+
+type Plan = {
+  id: PlanId;
+  name: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  commission: string;
+  description: string;
+  features: string[];
+  popular?: boolean;
+};
 
 const GREEN = "#176b50";
 const GREEN_DARK = "#104b39";
 const GREEN_LIGHT = "#eaf5ef";
-const TEXT = "#18372b";
-const MUTED = "#667b70";
-const BORDER = "#dce9e0";
+const PAGE_BG = "#f5f7f6";
+const BORDER = "#e4e9e6";
+const MUTED = "#68756e";
+const TEXT = "#1c2922";
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
-  }).format(Number(value) || 0);
+  }).format(Number.isFinite(value) ? value : 0);
 
-function normalisePlan(value: unknown) {
-  const plan = String(value ?? "host").toLowerCase();
+// Keep this helper at module scope so every component can access it.
+const formatPrice = (price: number) => money(price);
 
-  if (plan.includes("elite")) return "elite";
-  if (plan.includes("super")) return "super";
-
-  return "host";
-}
-
-const styles: Record<string, CSSProperties> = {
-  page: {
-    display: "flex",
-    minHeight: "100vh",
-    background: "#f5f8f5",
-    color: TEXT,
-    fontFamily: "inherit",
-  },
-  sidebar: {
-    width: 235,
-    flexShrink: 0,
-    background: GREEN_DARK,
-    color: "#ffffff",
-    padding: 22,
-    boxSizing: "border-box",
-  },
-  navButton: {
-    width: "100%",
-    display: "block",
-    padding: "12px 14px",
-    border: 0,
-    borderRadius: 9,
-    background: "transparent",
-    color: "#e5f3e9",
-    textAlign: "left",
-    cursor: "pointer",
-    marginBottom: 5,
-    fontSize: 14,
-  },
-  main: {
-    flex: 1,
-    minWidth: 0,
-    padding: 28,
-    boxSizing: "border-box",
-  },
-  section: {
-    background: "#ffffff",
-    border: `1px solid ${BORDER}`,
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 22,
-    scrollMarginTop: 24,
-    boxShadow: "0 3px 14px rgba(16, 75, 57, 0.035)",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
-    gap: 16,
-  },
-  muted: {
-    color: MUTED,
-    lineHeight: 1.65,
-  },
-  button: {
-    padding: "12px 16px",
-    border: 0,
-    borderRadius: 9,
-    background: GREEN,
-    color: "#ffffff",
-    fontWeight: 700,
-    cursor: "pointer",
-    fontSize: 14,
-  },
-  secondaryButton: {
-    padding: "10px 13px",
-    border: `1px solid ${BORDER}`,
-    borderRadius: 9,
-    background: "#ffffff",
-    color: TEXT,
-    cursor: "pointer",
-    fontWeight: 600,
-  },
-};
-
-const plans = [
+const plans: Plan[] = [
   {
     id: "host",
-    name: "Host",
-    icon: "🔑",
-    monthly: 0,
-    yearly: 0,
+    name: "Host Free",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
     commission: "12%",
     description: "Everything you need to get started.",
     features: [
-      "Basic holiday-home listing",
-      "Bookings and guest messaging",
-      "Property management dashboard",
+      "Create property listings",
+      "Manage bookings and enquiries",
+      "Message your guests",
+      "Standard search visibility",
     ],
   },
   {
     id: "super",
     name: "Super Host",
-    icon: "🏖️",
-    monthly: 19.99,
-    yearly: 199.9,
+    monthlyPrice: 19.99,
+    yearlyPrice: 199.9,
     commission: "5%",
-    description: "More visibility for your property.",
+    description: "More visibility with lower commission.",
     features: [
-      "Everything in Host",
-      "Higher listing ranking",
+      "Everything in Host Free",
+      "Reduced 5% booking commission",
+      "Improved search ranking",
       "Featured listing boost",
-      "Increased visibility",
     ],
+    popular: true,
   },
   {
     id: "elite",
     name: "Elite Host",
-    icon: "👑",
-    monthly: 39.99,
-    yearly: 399.9,
+    monthlyPrice: 39.99,
+    yearlyPrice: 399.9,
     commission: "1%",
-    description: "Premium benefits for your holiday business.",
+    description: "Maximum exposure and our lowest commission.",
     features: [
       "Everything in Super Host",
-      "Homepage feature, subject to availability",
-      "Promotional advertising opportunities",
-      "Priority support",
+      "Just 1% booking commission",
+      "Homepage feature opportunities",
+      "Priority host support",
     ],
   },
-] as const;
+];
+
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    display: "flex",
+    background: PAGE_BG,
+    color: TEXT,
+    fontFamily:
+      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  },
+  sidebar: {
+    width: 238,
+    flexShrink: 0,
+    background: GREEN_DARK,
+    color: "#fff",
+    padding: "28px 16px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  },
+  brand: {
+    fontSize: 22,
+    fontWeight: 800,
+    letterSpacing: "-0.7px",
+    padding: "0 12px",
+    marginBottom: 28,
+  },
+  navItem: {
+    display: "block",
+    width: "100%",
+    boxSizing: "border-box",
+    border: 0,
+    textAlign: "left",
+    textDecoration: "none",
+    padding: "12px 14px",
+    borderRadius: 10,
+    color: "#dcece3",
+    background: "transparent",
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  navActive: {
+    background: "rgba(255,255,255,0.14)",
+    color: "#fff",
+  },
+  main: {
+    minWidth: 0,
+    flex: 1,
+    padding: "30px clamp(16px, 3vw, 42px) 48px",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 16,
+    flexWrap: "wrap",
+    marginBottom: 26,
+  },
+  heading: {
+    fontSize: 28,
+    lineHeight: 1.2,
+    letterSpacing: "-0.8px",
+    fontWeight: 800,
+    margin: 0,
+  },
+  muted: { color: MUTED, fontSize: 14, lineHeight: 1.6 },
+  card: {
+    background: "#fff",
+    border: `1px solid ${BORDER}`,
+    borderRadius: 16,
+    padding: 22,
+    minWidth: 0,
+    boxSizing: "border-box",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
+    gap: 16,
+  },
+  sectionTitle: {
+    margin: "0 0 6px",
+    fontSize: 19,
+    fontWeight: 800,
+    letterSpacing: "-0.35px",
+  },
+  primaryButton: {
+    background: GREEN,
+    color: "#fff",
+    border: `1px solid ${GREEN}`,
+    borderRadius: 10,
+    padding: "11px 16px",
+    fontSize: 14,
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+  secondaryButton: {
+    background: "#fff",
+    color: GREEN,
+    border: `1px solid ${GREEN}`,
+    borderRadius: 10,
+    padding: "10px 14px",
+    fontSize: 14,
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+  input: {
+    width: "100%",
+    boxSizing: "border-box",
+    border: `1px solid ${BORDER}`,
+    borderRadius: 10,
+    padding: "12px 13px",
+    background: "#fff",
+    color: TEXT,
+    fontSize: 14,
+  },
+  pill: {
+    display: "inline-block",
+    borderRadius: 999,
+    background: GREEN_LIGHT,
+    color: GREEN,
+    padding: "5px 9px",
+    fontSize: 12,
+    fontWeight: 800,
+  },
+};
+
+function getPlanId(value: unknown): PlanId {
+  const plan = String(value ?? "").toLowerCase();
+
+  if (plan.includes("elite")) return "elite";
+  if (plan.includes("super")) return "super";
+  return "host";
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return "Something went wrong. Please try again.";
+}
 
 export default function HostDashboard() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState<RecordData | null>(null);
-  const [profile, setProfile] = useState<RecordData | null>(null);
-  const [properties, setProperties] = useState<RecordData[]>([]);
-  const [bookings, setBookings] = useState<RecordData[]>([]);
-  const [conversations, setConversations] = useState<RecordData[]>([]);
-  const [reviews, setReviews] = useState<RecordData[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [pageError, setPageError] = useState("");
   const [notice, setNotice] = useState("");
-  const [activeSection, setActiveSection] = useState("overview");
 
   const [planBilling, setPlanBilling] =
-    useState<BillingPeriod>("monthly");
-
-  const [processingPlan, setProcessingPlan] =
-    useState<PaidPlan | null>(null);
+    useState<BillingInterval>("monthly");
+  const [processingPlan, setProcessingPlan] = useState<PlanId | null>(null);
 
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
   const [processingPromotion, setProcessingPromotion] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadDashboard() {
+  const loadDashboard = useCallback(
+    async (mountedCheck: () => boolean = () => true) => {
       setLoading(true);
-      setError("");
+      setPageError("");
 
       try {
-        const { data: authData, error: authError } =
-          await supabase.auth.getUser();
+        const {
+          data: { user: currentUser },
+          error: authError,
+        } = await supabase.auth.getUser();
 
         if (authError) throw authError;
-
-        const currentUser = authData.user;
 
         if (!currentUser) {
           navigate("/login");
           return;
         }
 
-        if (!mounted) return;
+        if (!mountedCheck()) return;
+
         setUser(currentUser);
 
-        const { data: profileData, error: profileError } =
-          await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", currentUser.id)
-            .single();
+        // Profile is essential to determine whether this account is a host.
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentUser.id)
+          .maybeSingle();
 
         if (profileError) throw profileError;
 
-        if (profileData.role !== "host") {
+        if (!mountedCheck()) return;
+
+        if (!profileData) {
+          setPageError(
+            "We couldn't find your profile. Please check that your profiles table has a record for your account."
+          );
+          return;
+        }
+
+        setProfile(profileData);
+
+        if (profileData.role && profileData.role !== "host") {
           navigate("/account");
           return;
         }
 
-        if (!mounted) return;
-        setProfile(profileData);
+        // Load each dashboard section independently so one optional section
+        // cannot prevent the rest of the dashboard from appearing.
+        const propertyResult = await supabase
+          .from("properties")
+          .select("*")
+          .eq("owner_id", currentUser.id)
+          .order("created_at", { ascending: false });
 
-        const { data: propertyData, error: propertyError } =
-          await supabase
-            .from("properties")
-            .select("*")
-            .eq("owner_id", currentUser.id)
-            .order("created_at", { ascending: false });
+        if (!mountedCheck()) return;
 
-        if (propertyError) throw propertyError;
+        if (propertyResult.error) {
+          console.error("Properties could not be loaded:", propertyResult.error);
+          setProperties([]);
+          setNotice("Some property information could not be loaded.");
+        } else {
+          const propertyData = propertyResult.data ?? [];
+          setProperties(propertyData);
 
-        const propertyList = propertyData ?? [];
+          const propertyIds = propertyData
+            .map((property: any) => property.id)
+            .filter(Boolean);
 
-        if (!mounted) return;
-        setProperties(propertyList);
-
-        if (propertyList.length > 0) {
-          const propertyIds = propertyList.map(
-            (property) => property.id
-          );
-
-          const { data: bookingData, error: bookingError } =
-            await supabase
+          if (propertyIds.length > 0) {
+            const bookingResult = await supabase
               .from("bookings")
               .select("*")
-              .in("property_id", propertyIds);
+              .in("property_id", propertyIds)
+              .order("created_at", { ascending: false });
 
-          if (bookingError) throw bookingError;
+            if (!mountedCheck()) return;
 
-          if (!mounted) return;
-          setBookings(bookingData ?? []);
-        } else {
-          setBookings([]);
+            if (bookingResult.error) {
+              console.error("Bookings could not be loaded:", bookingResult.error);
+              setBookings([]);
+            } else {
+              setBookings(bookingResult.data ?? []);
+            }
+          } else {
+            setBookings([]);
+          }
         }
 
-        const { data: conversationData, error: conversationError } =
-          await supabase
-            .from("conversations")
-            .select("*")
-            .eq("host_id", currentUser.id);
+        const conversationResult = await supabase
+          .from("conversations")
+          .select("*")
+          .eq("host_id", currentUser.id)
+          .order("created_at", { ascending: false });
 
-        if (conversationError) throw conversationError;
+        if (!mountedCheck()) return;
 
-        if (!mounted) return;
-        setConversations(conversationData ?? []);
-
-        const { data: reviewData, error: reviewError } =
-          await supabase
-            .from("reviews")
-            .select("*")
-            .eq("host_id", currentUser.id);
-
-        if (reviewError) throw reviewError;
-
-        if (!mounted) return;
-        setReviews(reviewData ?? []);
-
-        if (propertyList.length > 0) {
-          setSelectedPropertyId((current) => {
-            const stillExists = propertyList.some(
-              (property) => String(property.id) === current
-            );
-
-            return stillExists
-              ? current
-              : String(propertyList[0].id);
-          });
-        }
-      } catch (err) {
-        console.error("Dashboard loading error:", err);
-
-        if (mounted) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Unable to load your dashboard."
+        if (conversationResult.error) {
+          console.error(
+            "Conversations could not be loaded:",
+            conversationResult.error
           );
+          setConversations([]);
+        } else {
+          setConversations(conversationResult.data ?? []);
+        }
+
+        // Reviews are optional. A missing host_id column or another reviews
+        // query error should not crash the whole dashboard.
+        const reviewResult = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("host_id", currentUser.id);
+
+        if (!mountedCheck()) return;
+
+        if (reviewResult.error) {
+          console.error("Reviews could not be loaded:", reviewResult.error);
+          setReviews([]);
+        } else {
+          setReviews(reviewResult.data ?? []);
+        }
+      } catch (error) {
+        console.error("Dashboard loading error:", error);
+
+        if (mountedCheck()) {
+          setPageError(getErrorMessage(error));
         }
       } finally {
-        if (mounted) setLoading(false);
+        if (mountedCheck()) setLoading(false);
       }
-    }
+    },
+    [navigate]
+  );
 
-    loadDashboard();
+  useEffect(() => {
+    let mounted = true;
+
+    void loadDashboard(() => mounted);
 
     return () => {
       mounted = false;
     };
-  }, [navigate]);
+  }, [loadDashboard]);
 
-  const currentPlan = normalisePlan(profile?.plan);
+  const currentPlan = getPlanId(profile?.plan);
+  const isVerified = Boolean(
+    profile?.id_verified && profile?.insurance_verified
+  );
 
-  const isVerified =
-    Boolean(profile?.id_verified) &&
-    Boolean(profile?.insurance_verified);
+  const grossEarnings = bookings.reduce((total, booking) => {
+    const status = String(booking.status ?? "").toLowerCase();
+
+    // Avoid counting cancelled or rejected bookings as earnings.
+    if (["cancelled", "canceled", "rejected"].includes(status)) return total;
+
+    const amount = Number(
+      booking.total_price ?? booking.total_amount ?? booking.amount ?? 0
+    );
+
+    return total + (Number.isFinite(amount) ? amount : 0);
+  }, 0);
 
   const commissionRate =
-    currentPlan === "elite"
-      ? 0.01
-      : currentPlan === "super"
-      ? 0.05
-      : 0.12;
-
-  const grossEarnings = bookings.reduce(
-    (total, booking) =>
-      total + (Number(booking.total_price) || 0),
-    0
-  );
+    currentPlan === "elite" ? 0.01 : currentPlan === "super" ? 0.05 : 0.12;
 
   const estimatedCommission = grossEarnings * commissionRate;
   const estimatedNet = grossEarnings - estimatedCommission;
 
-  async function handlePlanUpgrade(plan: PaidPlan) {
-    setError("");
+  const handlePlanUpgrade = async (planId: PlanId) => {
+    if (planId === "host") {
+      setNotice("Host Free is the free plan.");
+      return;
+    }
+
+    setProcessingPlan(planId);
+    setPageError("");
     setNotice("");
-    setProcessingPlan(plan);
 
     try {
-      const { data, error: checkoutError } =
-        await supabase.functions.invoke(
-          "create-plan-checkout",
-          {
-            body: {
-              plan,
-              billingInterval: planBilling,
-            },
-          }
-        );
+      const { data, error } = await supabase.functions.invoke(
+        "create-plan-checkout",
+        {
+          body: {
+            plan: planId,
+            billingInterval: planBilling,
+          },
+        }
+      );
 
-      if (checkoutError) throw checkoutError;
+      if (error) throw error;
 
-      if (
-        !data?.url ||
-        typeof data.url !== "string" ||
-        !data.url.startsWith("https://")
-      ) {
+      if (!data?.url || typeof data.url !== "string") {
         throw new Error(
-          "Membership checkout is not available yet. Please try again later."
+          "The checkout link was not returned. Check that create-plan-checkout is deployed and configured."
         );
       }
 
+      if (!data.url.startsWith("https://")) {
+        throw new Error("The checkout link is not a valid secure URL.");
+      }
+
       window.location.assign(data.url);
-    } catch (err) {
-      console.error("Membership checkout error:", err);
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to start membership payment."
+    } catch (error) {
+      console.error("Plan checkout error:", error);
+      setPageError(
+        `Unable to start checkout: ${getErrorMessage(error)}. Make sure the create-plan-checkout Supabase Edge Function and Stripe settings are configured.`
       );
-
+    } finally {
       setProcessingPlan(null);
     }
-  }
+  };
 
-  async function handlePromotionCheckout() {
-    if (!user) {
-      setError("Please sign in before promoting a property.");
-      return;
-    }
-
-    if (!selectedPropertyId) {
-      setError("Please select a property to promote.");
-      return;
-    }
-
+  const handlePromotionCheckout = async () => {
     const selectedProperty = properties.find(
       (property) => String(property.id) === selectedPropertyId
     );
 
     if (!selectedProperty) {
-      setError("We couldn't find that property. Please refresh and try again.");
+      setPageError("Please choose a property to promote first.");
       return;
     }
 
-    setError("");
-    setNotice("");
     setProcessingPromotion(true);
+    setPageError("");
+    setNotice("");
 
     try {
-      const { data, error: checkoutError } =
-        await supabase.functions.invoke(
-          "create-property-promotion-checkout",
-          {
-            body: {
-              property_id: selectedProperty.id,
-              promotion_type: "homepage_search",
-            },
-          }
-        );
+      const { data, error } = await supabase.functions.invoke(
+        "create-property-promotion-checkout",
+        {
+          body: {
+            property_id: selectedProperty.id,
+            promotion_type: "homepage_search",
+          },
+        }
+      );
 
-      if (checkoutError) throw checkoutError;
+      if (error) throw error;
 
-      if (
-        !data?.url ||
-        typeof data.url !== "string" ||
-        !data.url.startsWith("https://")
-      ) {
+      if (!data?.url || typeof data.url !== "string") {
         throw new Error(
-          "Property promotion checkout is not available yet. Please try again later."
+          "The checkout link was not returned. Check that create-property-promotion-checkout is deployed and configured."
         );
       }
 
+      if (!data.url.startsWith("https://")) {
+        throw new Error("The checkout link is not a valid secure URL.");
+      }
+
       window.location.assign(data.url);
-    } catch (err) {
-      console.error("Property promotion checkout error:", err);
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to start the property promotion payment."
+    } catch (error) {
+      console.error("Property promotion checkout error:", error);
+      setPageError(
+        `Unable to start promotion checkout: ${getErrorMessage(error)}. Make sure the create-property-promotion-checkout Supabase Edge Function and Stripe settings are configured.`
       );
-
+    } finally {
       setProcessingPromotion(false);
     }
-  }
+  };
 
-  async function deleteProperty(propertyId: string) {
-    if (!user) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this property?"
-    );
-
-    if (!confirmed) return;
-
-    setError("");
-    setNotice("");
-
-    try {
-      const { error: deleteError } = await supabase
-        .from("properties")
-        .delete()
-        .eq("id", propertyId)
-        .eq("owner_id", user.id);
-
-      if (deleteError) throw deleteError;
-
-      setProperties((current) =>
-        current.filter((property) => String(property.id) !== propertyId)
-      );
-
-      setNotice("Property deleted.");
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to delete the property."
-      );
-    }
-  }
-
-  async function updateNewsletterPreference(value: boolean) {
-    if (!user) return;
-
-    setError("");
-    setNotice("");
-
-    try {
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ newsletter_opt_in: value })
-        .eq("id", user.id);
-
-      if (updateError) throw updateError;
-
-      setProfile((current) =>
-        current
-          ? { ...current, newsletter_opt_in: value }
-          : current
-      );
-
-      setNotice("Your preferences have been updated.");
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to update your preferences."
-      );
-    }
-  }
-
-  function goToSection(id: string) {
-    setActiveSection(id);
-
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }
+  const goTo = (path: string) => navigate(path);
 
   if (loading) {
     return (
-      <div style={{ padding: 40, color: GREEN_DARK }}>
-        Loading your host dashboard...
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          background: PAGE_BG,
+          color: GREEN_DARK,
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🌿</div>
+          <strong>Loading your host dashboard…</strong>
+        </div>
       </div>
     );
   }
 
-  if (!profile) {
+  if (pageError && !profile) {
     return (
-      <div style={{ padding: 40, color: GREEN_DARK }}>
-        <h2>Your dashboard couldn't be loaded</h2>
-        <p>{error || "Please sign in and try again."}</p>
-        <button style={styles.button} onClick={() => navigate("/login")}>
-          Sign in
-        </button>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          background: PAGE_BG,
+          padding: 24,
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        <div style={{ ...styles.card, maxWidth: 540, width: "100%" }}>
+          <h2 style={styles.sectionTitle}>We couldn't load your dashboard</h2>
+          <p style={styles.muted}>{pageError}</p>
+          <button
+            type="button"
+            style={styles.primaryButton}
+            onClick={() => void loadDashboard()}
+          >
+            Try again
+          </button>
+          <button
+            type="button"
+            style={{ ...styles.secondaryButton, marginLeft: 8 }}
+            onClick={() => goTo("/account")}
+          >
+            Go to account
+          </button>
+        </div>
       </div>
     );
   }
@@ -528,93 +569,171 @@ export default function HostDashboard() {
   return (
     <div style={styles.page}>
       <aside style={styles.sidebar}>
-        <h2 style={{ marginTop: 5, lineHeight: 1.3 }}>
-          Static Holidays
-        </h2>
+        <div style={styles.brand}>🌿 Static Holidays</div>
 
-        <p style={{ color: "#c9e0d1", fontSize: 13 }}>
-          Owner dashboard
-        </p>
-
-        <div
-          style={{
-            height: 1,
-            background: "#ffffff25",
-            margin: "22px 0",
-          }}
-        />
-
-        {[
-          ["overview", "Overview"],
-          ["properties", "My Properties"],
-          ["promotion", "Promote a Property"],
-          ["bookings", "Bookings"],
-          ["compliance", "Compliance Centre"],
-          ["messages", "Messages"],
-          ["earnings", "Earnings"],
-          ["reviews", "Reviews"],
-          ["account", "Subscriptions & Plans"],
-        ].map(([id, label]) => (
+        <nav
+          aria-label="Host dashboard navigation"
+          style={{ display: "flex", flexDirection: "column", gap: 5 }}
+        >
           <button
-            key={id}
             type="button"
-            onClick={() =>
-              id === "compliance"
-                ? navigate("/host-compliance")
-                : goToSection(id)
-            }
+            style={{ ...styles.navItem, ...styles.navActive }}
+            onClick={() => goTo("/host-dashboard")}
+          >
+            ◫ &nbsp; Overview
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/my-properties")}
+          >
+            ⌂ &nbsp; My Properties
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/promote-property")}
+          >
+            ✦ &nbsp; Promote a Property
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/host-bookings")}
+          >
+            ▣ &nbsp; Bookings
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/host-compliance")}
+          >
+            ✓ &nbsp; Compliance Centre
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/host-messages")}
+          >
+            ✉ &nbsp; Messages
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/host-earnings")}
+          >
+            £ &nbsp; Earnings
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/host-reviews")}
+          >
+            ☆ &nbsp; Reviews
+          </button>
+          <button
+            type="button"
+            style={styles.navItem}
+            onClick={() => goTo("/host-subscriptions")}
+          >
+            ◈ &nbsp; Plans & Membership
+          </button>
+        </nav>
+
+        <div style={{ marginTop: "auto", padding: "24px 12px 0" }}>
+          <div style={{ fontSize: 12, color: "#c1d9cb", marginBottom: 5 }}>
+            Signed in as
+          </div>
+          <div
             style={{
-              ...styles.navButton,
-              background:
-                activeSection === id
-                  ? "#ffffff20"
-                  : "transparent",
-              fontWeight: activeSection === id ? 700 : 400,
+              fontWeight: 700,
+              overflowWrap: "anywhere",
+              fontSize: 13,
             }}
           >
-            {label}
+            {profile?.full_name || user?.email || "Host account"}
+          </div>
+          <button
+            type="button"
+            style={{ ...styles.navItem, marginTop: 18, paddingLeft: 0 }}
+            onClick={() => goTo("/account")}
+          >
+            ⚙ &nbsp; Account settings
           </button>
-        ))}
+          <button
+            type="button"
+            style={{ ...styles.navItem, paddingLeft: 0 }}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate("/login");
+            }}
+          >
+            ↪ &nbsp; Sign out
+          </button>
+        </div>
       </aside>
 
       <main style={styles.main}>
-        <header id="overview" style={{ marginBottom: 26 }}>
-          <p
-            style={{
-              color: GREEN,
-              fontWeight: 800,
-              letterSpacing: 1.5,
-              fontSize: 12,
-              marginBottom: 8,
-            }}
+        <header style={styles.header}>
+          <div>
+            <p
+              style={{
+                margin: "0 0 7px",
+                color: GREEN,
+                fontWeight: 800,
+                fontSize: 12,
+                textTransform: "uppercase",
+                letterSpacing: "1.2px",
+              }}
+            >
+              HOST CONTROL CENTRE
+            </p>
+            <h1 style={styles.heading}>
+              Welcome back
+              {profile?.full_name
+                ? `, ${String(profile.full_name).split(" ")[0]}`
+                : ""}
+              !
+            </h1>
+            <p style={{ ...styles.muted, margin: "8px 0 0" }}>
+              Manage your properties, bookings and host membership in one place.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            style={styles.primaryButton}
+            onClick={() => goTo("/add-property")}
           >
-            OWNER DASHBOARD
-          </p>
-
-          <h1 style={{ margin: "0 0 8px", color: GREEN_DARK }}>
-            Welcome
-            {profile.full_name ? `, ${profile.full_name}` : ""}
-          </h1>
-
-          <p style={styles.muted}>
-            Manage your holiday properties, bookings and membership
-            in one place.
-          </p>
+            + Add a property
+          </button>
         </header>
 
-        {error && (
+        {pageError && (
           <div
             role="alert"
             style={{
-              padding: 14,
+              ...styles.card,
+              borderColor: "#e9c2bd",
+              background: "#fff8f7",
+              color: "#8c3025",
               marginBottom: 18,
-              background: "#fff1f0",
-              color: "#a52a24",
-              border: "1px solid #ffd5d1",
-              borderRadius: 10,
             }}
           >
-            {error}
+            <strong>Something needs your attention</strong>
+            <p style={{ margin: "6px 0 0", fontSize: 14 }}>{pageError}</p>
+            <button
+              type="button"
+              style={{
+                ...styles.secondaryButton,
+                marginTop: 12,
+                borderColor: "#c76b5d",
+                color: "#8c3025",
+              }}
+              onClick={() => setPageError("")}
+            >
+              Dismiss
+            </button>
           </div>
         )}
 
@@ -622,108 +741,200 @@ export default function HostDashboard() {
           <div
             role="status"
             style={{
-              padding: 14,
-              marginBottom: 18,
+              ...styles.card,
               background: GREEN_LIGHT,
               color: GREEN_DARK,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 10,
+              marginBottom: 18,
             }}
           >
             {notice}
           </div>
         )}
 
-        <section style={{ ...styles.grid, marginBottom: 22 }}>
-          {[
-            ["Properties", properties.length],
-            ["Bookings", bookings.length],
-            ["Messages", conversations.length],
-            ["Reviews", reviews.length],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              style={{
-                ...styles.section,
-                marginBottom: 0,
-                borderTop: `3px solid ${GREEN}`,
-              }}
-            >
-              <p style={styles.muted}>{label}</p>
-              <h2 style={{ fontSize: 30, margin: 0, color: GREEN_DARK }}>
-                {value}
-              </h2>
+        {!isVerified && (
+          <section
+            style={{
+              ...styles.card,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 18,
+              flexWrap: "wrap",
+              marginBottom: 20,
+              borderColor: "#ead9b4",
+              background: "#fffaf0",
+            }}
+          >
+            <div style={{ flex: "1 1 260px" }}>
+              <div style={{ fontWeight: 800, marginBottom: 6 }}>
+                ✓ Complete your host verification
+              </div>
+              <div style={{ ...styles.muted, color: "#796644" }}>
+                Complete your identity and insurance checks to help keep
+                Static Holidays safe and trustworthy.
+              </div>
+              <div style={{ marginTop: 12, fontSize: 13 }}>
+                <span style={{ marginRight: 14 }}>
+                  {profile?.id_verified ? "✓" : "○"} Identity verified
+                </span>
+                <span>
+                  {profile?.insurance_verified ? "✓" : "○"} Insurance verified
+                </span>
+              </div>
             </div>
-          ))}
+            <button
+              type="button"
+              style={styles.primaryButton}
+              onClick={() => goTo("/host-compliance")}
+            >
+              Complete verification →
+            </button>
+          </section>
+        )}
+
+        <section style={{ ...styles.grid, marginBottom: 26 }}>
+          <div style={styles.card}>
+            <div style={{ ...styles.muted, marginBottom: 12 }}>
+              My properties
+            </div>
+            <div style={{ fontSize: 30, fontWeight: 800 }}>
+              {properties.length}
+            </div>
+            <div style={{ ...styles.muted, marginTop: 8 }}>
+              Properties in your account
+            </div>
+          </div>
+
+          <div style={styles.card}>
+            <div style={{ ...styles.muted, marginBottom: 12 }}>
+              Total bookings
+            </div>
+            <div style={{ fontSize: 30, fontWeight: 800 }}>
+              {bookings.length}
+            </div>
+            <div style={{ ...styles.muted, marginTop: 8 }}>
+              Bookings across your properties
+            </div>
+          </div>
+
+          <div style={styles.card}>
+            <div style={{ ...styles.muted, marginBottom: 12 }}>
+              Estimated net earnings
+            </div>
+            <div style={{ fontSize: 30, fontWeight: 800 }}>
+              {money(estimatedNet)}
+            </div>
+            <div style={{ ...styles.muted, marginTop: 8 }}>
+              After an estimated {Math.round(commissionRate * 100)}% commission
+            </div>
+          </div>
+
+          <div style={styles.card}>
+            <div style={{ ...styles.muted, marginBottom: 12 }}>
+              Current membership
+            </div>
+            <div style={{ fontSize: 23, fontWeight: 800 }}>
+              {plans.find((plan) => plan.id === currentPlan)?.name ?? "Host Free"}
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <span style={styles.pill}>
+                {currentPlan === "elite"
+                  ? "1% commission"
+                  : currentPlan === "super"
+                    ? "5% commission"
+                    : "12% commission"}
+              </span>
+            </div>
+          </div>
         </section>
 
-        <section id="compliance" style={styles.section}>
-          <h2 style={{ color: GREEN_DARK }}>Host verification</h2>
-
-          <p style={styles.muted}>
-            {isVerified
-              ? "Your basic identity and insurance checks are marked complete."
-              : "Visit the Compliance Centre to manage your verification documents."}
-          </p>
-
-          <button
-            style={styles.button}
-            onClick={() => navigate("/host-compliance")}
+        <section style={{ marginBottom: 30 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "end",
+              gap: 16,
+              flexWrap: "wrap",
+              marginBottom: 16,
+            }}
           >
-            Open Compliance Centre
-          </button>
-        </section>
-
-        <section id="properties" style={styles.section}>
-          <h2 style={{ color: GREEN_DARK }}>My Properties</h2>
-
-          <p style={styles.muted}>
-            Manage your caravans, lodges and holiday homes.
-          </p>
-
-          <button
-            style={styles.button}
-            onClick={() => navigate("/add-property")}
-          >
-            + Add a Property
-          </button>
+            <div>
+              <h2 style={styles.sectionTitle}>Your properties</h2>
+              <p style={{ ...styles.muted, margin: 0 }}>
+                Keep your listings up to date and ready for guests.
+              </p>
+            </div>
+            <button
+              type="button"
+              style={styles.secondaryButton}
+              onClick={() => goTo("/my-properties")}
+            >
+              View all properties →
+            </button>
+          </div>
 
           {properties.length === 0 ? (
-            <p style={styles.muted}>
-              You haven't added any properties yet.
-            </p>
+            <div style={styles.card}>
+              <div style={{ fontSize: 30, marginBottom: 8 }}>⌂</div>
+              <h3 style={{ margin: "0 0 8px", fontSize: 17 }}>
+                Your first property starts here
+              </h3>
+              <p style={styles.muted}>
+                Add a holiday let to begin creating your listing and managing
+                guest enquiries.
+              </p>
+              <button
+                type="button"
+                style={styles.primaryButton}
+                onClick={() => goTo("/add-property")}
+              >
+                + Add your first property
+              </button>
+            </div>
           ) : (
-            <div style={{ ...styles.grid, marginTop: 20 }}>
-              {properties.map((property) => (
-                <article
-                  key={property.id}
-                  style={{
-                    border: `1px solid ${BORDER}`,
-                    borderRadius: 13,
-                    padding: 18,
-                    background: "#ffffff",
-                  }}
-                >
-                  <h3 style={{ color: GREEN_DARK }}>
-                    {property.title || "Untitled property"}
-                  </h3>
+            <div style={styles.grid}>
+              {properties.slice(0, 6).map((property: any) => (
+                <article key={property.id} style={styles.card}>
+                  {property.image_url || property.cover_image ? (
+                    <img
+                      src={property.image_url || property.cover_image}
+                      alt={property.title || property.name || "Holiday property"}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        height: 155,
+                        objectFit: "cover",
+                        borderRadius: 10,
+                        marginBottom: 14,
+                        background: GREEN_LIGHT,
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        height: 125,
+                        borderRadius: 10,
+                        background: GREEN_LIGHT,
+                        display: "grid",
+                        placeItems: "center",
+                        fontSize: 34,
+                        marginBottom: 14,
+                      }}
+                    >
+                      🏡
+                    </div>
+                  )}
 
-                  <p style={styles.muted}>
+                  <h3 style={{ fontSize: 17, margin: "0 0 6px" }}>
+                    {property.title ||
+                      property.name ||
+                      "Untitled property"}
+                  </h3>
+                  <p style={{ ...styles.muted, margin: "0 0 14px" }}>
                     {property.location ||
                       property.address ||
                       "Location not added"}
-                  </p>
-
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    {property.status || "Not set"}
-                  </p>
-
-                  <p>
-                    <strong>
-                      {money(Number(property.price_per_night) || 0)}
-                    </strong>{" "}
-                    per night
                   </p>
 
                   <div
@@ -734,31 +945,20 @@ export default function HostDashboard() {
                     }}
                   >
                     <button
+                      type="button"
                       style={styles.secondaryButton}
-                      onClick={() =>
-                        navigate(`/add-property?id=${property.id}`)
-                      }
+                      onClick={() => goTo(`/edit-property/${property.id}`)}
                     >
-                      Edit
+                      Edit listing
                     </button>
-
                     <button
+                      type="button"
                       style={styles.secondaryButton}
                       onClick={() =>
-                        navigate(`/property-calendar/${property.id}`)
+                        goTo(`/property-calendar/${property.id}`)
                       }
                     >
                       Calendar
-                    </button>
-
-                    <button
-                      style={{
-                        ...styles.secondaryButton,
-                        color: "#a52a24",
-                      }}
-                      onClick={() => deleteProperty(String(property.id))}
-                    >
-                      Delete
                     </button>
                   </div>
                 </article>
@@ -767,599 +967,571 @@ export default function HostDashboard() {
           )}
         </section>
 
-        {/* ONE-OFF PROPERTY PROMOTION */}
-        <section
-          id="promotion"
-          style={{
-            ...styles.section,
-            border: `2px solid ${GREEN}`,
-            background: "linear-gradient(145deg, #ffffff 0%, #f0f8f2 100%)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 22,
-              alignItems: "center",
-            }}
-          >
-            <div style={{ flex: "1 1 300px", minWidth: 0 }}>
-              <span
-                style={{
-                  display: "inline-block",
-                  background: GREEN_LIGHT,
-                  color: GREEN_DARK,
-                  padding: "7px 11px",
-                  borderRadius: 20,
-                  fontSize: 12,
-                  fontWeight: 800,
-                  marginBottom: 12,
-                }}
-              >
-                SPECIAL OFFER · ONE-OFF PAYMENT
-              </span>
-
-              <h2
-                style={{
-                  fontSize: 27,
-                  lineHeight: 1.25,
-                  color: GREEN_DARK,
-                  margin: "0 0 10px",
-                }}
-              >
-                Give your property a visibility boost
-              </h2>
-
-              <p style={styles.muted}>
-                Want more guests to discover your holiday home?
-                Promote your selected property on the Static Holidays
-                homepage and improve its search placement for 30 days.
-              </p>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 10,
-                  margin: "18px 0",
-                }}
-              >
-                {[
-                  "Homepage promotion",
-                  "Improved search visibility",
-                  "30-day promotion period",
-                ].map((feature) => (
-                  <span
-                    key={feature}
-                    style={{
-                      background: "#ffffff",
-                      border: `1px solid ${BORDER}`,
-                      borderRadius: 8,
-                      padding: "9px 11px",
-                      fontSize: 13,
-                      color: GREEN_DARK,
-                    }}
-                  >
-                    ✓ {feature}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div
-              style={{
-                flex: "0 1 260px",
-                minWidth: 230,
-                background: "#ffffff",
-                border: `1px solid ${BORDER}`,
-                borderRadius: 16,
-                padding: 22,
-                textAlign: "center",
-                boxShadow: "0 8px 24px rgba(16,75,57,0.07)",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 8px",
-                  color: MUTED,
-                  fontSize: 13,
-                }}
-              >
-                One property · 30 days
-              </p>
-
-              <div
-                style={{
-                  fontSize: 42,
-                  fontWeight: 800,
-                  color: GREEN_DARK,
-                  letterSpacing: -1,
-                }}
-              >
-                £4.99
-              </div>
-
-              <p style={{ ...styles.muted, fontSize: 13 }}>
-                One-off payment. No recurring subscription for this
-                promotion.
-              </p>
-            </div>
-          </div>
-
-          <div
-            style={{
-              borderTop: `1px solid ${BORDER}`,
-              marginTop: 22,
-              paddingTop: 22,
-            }}
-          >
-            <label
-              htmlFor="promotion-property"
-              style={{
-                display: "block",
-                fontWeight: 700,
-                marginBottom: 9,
-                color: GREEN_DARK,
-              }}
-            >
-              Which property would you like to promote?
-            </label>
-
-            <select
-              id="promotion-property"
-              value={selectedPropertyId}
-              onChange={(event) =>
-                setSelectedPropertyId(event.target.value)
-              }
-              disabled={properties.length === 0 || processingPromotion}
-              style={{
-                display: "block",
-                width: "100%",
-                maxWidth: 540,
-                padding: 13,
-                border: `1px solid ${BORDER}`,
-                borderRadius: 9,
-                background: "#ffffff",
-                color: TEXT,
-                fontSize: 15,
-                marginBottom: 16,
-              }}
-            >
-              {properties.length === 0 ? (
-                <option value="">
-                  Add a property before promoting it
-                </option>
-              ) : (
-                properties.map((property) => (
-                  <option
-                    key={property.id}
-                    value={String(property.id)}
-                  >
-                    {property.title || "Untitled property"}
-                    {property.location
-                      ? ` — ${property.location}`
-                      : ""}
-                  </option>
-                ))
-              )}
-            </select>
-
-            {properties.length === 0 ? (
-              <button
-                style={styles.button}
-                onClick={() => navigate("/add-property")}
-              >
-                + Add a Property First
-              </button>
-            ) : (
-              <button
-                type="button"
-                style={{
-                  ...styles.button,
-                  padding: "14px 22px",
-                  fontSize: 15,
-                  opacity: processingPromotion ? 0.7 : 1,
-                  cursor: processingPromotion
-                    ? "not-allowed"
-                    : "pointer",
-                }}
-                disabled={processingPromotion}
-                onClick={handlePromotionCheckout}
-              >
-                {processingPromotion
-                  ? "Opening secure payment..."
-                  : "Promote for £4.99 →"}
-              </button>
-            )}
-
-            <p
-              style={{
-                ...styles.muted,
-                fontSize: 12,
-                marginTop: 12,
-              }}
-            >
-              Promotion begins after payment confirmation and approval
-              of the listing. Search position is not guaranteed.
-              Availability and eligibility rules apply.
+        <section style={{ marginBottom: 30 }}>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={styles.sectionTitle}>Bookings & earnings</h2>
+            <p style={{ ...styles.muted, margin: 0 }}>
+              A quick look at your recent booking activity.
             </p>
           </div>
-        </section>
 
-        <section id="bookings" style={styles.section}>
-          <h2 style={{ color: GREEN_DARK }}>Bookings</h2>
-
-          {bookings.length === 0 ? (
-            <p style={styles.muted}>No bookings to display yet.</p>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  textAlign: "left",
-                }}
-              >
-                <thead>
-                  <tr style={{ background: GREEN_LIGHT }}>
-                    <th style={{ padding: 12 }}>Booking</th>
-                    <th style={{ padding: 12 }}>Status</th>
-                    <th style={{ padding: 12 }}>Total</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {bookings.map((booking) => (
-                    <tr
-                      key={booking.id}
-                      style={{ borderBottom: `1px solid ${BORDER}` }}
-                    >
-                      <td style={{ padding: 12 }}>
-                        {String(booking.id).slice(0, 8)}
-                      </td>
-                      <td style={{ padding: 12 }}>
-                        {booking.status || "Pending"}
-                      </td>
-                      <td style={{ padding: 12 }}>
-                        {money(booking.total_price)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-
-        <section id="messages" style={styles.section}>
-          <h2 style={{ color: GREEN_DARK }}>Messages</h2>
-
-          {conversations.length === 0 ? (
-            <p style={styles.muted}>No conversations yet.</p>
-          ) : (
-            conversations.map((conversation) => (
-              <div
-                key={conversation.id}
-                style={{
-                  padding: "12px 0",
-                  borderBottom: `1px solid ${BORDER}`,
-                }}
-              >
-                <p>
-                  {conversation.subject ||
-                    conversation.last_message ||
-                    "Guest conversation"}
-                </p>
-
-                <button
-                  style={styles.secondaryButton}
-                  onClick={() =>
-                    navigate(
-                      `/messages/${
-                        conversation.booking_id || conversation.id
-                      }`
-                    )
-                  }
-                >
-                  Open conversation
-                </button>
+          <div style={styles.card}>
+            <div style={styles.grid}>
+              <div>
+                <div style={styles.muted}>Booking value counted</div>
+                <div style={{ fontSize: 24, fontWeight: 800, marginTop: 7 }}>
+                  {money(grossEarnings)}
+                </div>
               </div>
-            ))
-          )}
-        </section>
-
-        <section id="earnings" style={styles.section}>
-          <h2 style={{ color: GREEN_DARK }}>Earnings overview</h2>
-
-          <div style={styles.grid}>
-            <div>
-              <p style={styles.muted}>Booking totals shown</p>
-              <h3>{money(grossEarnings)}</h3>
+              <div>
+                <div style={styles.muted}>Estimated platform commission</div>
+                <div style={{ fontSize: 24, fontWeight: 800, marginTop: 7 }}>
+                  {money(estimatedCommission)}
+                </div>
+              </div>
+              <div>
+                <div style={styles.muted}>Estimated earnings after commission</div>
+                <div style={{ fontSize: 24, fontWeight: 800, marginTop: 7 }}>
+                  {money(estimatedNet)}
+                </div>
+              </div>
             </div>
 
-            <div>
-              <p style={styles.muted}>
-                Estimated commission ({commissionRate * 100}%)
-              </p>
-              <h3>{money(estimatedCommission)}</h3>
-            </div>
+            <p style={{ ...styles.muted, margin: "15px 0 0", fontSize: 12 }}>
+              These figures are estimates based on the booking amounts returned
+              by your database. They are not an accounting statement and may
+              not reflect refunds, taxes or payment-processing charges.
+            </p>
 
-            <div>
-              <p style={styles.muted}>Estimated after commission</p>
-              <h3>{money(estimatedNet)}</h3>
-            </div>
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, marginTop: 16 }}
+              onClick={() => goTo("/host-bookings")}
+            >
+              View bookings →
+            </button>
           </div>
-
-          <p style={{ ...styles.muted, fontSize: 12 }}>
-            Estimates only. Figures use booking records returned to
-            this dashboard and may include unpaid or cancelled
-            bookings. They are not payout statements.
-          </p>
         </section>
 
-        <section id="reviews" style={styles.section}>
-          <h2 style={{ color: GREEN_DARK }}>Guest Reviews</h2>
-
-          {reviews.length === 0 ? (
-            <p style={styles.muted}>No reviews yet.</p>
-          ) : (
-            reviews.map((review) => (
-              <article
-                key={review.id}
-                style={{
-                  padding: "12px 0",
-                  borderBottom: `1px solid ${BORDER}`,
-                }}
-              >
-                <strong>
-                  {review.rating
-                    ? `${review.rating}/5`
-                    : "Guest review"}
-                </strong>
-                <p>
-                  {review.comment ||
-                    review.review ||
-                    "No written comment."}
-                </p>
-              </article>
-            ))
-          )}
-        </section>
-
-        {/* SUBSCRIPTION PLANS */}
-        <section id="account" style={styles.section}>
-          <h2 style={{ color: GREEN_DARK }}>
-            Membership & Subscription Plans
-          </h2>
-
-          <p style={styles.muted}>
-            Choose the plan that suits your holiday business.
-            Compare the benefits, booking commission and payment options.
-          </p>
+        <section style={{ marginBottom: 30 }}>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={styles.sectionTitle}>Account & membership plans</h2>
+            <p style={{ ...styles.muted, margin: 0 }}>
+              Choose a plan to reduce commission and increase your property's
+              visibility.
+            </p>
+          </div>
 
           <div
             style={{
               display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 14,
               flexWrap: "wrap",
-              gap: 8,
-              margin: "20px 0",
+              marginBottom: 16,
             }}
           >
-            {(["monthly", "yearly"] as BillingPeriod[]).map((period) => (
+            <div style={{ ...styles.muted, fontWeight: 700 }}>
+              Choose your billing period
+            </div>
+            <div
+              style={{
+                display: "inline-flex",
+                gap: 4,
+                padding: 4,
+                background: "#e9eeeb",
+                borderRadius: 12,
+              }}
+            >
               <button
-                key={period}
                 type="button"
-                onClick={() => setPlanBilling(period)}
-                aria-pressed={planBilling === period}
+                aria-pressed={planBilling === "monthly"}
+                onClick={() => setPlanBilling("monthly")}
                 style={{
-                  ...styles.secondaryButton,
-                  background:
-                    planBilling === period ? GREEN : "#ffffff",
-                  color:
-                    planBilling === period ? "#ffffff" : TEXT,
-                  borderColor:
-                    planBilling === period ? GREEN : BORDER,
+                  border: 0,
+                  borderRadius: 9,
+                  padding: "10px 14px",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  background: planBilling === "monthly" ? "#fff" : "transparent",
+                  color: TEXT,
+                  boxShadow:
+                    planBilling === "monthly"
+                      ? "0 1px 4px rgba(0,0,0,0.08)"
+                      : "none",
                 }}
               >
-                {period === "monthly"
-                  ? "Monthly billing"
-                  : "Pay yearly — save two months"}
+                Monthly
               </button>
-            ))}
+              <button
+                type="button"
+                aria-pressed={planBilling === "yearly"}
+                onClick={() => setPlanBilling("yearly")}
+                style={{
+                  border: 0,
+                  borderRadius: 9,
+                  padding: "10px 14px",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  background: planBilling === "yearly" ? "#fff" : "transparent",
+                  color: TEXT,
+                  boxShadow:
+                    planBilling === "yearly"
+                      ? "0 1px 4px rgba(0,0,0,0.08)"
+                      : "none",
+                }}
+              >
+                Yearly · 2 months free
+              </button>
+            </div>
           </div>
 
           <div style={styles.grid}>
             {plans.map((plan) => {
-              const isCurrent = currentPlan === plan.id;
-
               const price =
-                planBilling === "yearly"
-                  ? plan.yearly
-                  : plan.monthly;
+                planBilling === "monthly"
+                  ? plan.monthlyPrice
+                  : plan.yearlyPrice;
+              const isCurrent = currentPlan === plan.id;
 
               return (
                 <article
                   key={plan.id}
                   style={{
-                    border:
-                      plan.id === "super"
-                        ? `2px solid ${GREEN}`
-                        : `1px solid ${BORDER}`,
-                    borderRadius: 14,
-                    padding: 20,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 14,
-                    minWidth: 0,
-                    background: "#ffffff",
+                    ...styles.card,
+                    position: "relative",
+                    border: plan.popular
+                      ? `2px solid ${GREEN}`
+                      : `1px solid ${BORDER}`,
+                    padding: plan.popular ? 21 : 22,
                   }}
                 >
-                  {plan.id === "super" && (
-                    <span
-                      style={{
-                        color: GREEN,
-                        fontSize: 12,
-                        fontWeight: 800,
-                        letterSpacing: 1,
-                      }}
-                    >
-                      POPULAR CHOICE
-                    </span>
+                  {plan.popular && (
+                    <div style={{ marginBottom: 12 }}>
+                      <span style={styles.pill}>MOST POPULAR</span>
+                    </div>
                   )}
 
-                  <h3 style={{ margin: 0, color: GREEN_DARK }}>
-                    {plan.icon} {plan.name}
+                  <h3 style={{ fontSize: 20, margin: "0 0 7px" }}>
+                    {plan.name}
                   </h3>
-
-                  <p style={{ ...styles.muted, margin: 0 }}>
+                  <p style={{ ...styles.muted, margin: "0 0 18px" }}>
                     {plan.description}
                   </p>
 
-                  <div>
-                    <strong
-                      style={{
-                        fontSize: 29,
-                        color: GREEN_DARK,
-                      }}
-                    >
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
+                    <span style={{ fontSize: 31, fontWeight: 850 }}>
                       {formatPrice(price)}
-                    </strong>
-
-                    <div style={styles.muted}>
-                      {price === 0
-                        ? "Free membership"
-                        : planBilling === "yearly"
-                        ? "for one year, paid upfront"
-                        : "per month"}
-                    </div>
+                    </span>
+                    <span style={styles.muted}>
+                      {plan.id === "host"
+                        ? "/ forever"
+                        : planBilling === "monthly"
+                          ? "/ month"
+                          : "/ year"}
+                    </span>
                   </div>
 
                   {plan.id !== "host" && planBilling === "yearly" && (
-                    <div
-                      style={{
-                        background: GREEN_LIGHT,
-                        color: GREEN_DARK,
-                        padding: 10,
-                        borderRadius: 8,
-                        fontSize: 13,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Save{" "}
-                      {formatPrice(
-                        plan.monthly * 12 - plan.yearly
-                      )}{" "}
-                      per year
-                    </div>
+                    <p style={{ ...styles.muted, margin: "5px 0 0", fontSize: 12 }}>
+                      Equivalent to {formatPrice(price / 12)} per month, billed
+                      yearly.
+                    </p>
                   )}
 
                   <div
                     style={{
-                      borderTop: `1px solid ${BORDER}`,
-                      borderBottom: `1px solid ${BORDER}`,
-                      padding: "13px 0",
+                      margin: "18px 0",
+                      padding: 12,
+                      background: GREEN_LIGHT,
+                      borderRadius: 10,
                     }}
                   >
-                    <strong>{plan.commission} booking commission</strong>
+                    <div style={{ fontSize: 12, color: MUTED }}>
+                      Booking commission
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 23,
+                        fontWeight: 850,
+                        color: GREEN_DARK,
+                        marginTop: 3,
+                      }}
+                    >
+                      {plan.commission}
+                    </div>
                   </div>
 
                   <ul
                     style={{
                       paddingLeft: 20,
-                      lineHeight: 1.8,
-                      fontSize: 14,
-                      color: TEXT,
+                      margin: "0 0 22px",
+                      minHeight: 125,
                     }}
                   >
                     {plan.features.map((feature) => (
-                      <li key={feature}>{feature}</li>
+                      <li
+                        key={feature}
+                        style={{
+                          fontSize: 13,
+                          lineHeight: 1.6,
+                          marginBottom: 8,
+                          color: "#35433b",
+                        }}
+                      >
+                        {feature}
+                      </li>
                     ))}
                   </ul>
 
-                  {plan.id === "host" ? (
-                    <button
-                      type="button"
-                      disabled={isCurrent}
-                      style={{
-                        ...styles.button,
-                        marginTop: "auto",
-                        background: isCurrent ? "#e6eee8" : GREEN_DARK,
-                        color: isCurrent ? MUTED : "#ffffff",
-                        cursor: isCurrent ? "default" : "pointer",
-                      }}
-                    >
-                      {isCurrent ? "Your current plan" : "Free plan"}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={
+                  <button
+                    type="button"
+                    disabled={isCurrent || processingPlan !== null}
+                    style={{
+                      ...styles.primaryButton,
+                      width: "100%",
+                      opacity:
+                        isCurrent || processingPlan !== null ? 0.65 : 1,
+                      cursor:
                         isCurrent || processingPlan !== null
-                      }
-                      onClick={() => handlePlanUpgrade(plan.id)}
-                      style={{
-                        ...styles.button,
-                        marginTop: "auto",
-                        background: isCurrent ? "#e6eee8" : GREEN,
-                        color: isCurrent ? MUTED : "#ffffff",
-                        opacity:
-                          processingPlan === plan.id ? 0.7 : 1,
-                        cursor:
-                          isCurrent || processingPlan !== null
-                            ? "not-allowed"
-                            : "pointer",
-                      }}
-                    >
-                      {isCurrent
+                          ? "not-allowed"
+                          : "pointer",
+                    }}
+                    onClick={() => void handlePlanUpgrade(plan.id)}
+                  >
+                    {processingPlan === plan.id
+                      ? "Opening secure checkout…"
+                      : isCurrent
                         ? "Your current plan"
-                        : processingPlan === plan.id
-                        ? "Opening secure checkout..."
-                        : "Buy Now"}
-                    </button>
-                  )}
+                        : plan.id === "host"
+                          ? "Free plan"
+                          : `Buy ${plan.name} →`}
+                  </button>
                 </article>
               );
             })}
           </div>
+        </section>
 
-          <p style={{ ...styles.muted, fontSize: 12, marginTop: 18 }}>
-            Yearly membership is paid upfront. Promotion benefits may
-            be subject to eligibility and availability. Membership
-            prices, commission and benefits should match the applicable
-            terms and the payment system.
-          </p>
-
+        <section style={{ marginBottom: 30 }}>
           <div
             style={{
-              borderTop: `1px solid ${BORDER}`,
-              marginTop: 24,
-              paddingTop: 20,
+              ...styles.card,
+              background: GREEN_DARK,
+              color: "#fff",
+              border: 0,
+              padding: "clamp(22px, 4vw, 34px)",
             }}
           >
-            <h3 style={{ color: GREEN_DARK }}>
-              Newsletter preferences
-            </h3>
-
-            <label
+            <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                margin: "12px 0",
+                justifyContent: "space-between",
+                gap: 24,
+                flexWrap: "wrap",
               }}
             >
-              <input
-                type="checkbox"
-                checked={Boolean(profile.newsletter_opt_in)}
-                onChange={(event) =>
-                  updateNewsletterPreference(event.target.checked)
-                }
-              />
-              Receive Static Holidays newsletters
-            </label>
+              <div style={{ flex: "1 1 280px" }}>
+                <span
+                  style={{
+                    ...styles.pill,
+                    background: "rgba(255,255,255,0.14)",
+                    color: "#fff",
+                  }}
+                >
+                  ONE-OFF PROMOTION
+                </span>
+                <h2
+                  style={{
+                    fontSize: 25,
+                    lineHeight: 1.25,
+                    margin: "14px 0 10px",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  Put your property in the spotlight
+                </h2>
+                <p
+                  style={{
+                    margin: 0,
+                    maxWidth: 570,
+                    color: "#d6e6dc",
+                    lineHeight: 1.7,
+                    fontSize: 14,
+                  }}
+                >
+                  Promote a property on the homepage and improve its search
+                  visibility for 30 days — without changing your subscription.
+                </p>
+                <div
+                  style={{
+                    fontSize: 31,
+                    fontWeight: 850,
+                    marginTop: 18,
+                  }}
+                >
+                  £4.99{" "}
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>
+                    / 30 days
+                  </span>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  flex: "1 1 260px",
+                  maxWidth: 380,
+                  background: "#fff",
+                  color: TEXT,
+                  padding: 18,
+                  borderRadius: 13,
+                }}
+              >
+                <label
+                  htmlFor="promotion-property"
+                  style={{
+                    display: "block",
+                    fontSize: 13,
+                    fontWeight: 800,
+                    marginBottom: 8,
+                  }}
+                >
+                  Choose a property to promote
+                </label>
+                <select
+                  id="promotion-property"
+                  value={selectedPropertyId}
+                  onChange={(event) =>
+                    setSelectedPropertyId(event.target.value)
+                  }
+                  style={styles.input}
+                >
+                  <option value="">Select your property…</option>
+                  {properties.map((property: any) => (
+                    <option key={property.id} value={String(property.id)}>
+                      {property.title || property.name || `Property ${property.id}`}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  disabled={
+                    !selectedPropertyId ||
+                    processingPromotion ||
+                    properties.length === 0
+                  }
+                  style={{
+                    ...styles.primaryButton,
+                    width: "100%",
+                    marginTop: 12,
+                    opacity:
+                      !selectedPropertyId ||
+                      processingPromotion ||
+                      properties.length === 0
+                        ? 0.6
+                        : 1,
+                  }}
+                  onClick={() => void handlePromotionCheckout()}
+                >
+                  {processingPromotion
+                    ? "Opening secure checkout…"
+                    : "Promote for £4.99 →"}
+                </button>
+
+                {properties.length === 0 && (
+                  <p
+                    style={{
+                      color: MUTED,
+                      fontSize: 12,
+                      lineHeight: 1.5,
+                      margin: "10px 0 0",
+                    }}
+                  >
+                    Add a property before purchasing a promotion.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </section>
+
+        <section style={{ marginBottom: 30 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "end",
+              gap: 14,
+              flexWrap: "wrap",
+              marginBottom: 16,
+            }}
+          >
+            <div>
+              <h2 style={styles.sectionTitle}>Recent messages</h2>
+              <p style={{ ...styles.muted, margin: 0 }}>
+                Keep up with guest enquiries.
+              </p>
+            </div>
+            <button
+              type="button"
+              style={styles.secondaryButton}
+              onClick={() => goTo("/host-messages")}
+            >
+              Open messages →
+            </button>
+          </div>
+
+          <div style={styles.card}>
+            {conversations.length === 0 ? (
+              <p style={{ ...styles.muted, margin: 0 }}>
+                No conversations to show yet. Guest enquiries will appear here
+                when available.
+              </p>
+            ) : (
+              conversations.slice(0, 5).map((conversation: any) => (
+                <div
+                  key={conversation.id}
+                  style={{
+                    padding: "13px 0",
+                    borderBottom: `1px solid ${BORDER}`,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 750, fontSize: 14 }}>
+                      {conversation.subject ||
+                        conversation.guest_name ||
+                        conversation.title ||
+                        "Guest conversation"}
+                    </div>
+                    <div style={{ ...styles.muted, fontSize: 12, marginTop: 4 }}>
+                      {conversation.updated_at || conversation.created_at
+                        ? new Date(
+                            conversation.updated_at || conversation.created_at
+                          ).toLocaleDateString("en-GB")
+                        : "Date unavailable"}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={() => goTo(`/host-messages/${conversation.id}`)}
+                  >
+                    Open
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section style={{ marginBottom: 30 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "end",
+              gap: 14,
+              flexWrap: "wrap",
+              marginBottom: 16,
+            }}
+          >
+            <div>
+              <h2 style={styles.sectionTitle}>Guest reviews</h2>
+              <p style={{ ...styles.muted, margin: 0 }}>
+                See the feedback guests have left about their stays.
+              </p>
+            </div>
+            <button
+              type="button"
+              style={styles.secondaryButton}
+              onClick={() => goTo("/host-reviews")}
+            >
+              View reviews →
+            </button>
+          </div>
+
+          <div style={styles.card}>
+            {reviews.length === 0 ? (
+              <p style={{ ...styles.muted, margin: 0 }}>
+                No reviews to display yet. If you expected reviews here, check
+                the browser console for “Reviews could not be loaded” and verify
+                that your reviews table has a host_id column.
+              </p>
+            ) : (
+              reviews.slice(0, 5).map((review: any) => (
+                <article
+                  key={review.id}
+                  style={{
+                    padding: "14px 0",
+                    borderBottom: `1px solid ${BORDER}`,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 12,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <strong style={{ fontSize: 14 }}>
+                      {review.guest_name ||
+                        review.reviewer_name ||
+                        "Guest review"}
+                    </strong>
+                    <span style={{ color: "#a56a14", fontWeight: 800 }}>
+                      {review.rating != null
+                        ? `${"★".repeat(
+                            Math.max(
+                              0,
+                              Math.min(5, Math.round(Number(review.rating) || 0))
+                            )
+                          )} ${review.rating}/5`
+                        : "Rating not supplied"}
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 14,
+                      color: "#4c5951",
+                      lineHeight: 1.65,
+                      margin: "8px 0 0",
+                    }}
+                  >
+                    {review.comment ||
+                      review.review_text ||
+                      review.content ||
+                      "No written comment."}
+                  </p>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+
+        <footer
+          style={{
+            borderTop: `1px solid ${BORDER}`,
+            paddingTop: 18,
+            color: MUTED,
+            fontSize: 12,
+            lineHeight: 1.6,
+          }}
+        >
+          Static Holidays host dashboard · Membership prices and commission
+          estimates are displayed for guidance. Check your account and payment
+          configuration before accepting live payments.
+        </footer>
       </main>
     </div>
   );
