@@ -1,5 +1,5 @@
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import ReviewsList from "../components/ReviewsList";
@@ -39,8 +39,24 @@ type PropertyImage = {
   position: number;
 };
 
+type DateStatus = "available" | "blocked" | "booked" | "offer" | "season";
+
+type CalendarDate = {
+  calendar_date: string;
+  status: DateStatus;
+  price: number | string | null;
+};
+
+type BookingRecord = {
+  check_in: string;
+  check_out: string;
+  booking_status: string;
+};
+
 const fallbackImage =
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+
+const green = "#176b50";
 
 const pageStyle: CSSProperties = {
   minHeight: "100vh",
@@ -63,9 +79,9 @@ const primaryButtonStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   gap: 8,
-  background: "#176b50",
+  background: green,
   color: "#fff",
-  border: "1px solid #176b50",
+  border: `1px solid ${green}`,
   borderRadius: 10,
   padding: "13px 18px",
   fontSize: 13,
@@ -80,7 +96,7 @@ const secondaryButtonStyle: CSSProperties = {
   justifyContent: "center",
   gap: 8,
   background: "#fff",
-  color: "#176b50",
+  color: green,
   border: "1px solid #d7e1d8",
   borderRadius: 10,
   padding: "12px 16px",
@@ -97,12 +113,15 @@ const sectionTitleStyle: CSSProperties = {
   color: "#203128",
 };
 
-function today() {
-  const date = new Date();
+function localDateKey(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function today() {
+  return localDateKey(new Date());
 }
 
 function countNights(checkIn: string, checkOut: string) {
@@ -111,15 +130,48 @@ function countNights(checkIn: string, checkOut: string) {
   const start = new Date(`${checkIn}T00:00:00Z`).getTime();
   const end = new Date(`${checkOut}T00:00:00Z`).getTime();
 
-  return Math.round((end - start) / (1000 * 60 * 60 * 24));
+  return Math.round((end - start) / 86400000);
+}
+
+function getStayDates(checkIn: string, checkOut: string) {
+  const dates: string[] = [];
+  if (!checkIn || !checkOut || checkOut <= checkIn) return dates;
+
+  const cursor = new Date(`${checkIn}T12:00:00Z`);
+  const end = new Date(`${checkOut}T12:00:00Z`);
+
+  while (cursor < end) {
+    dates.push(cursor.toISOString().slice(0, 10));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return dates;
 }
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function getPositivePrice(value: unknown): number | null {
+  if (value === null || value === undefined || String(value).trim() === "") {
+    return null;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function formatDate(value: string) {
+  return new Date(`${value}T12:00:00`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default function PropertyDetail() {
@@ -130,13 +182,26 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState<Property | null>(null);
   const [images, setImages] = useState<PropertyImage[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [calendarDates, setCalendarDates] = useState<
+    Record<string, CalendarDate>
+  >({});
+  const [calendarLoading, setCalendarLoading] = useState(true);
+  const [calendarError, setCalendarError] = useState("");
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
   const [saved, setSaved] = useState(false);
   const [savingFav, setSavingFav] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
+
+  const [bookingMessage, setBookingMessage] = useState("");
+  const [bookingMessageType, setBookingMessageType] = useState<
+    "success" | "error"
+  >("error");
 
   useEffect(() => {
     let cancelled = false;
@@ -185,18 +250,60 @@ export default function PropertyDetail() {
           );
           setImages(orderedImages);
         }
-
-        setLoading(false);
       } catch (error) {
         console.error("Could not load property:", error);
-        if (!cancelled) {
-          setProperty(null);
-          setLoading(false);
-        }
+        if (!cancelled) setProperty(null);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     }
 
     void loadProperty();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [propertyId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCalendar() {
+      if (!propertyId) {
+        setCalendarLoading(false);
+        return;
+      }
+
+      setCalendarLoading(true);
+      setCalendarError("");
+
+      const { data, error } = await supabase
+        .from("property_calendar_dates")
+        .select("calendar_date, status, price")
+        .eq("property_id", propertyId);
+
+      if (cancelled) return;
+
+      if (error) {
+        console.error("Could not load property calendar:", error);
+        setCalendarDates({});
+        setCalendarError(
+          "We couldn't load availability. Please try again shortly."
+        );
+      } else {
+        const dates: Record<string, CalendarDate> = {};
+
+        for (const row of data ?? []) {
+          dates[row.calendar_date] = row as CalendarDate;
+        }
+
+        setCalendarDates(dates);
+      }
+
+      setCalendarLoading(false);
+    }
+
+    void loadCalendar();
 
     return () => {
       cancelled = true;
@@ -243,6 +350,74 @@ export default function PropertyDetail() {
     };
   }, [property]);
 
+  const basePrice = getPositivePrice(property?.nightly_price);
+
+  const stayDates = useMemo(
+    () => getStayDates(startDate, endDate),
+    [startDate, endDate]
+  );
+
+  const stayPriceInfo = useMemo(() => {
+    if (stayDates.length === 0) {
+      return {
+        total: 0,
+        valid: false,
+        unavailable: [] as string[],
+        unpriced: [] as string[],
+        nightlyPrices: [] as number[],
+      };
+    }
+
+    const unavailable: string[] = [];
+    const unpriced: string[] = [];
+    const nightlyPrices: number[] = [];
+
+    for (const date of stayDates) {
+      const entry = calendarDates[date];
+
+      if (!entry || entry.status !== "available") {
+        unavailable.push(date);
+        continue;
+      }
+
+      const datePrice = getPositivePrice(entry.price);
+      const effectivePrice = datePrice ?? basePrice;
+
+      if (effectivePrice === null) {
+        unpriced.push(date);
+        continue;
+      }
+
+      nightlyPrices.push(effectivePrice);
+    }
+
+    const valid =
+      unavailable.length === 0 &&
+      unpriced.length === 0 &&
+      nightlyPrices.length === stayDates.length;
+
+    return {
+      total: valid ? nightlyPrices.reduce((sum, price) => sum + price, 0) : 0,
+      valid,
+      unavailable,
+      unpriced,
+      nightlyPrices,
+    };
+  }, [stayDates, calendarDates, basePrice]);
+
+  const displayPrice = useMemo(() => {
+    if (basePrice !== null) return basePrice;
+
+    const availablePrices = Object.values(calendarDates)
+      .filter((entry) => entry.status === "available")
+      .map((entry) => getPositivePrice(entry.price))
+      .filter((price): price is number => price !== null);
+
+    return availablePrices.length > 0 ? Math.min(...availablePrices) : null;
+  }, [basePrice, calendarDates]);
+
+  const isOwner = !!property && currentUserId === property.owner_id;
+
   async function toggleFavourite() {
     if (!property || savingFav) return;
 
@@ -254,7 +429,6 @@ export default function PropertyDetail() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        alert("Please log in first.");
         navigate("/login");
         return;
       }
@@ -275,7 +449,6 @@ export default function PropertyDetail() {
           .eq("id", existing.id);
 
         if (error) throw error;
-
         setSaved(false);
       } else {
         const { error } = await supabase.from("favourites").insert({
@@ -284,7 +457,6 @@ export default function PropertyDetail() {
         });
 
         if (error) throw error;
-
         setSaved(true);
       }
     } catch (error) {
@@ -302,20 +474,59 @@ export default function PropertyDetail() {
   async function createBooking() {
     if (!property || bookingLoading) return;
 
+    setBookingMessage("");
+
     if (!startDate || !endDate) {
-      alert("Please select your check-in and check-out dates.");
+      setBookingMessage("Please select check-in and check-out dates.");
+      setBookingMessageType("error");
       return;
     }
 
     const nights = countNights(startDate, endDate);
 
     if (startDate < today() || nights <= 0) {
-      alert("Please choose valid dates. Check-out must be after check-in.");
+      setBookingMessage(
+        "Please choose valid dates. Check-out must be after check-in."
+      );
+      setBookingMessageType("error");
       return;
     }
 
-    if (!Number.isFinite(price) || price <= 0) {
-      alert("The owner has not set a valid nightly price yet.");
+    if (isOwner) {
+      setBookingMessage("You cannot book your own property.");
+      setBookingMessageType("error");
+      return;
+    }
+
+    if (calendarLoading || calendarError) {
+      setBookingMessage(
+        "Availability has not been verified. Please reload the page and try again."
+      );
+      setBookingMessageType("error");
+      return;
+    }
+
+    if (stayPriceInfo.unavailable.length > 0) {
+      setBookingMessage(
+        `These dates are unavailable: ${stayPriceInfo.unavailable
+          .map(formatDate)
+          .join(", ")}. Please choose different dates.`
+      );
+      setBookingMessageType("error");
+      return;
+    }
+
+    if (stayPriceInfo.unpriced.length > 0) {
+      setBookingMessage(
+        "The host hasn't set a price for every night of this stay."
+      );
+      setBookingMessageType("error");
+      return;
+    }
+
+    if (!stayPriceInfo.valid || stayPriceInfo.total <= 0) {
+      setBookingMessage("A valid price is not available for this stay.");
+      setBookingMessageType("error");
       return;
     }
 
@@ -327,37 +538,115 @@ export default function PropertyDetail() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        alert("Please log in before requesting a booking.");
         navigate("/login");
         return;
       }
 
       if (user.id === property.owner_id) {
-        alert("You cannot book your own property.");
+        setBookingMessage("You cannot book your own property.");
+        setBookingMessageType("error");
         return;
       }
 
-      const { error } = await supabase.from("bookings").insert({
+      // Reload the selected calendar dates immediately before submission.
+      const { data: freshCalendar, error: calendarCheckError } =
+        await supabase
+          .from("property_calendar_dates")
+          .select("calendar_date, status, price")
+          .eq("property_id", property.id)
+          .gte("calendar_date", startDate)
+          .lt("calendar_date", endDate);
+
+      if (calendarCheckError) throw calendarCheckError;
+
+      const freshByDate = new Map(
+        (freshCalendar ?? []).map((entry) => [
+          entry.calendar_date,
+          entry as CalendarDate,
+        ])
+      );
+
+      const nowUnavailable = stayDates.filter(
+        (date) => freshByDate.get(date)?.status !== "available"
+      );
+
+      if (nowUnavailable.length > 0) {
+        setBookingMessage(
+          `Availability has changed for ${nowUnavailable
+            .map(formatDate)
+            .join(", ")}. Please choose different dates.`
+        );
+        setBookingMessageType("error");
+        return;
+      }
+
+      let freshTotal = 0;
+
+      for (const date of stayDates) {
+        const entry = freshByDate.get(date);
+        const datePrice = getPositivePrice(entry?.price);
+        const effectivePrice = datePrice ?? basePrice;
+
+        if (effectivePrice === null) {
+          setBookingMessage(
+            `The host hasn't set a price for ${formatDate(date)}.`
+          );
+          setBookingMessageType("error");
+          return;
+        }
+
+        freshTotal += effectivePrice;
+      }
+
+      // Check for overlapping requests/bookings.
+      // This query requires appropriate Supabase RLS permissions.
+      const { data: overlaps, error: overlapError } = await supabase
+        .from("bookings")
+        .select("check_in, check_out, booking_status")
+        .eq("property_id", property.id)
+        .lt("check_in", endDate)
+        .gt("check_out", startDate);
+
+      if (overlapError) throw overlapError;
+
+      const conflict = ((overlaps ?? []) as BookingRecord[]).some(
+        (booking) =>
+          !["cancelled", "rejected"].includes(
+            String(booking.booking_status).toLowerCase()
+          )
+      );
+
+      if (conflict) {
+        setBookingMessage(
+          "These dates overlap an existing booking request. Please select different dates."
+        );
+        setBookingMessageType("error");
+        return;
+      }
+
+      const { error: insertError } = await supabase.from("bookings").insert({
         property_id: property.id,
         owner_id: property.owner_id,
         guest_id: user.id,
         check_in: startDate,
         check_out: endDate,
-        total_price: nights * price,
+        total_price: Number(freshTotal.toFixed(2)),
         booking_status: "pending",
       });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
-      alert("Booking request sent!");
+      setBookingMessage("Your booking request has been sent to the host.");
+      setBookingMessageType("success");
       navigate("/bookings");
     } catch (error) {
       console.error("Could not create booking:", error);
-      alert(
+      setBookingMessage(
         error instanceof Error
           ? error.message
-          : "Could not send your booking request."
+          : "Could not send your booking request. Please try again."
       );
+      setBookingMessageType("error");
     } finally {
       setBookingLoading(false);
     }
@@ -369,6 +658,41 @@ export default function PropertyDetail() {
       block: "start",
     });
   }
+
+  const amenities = property
+    ? [
+        property.family_friendly && "Family friendly",
+        property.pet_friendly && "Pet friendly",
+        property.equine_friendly && "Equine friendly",
+        property.has_log_burner && "Log burner",
+        property.has_garden && "Garden",
+        property.has_hot_tub && "Hot tub",
+        property.has_pool &&
+          `Swimming pool${
+            property.pool_type && property.pool_type !== "none"
+              ? ` (${property.pool_type})`
+              : ""
+          }`,
+        property.wifi && "Wi-Fi",
+        property.parking && "Parking",
+        property.sea_view && "Sea view",
+        property.wheelchair_friendly && "Wheelchair friendly",
+      ].filter(Boolean) as string[]
+    : [];
+
+  const allImages: PropertyImage[] = images.length
+    ? images
+    : [
+        {
+          id: "fallback",
+          public_url: fallbackImage,
+          is_cover: true,
+          position: 0,
+        },
+      ];
+
+  const mainImage =
+    allImages[Math.min(activeImage, allImages.length - 1)] ?? allImages[0];
 
   if (loading) {
     return (
@@ -400,52 +724,13 @@ export default function PropertyDetail() {
     );
   }
 
-  const rawPrice = property.nightly_price ?? property.price_per_night;
-  const price =
-    rawPrice !== null &&
-    rawPrice !== undefined &&
-    String(rawPrice).trim() !== ""
-      ? Number(rawPrice)
-      : 0;
-
-  const validPrice = Number.isFinite(price) && price > 0;
-  const nights = countNights(startDate, endDate);
-  const totalPrice = nights > 0 && validPrice ? nights * price : 0;
-  const isOwner = currentUserId === property.owner_id;
-
-  const amenities = [
-    property.family_friendly && "Family friendly",
-    property.pet_friendly && "Pet friendly",
-    property.equine_friendly && "Equine friendly",
-    property.has_log_burner && "Log burner",
-    property.has_garden && "Garden",
-    property.has_hot_tub && "Hot tub",
-    property.has_pool &&
-      `Swimming pool${
-        property.pool_type && property.pool_type !== "none"
-          ? ` (${property.pool_type})`
-          : ""
-      }`,
-    property.wifi && "Wi-Fi",
-    property.parking && "Parking",
-    property.sea_view && "Sea view",
-    property.wheelchair_friendly && "Wheelchair friendly",
-  ].filter(Boolean) as string[];
-
-  const allImages: PropertyImage[] = images.length
-    ? images
-    : [
-        {
-          id: "fallback",
-          public_url: fallbackImage,
-          is_cover: true,
-          position: 0,
-        },
-      ];
-
-  const mainImage = allImages[
-    Math.min(activeImage, allImages.length - 1)
-  ] ?? allImages[0];
+  const mapQuery = property.location?.trim() ?? "";
+  const mapUrl = mapQuery
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
+    : "";
+  const mapEmbedUrl = mapQuery
+    ? `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`
+    : "";
 
   return (
     <main style={pageStyle}>
@@ -463,10 +748,7 @@ export default function PropertyDetail() {
           <button
             type="button"
             onClick={() => navigate("/properties")}
-            style={{
-              ...secondaryButtonStyle,
-              background: "transparent",
-            }}
+            style={{ ...secondaryButtonStyle, background: "transparent" }}
           >
             ← Browse properties
           </button>
@@ -480,15 +762,12 @@ export default function PropertyDetail() {
               >
                 Edit listing
               </button>
-
               <button
                 type="button"
-                onClick={() =>
-                  navigate(`/property-calendar/${property.id}`)
-                }
+                onClick={() => navigate(`/property-calendar/${property.id}`)}
                 style={primaryButtonStyle}
               >
-                Manage property calendar
+                Manage calendar
               </button>
             </div>
           )}
@@ -497,7 +776,7 @@ export default function PropertyDetail() {
         <header style={{ marginBottom: 22 }}>
           <p
             style={{
-              color: "#176b50",
+              color: green,
               fontSize: 11,
               fontWeight: 800,
               letterSpacing: 1.5,
@@ -532,7 +811,7 @@ export default function PropertyDetail() {
           aria-label="Property photos"
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(0, 1.7fr) minmax(0, 1fr)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
             gap: 12,
             marginBottom: 26,
           }}
@@ -557,7 +836,7 @@ export default function PropertyDetail() {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gridTemplateRows: "repeat(2, minmax(0, 1fr))",
+              gridAutoRows: "minmax(100px, 1fr)",
               gap: 12,
               minWidth: 0,
             }}
@@ -570,9 +849,10 @@ export default function PropertyDetail() {
                 aria-label={`View property photo ${index + 2}`}
                 style={{
                   padding: 0,
-                  border: activeImage === index + 1
-                    ? "3px solid #176b50"
-                    : "1px solid #e3eae3",
+                  border:
+                    activeImage === index + 1
+                      ? `3px solid ${green}`
+                      : "1px solid #e3eae3",
                   borderRadius: 13,
                   overflow: "hidden",
                   cursor: "pointer",
@@ -602,7 +882,6 @@ export default function PropertyDetail() {
               <div
                 style={{
                   gridColumn: "span 2",
-                  gridRow: "span 2",
                   display: "grid",
                   placeItems: "center",
                   textAlign: "center",
@@ -655,7 +934,6 @@ export default function PropertyDetail() {
               <h2 style={{ ...sectionTitleStyle, marginTop: 23 }}>
                 About this property
               </h2>
-
               <p
                 style={{
                   color: "#536258",
@@ -673,7 +951,6 @@ export default function PropertyDetail() {
             {amenities.length > 0 && (
               <section style={{ ...cardStyle, marginBottom: 18 }}>
                 <h2 style={sectionTitleStyle}>Facilities & amenities</h2>
-
                 <div
                   style={{
                     display: "grid",
@@ -698,9 +975,7 @@ export default function PropertyDetail() {
                         color: "#405448",
                       }}
                     >
-                      <span style={{ color: "#176b50", fontWeight: 800 }}>
-                        ✓
-                      </span>
+                      <span style={{ color: green, fontWeight: 800 }}>✓</span>
                       {amenity}
                     </div>
                   ))}
@@ -708,36 +983,35 @@ export default function PropertyDetail() {
               </section>
             )}
 
-            {property.holiday_types &&
-              property.holiday_types.length > 0 && (
-                <section style={{ ...cardStyle, marginBottom: 18 }}>
-                  <h2 style={sectionTitleStyle}>Perfect for</h2>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 9,
-                      marginTop: 14,
-                    }}
-                  >
-                    {property.holiday_types.map((item) => (
-                      <span
-                        key={item}
-                        style={{
-                          borderRadius: 30,
-                          padding: "8px 12px",
-                          background: "#eaf3eb",
-                          color: "#315640",
-                          fontSize: 12,
-                          fontWeight: 650,
-                        }}
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </section>
-              )}
+            {property.holiday_types && property.holiday_types.length > 0 && (
+              <section style={{ ...cardStyle, marginBottom: 18 }}>
+                <h2 style={sectionTitleStyle}>Perfect for</h2>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 9,
+                    marginTop: 14,
+                  }}
+                >
+                  {property.holiday_types.map((item) => (
+                    <span
+                      key={item}
+                      style={{
+                        borderRadius: 30,
+                        padding: "8px 12px",
+                        background: "#eaf3eb",
+                        color: "#315640",
+                        fontSize: 12,
+                        fontWeight: 650,
+                      }}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {property.features && property.features.length > 0 && (
               <section style={{ ...cardStyle, marginBottom: 18 }}>
@@ -752,11 +1026,63 @@ export default function PropertyDetail() {
               property.equine_facilities.length > 0 && (
                 <section style={{ ...cardStyle, marginBottom: 18 }}>
                   <h2 style={sectionTitleStyle}>Equine facilities</h2>
-                  <p style={{ color: "#536258", lineHeight: 1.8, fontSize: 14 }}>
+                  <p
+                    style={{
+                      color: "#536258",
+                      lineHeight: 1.8,
+                      fontSize: 14,
+                    }}
+                  >
                     {property.equine_facilities.join(" · ")}
                   </p>
                 </section>
               )}
+
+            {mapQuery && (
+              <section style={{ ...cardStyle, marginBottom: 18 }}>
+                <h2 style={sectionTitleStyle}>Location</h2>
+                <p
+                  style={{
+                    color: "#536258",
+                    fontSize: 13,
+                    lineHeight: 1.7,
+                    margin: "8px 0 16px",
+                  }}
+                >
+                  {property.location}
+                </p>
+                <iframe
+                  title={`Map showing ${property.title}`}
+                  src={mapEmbedUrl}
+                  width="100%"
+                  height="320"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    border: 0,
+                    borderRadius: 12,
+                    background: "#eef2ed",
+                  }}
+                />
+                <p style={{ margin: "14px 0 0" }}>
+                  <a
+                    href={mapUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      color: green,
+                      fontSize: 13,
+                      fontWeight: 750,
+                      textDecoration: "none",
+                    }}
+                  >
+                    Open in Google Maps ↗
+                  </a>
+                </p>
+              </section>
+            )}
 
             <section style={cardStyle}>
               <h2 style={sectionTitleStyle}>Guest reviews</h2>
@@ -789,7 +1115,7 @@ export default function PropertyDetail() {
                   fontSize: 11,
                   fontWeight: 800,
                   letterSpacing: 1.3,
-                  color: "#176b50",
+                  color: green,
                   textTransform: "uppercase",
                 }}
               >
@@ -799,23 +1125,25 @@ export default function PropertyDetail() {
               <div style={{ marginBottom: 19 }}>
                 <span
                   style={{
-                    fontSize: 27,
+                    fontSize: 25,
                     fontWeight: 800,
                     letterSpacing: "-0.7px",
                     color: "#203128",
                   }}
                 >
-                  {validPrice ? formatPrice(price) : "Price to be confirmed"}
+                  {displayPrice !== null
+                    ? formatPrice(displayPrice)
+                    : "Price to be confirmed"}
                 </span>
-
-                {validPrice && (
+                {displayPrice !== null && (
                   <span style={{ color: "#758078", fontSize: 12 }}>
-                    {" "}/ night
+                    {" "}
+                    / night
                   </span>
                 )}
               </div>
 
-              {!validPrice && (
+              {displayPrice === null && (
                 <p
                   style={{
                     margin: "0 0 18px",
@@ -827,7 +1155,7 @@ export default function PropertyDetail() {
                     lineHeight: 1.6,
                   }}
                 >
-                  The host has not set a bookable nightly price yet.
+                  The host has not set a nightly price yet.
                 </p>
               )}
 
@@ -836,12 +1164,12 @@ export default function PropertyDetail() {
                 onClick={scrollToCalendar}
                 style={{ ...primaryButtonStyle, width: "100%" }}
               >
-                View availability calendar
+                View availability
               </button>
 
               <button
                 type="button"
-                onClick={toggleFavourite}
+                onClick={() => void toggleFavourite()}
                 disabled={savingFav}
                 style={{
                   ...secondaryButtonStyle,
@@ -867,7 +1195,8 @@ export default function PropertyDetail() {
                   lineHeight: 1.7,
                 }}
               >
-                Choose your dates to calculate the stay total before requesting a booking.
+                Choose your dates to check availability and calculate your
+                stay total.
               </div>
             </section>
 
@@ -881,11 +1210,189 @@ export default function PropertyDetail() {
                   color: "#758078",
                   fontSize: 12,
                   lineHeight: 1.6,
-                  marginBottom: 20,
+                  marginBottom: 16,
                 }}
               >
-                Select your arrival and departure dates.
+                Choose dates the host has marked as available.
               </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  fontSize: 11,
+                  marginBottom: 17,
+                }}
+              >
+                <span style={{ background: "#dcfce7", padding: "5px 8px", borderRadius: 6 }}>
+                  Available
+                </span>
+                <span style={{ background: "#fee2e2", padding: "5px 8px", borderRadius: 6 }}>
+                  Blocked
+                </span>
+                <span style={{ background: "#ffedd5", padding: "5px 8px", borderRadius: 6 }}>
+                  Booked
+                </span>
+                <span style={{ background: "#f3f4f6", padding: "5px 8px", borderRadius: 6 }}>
+                  Not set
+                </span>
+              </div>
+
+              {calendarLoading && (
+                <p style={{ color: "#758078", fontSize: 13 }}>
+                  Loading availability…
+                </p>
+              )}
+
+              {!calendarLoading && calendarError && (
+                <p
+                  role="alert"
+                  style={{
+                    color: "#991b1b",
+                    background: "#fee2e2",
+                    borderRadius: 9,
+                    padding: 12,
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {calendarError}
+                </p>
+              )}
+
+              {!calendarLoading && !calendarError && (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+                    gap: 4,
+                    marginBottom: 20,
+                  }}
+                >
+                  {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
+                    <div
+                      key={`${day}-${index}`}
+                      style={{
+                        textAlign: "center",
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#758078",
+                        padding: "5px 0",
+                      }}
+                    >
+                      {day}
+                    </div>
+                  ))}
+
+                  {(() => {
+                    const start = new Date();
+                    start.setDate(1);
+                    start.setHours(12, 0, 0, 0);
+
+                    const daysInMonth = new Date(
+                      start.getFullYear(),
+                      start.getMonth() + 1,
+                      0
+                    ).getDate();
+
+                    const offset = (start.getDay() + 6) % 7;
+                    const cells = [];
+
+                    for (let i = 0; i < offset; i++) {
+                      cells.push(
+                        <div key={`blank-${i}`} aria-hidden="true" />
+                      );
+                    }
+
+                    for (let day = 1; day <= daysInMonth; day++) {
+                      const date = localDateKey(
+                        new Date(
+                          start.getFullYear(),
+                          start.getMonth(),
+                          day,
+                          12
+                        )
+                      );
+
+                      const entry = calendarDates[date];
+                      const status = entry?.status;
+                      const available = status === "available";
+                      const blocked = status === "blocked";
+                      const booked = status === "booked";
+                      const selected = date === startDate || date === endDate;
+                      const between =
+                        !!startDate &&
+                        !!endDate &&
+                        date > startDate &&
+                        date < endDate;
+
+                      const bg = selected
+                        ? "#176b50"
+                        : available
+                          ? "#dcfce7"
+                          : blocked
+                            ? "#fee2e2"
+                            : booked
+                              ? "#ffedd5"
+                              : "#f3f4f6";
+
+                      const fg = selected
+                        ? "#ffffff"
+                        : blocked
+                          ? "#991b1b"
+                          : booked
+                            ? "#9a3412"
+                            : "#203128";
+
+                      cells.push(
+                        <button
+                          key={date}
+                          type="button"
+                          disabled={date < today() || !available}
+                          title={`${formatDate(date)} — ${
+                            status ?? "not set"
+                          }${entry?.price != null ? ` — ${formatPrice(Number(entry.price))} per night` : ""}`}
+                          onClick={() => {
+                            setBookingMessage("");
+
+                            if (!startDate || endDate || date <= startDate) {
+                              setStartDate(date);
+                              setEndDate("");
+                            } else {
+                              setEndDate(date);
+                            }
+                          }}
+                          style={{
+                            minWidth: 0,
+                            height: 35,
+                            padding: 0,
+                            border: selected
+                              ? "2px solid #14532d"
+                              : between
+                                ? "2px solid #86b99a"
+                                : "1px solid #e5e7eb",
+                            borderRadius: 7,
+                            background: between ? "#bbf7d0" : bg,
+                            color: fg,
+                            fontSize: 11,
+                            fontWeight: selected ? 800 : 500,
+                            cursor:
+                              date < today() || !available
+                                ? "not-allowed"
+                                : "pointer",
+                            opacity: date < today() ? 0.45 : 1,
+                          }}
+                        >
+                          {day}
+                        </button>
+                      );
+                    }
+
+                    return cells;
+                  })()}
+                </div>
+              )}
 
               <label
                 style={{
@@ -893,7 +1400,7 @@ export default function PropertyDetail() {
                   fontSize: 12,
                   fontWeight: 700,
                   color: "#405448",
-                  marginBottom: 16,
+                  marginBottom: 15,
                 }}
               >
                 Check-in
@@ -904,10 +1411,8 @@ export default function PropertyDetail() {
                   onChange={(event) => {
                     const nextStart = event.target.value;
                     setStartDate(nextStart);
-
-                    if (endDate && nextStart >= endDate) {
-                      setEndDate("");
-                    }
+                    setEndDate("");
+                    setBookingMessage("");
                   }}
                   style={{
                     display: "block",
@@ -936,8 +1441,13 @@ export default function PropertyDetail() {
                 <input
                   type="date"
                   value={endDate}
-                  min={startDate || today()}
-                  onChange={(event) => setEndDate(event.target.value)}
+                  min={startDate ? localDateKey(new Date(
+                    new Date(`${startDate}T12:00:00Z`).getTime() + 86400000
+                  )) : today()}
+                  onChange={(event) => {
+                    setEndDate(event.target.value);
+                    setBookingMessage("");
+                  }}
                   style={{
                     display: "block",
                     width: "100%",
@@ -953,7 +1463,21 @@ export default function PropertyDetail() {
                 />
               </label>
 
-              {nights > 0 && (
+              {startDate && (
+                <p
+                  style={{
+                    color: "#617064",
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    margin: "12px 0 0",
+                  }}
+                >
+                  Check-in: {formatDate(startDate)}
+                  {endDate ? ` · Check-out: ${formatDate(endDate)}` : ""}
+                </p>
+              )}
+
+              {endDate && countNights(startDate, endDate) > 0 && (
                 <div
                   style={{
                     background: "#f3f7f2",
@@ -984,11 +1508,42 @@ export default function PropertyDetail() {
                       marginBottom: 9,
                     }}
                   >
-                    <span>{nights} {nights === 1 ? "night" : "nights"}</span>
                     <span>
-                      {validPrice ? `${formatPrice(price)} / night` : "Price TBC"}
+                      {countNights(startDate, endDate)}{" "}
+                      {countNights(startDate, endDate) === 1 ? "night" : "nights"}
+                    </span>
+                    <span>
+                      {stayPriceInfo.valid
+                        ? "Prices confirmed"
+                        : "Checking prices"}
                     </span>
                   </div>
+
+                  {stayPriceInfo.unavailable.length > 0 && (
+                    <p
+                      style={{
+                        color: "#991b1b",
+                        fontSize: 12,
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      Some nights are unavailable or have not been opened by
+                      the host. Please select different dates.
+                    </p>
+                  )}
+
+                  {stayPriceInfo.unpriced.length > 0 &&
+                    stayPriceInfo.unavailable.length === 0 && (
+                      <p
+                        style={{
+                          color: "#92400e",
+                          fontSize: 12,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        The host has not set a price for every night.
+                      </p>
+                    )}
 
                   <div
                     style={{
@@ -1002,30 +1557,86 @@ export default function PropertyDetail() {
                     }}
                   >
                     <strong style={{ fontSize: 13 }}>Estimated total</strong>
-                    <strong style={{ fontSize: 18, color: "#176b50" }}>
-                      {validPrice ? formatPrice(totalPrice) : "To be confirmed"}
+                    <strong style={{ fontSize: 18, color: green }}>
+                      {stayPriceInfo.valid
+                        ? formatPrice(stayPriceInfo.total)
+                        : "Not available"}
                     </strong>
                   </div>
+
+                  {stayPriceInfo.valid && (
+                    <p
+                      style={{
+                        fontSize: 11,
+                        color: "#758078",
+                        lineHeight: 1.6,
+                        margin: "10px 0 0",
+                      }}
+                    >
+                      The total uses each night's saved price, or the property's
+                      current nightly price where no date-specific price is set.
+                    </p>
+                  )}
                 </div>
+              )}
+
+              {bookingMessage && (
+                <p
+                  role="status"
+                  style={{
+                    background:
+                      bookingMessageType === "success" ? "#dcfce7" : "#fee2e2",
+                    color:
+                      bookingMessageType === "success" ? "#166534" : "#991b1b",
+                    borderRadius: 9,
+                    padding: 12,
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    overflowWrap: "anywhere",
+                    marginTop: 16,
+                  }}
+                >
+                  {bookingMessage}
+                </p>
               )}
 
               <button
                 type="button"
                 onClick={() => void createBooking()}
-                disabled={bookingLoading || !validPrice || nights <= 0}
+                disabled={
+                  bookingLoading ||
+                  calendarLoading ||
+                  !!calendarError ||
+                  !stayPriceInfo.valid ||
+                  isOwner
+                }
                 style={{
                   ...primaryButtonStyle,
                   width: "100%",
                   marginTop: 17,
                   opacity:
-                    bookingLoading || !validPrice || nights <= 0 ? 0.55 : 1,
+                    bookingLoading ||
+                    calendarLoading ||
+                    !!calendarError ||
+                    !stayPriceInfo.valid ||
+                    isOwner
+                      ? 0.55
+                      : 1,
                   cursor:
-                    bookingLoading || !validPrice || nights <= 0
+                    bookingLoading ||
+                    calendarLoading ||
+                    !!calendarError ||
+                    !stayPriceInfo.valid ||
+                    isOwner
                       ? "not-allowed"
                       : "pointer",
                 }}
               >
-                {bookingLoading ? "Sending request…" : "Request booking"}
+                {bookingLoading
+                  ? "Sending request…"
+                  : isOwner
+                    ? "Your property"
+                    : "Request booking"}
               </button>
 
               <p
@@ -1040,39 +1651,6 @@ export default function PropertyDetail() {
                 Your booking request will be sent to the property host.
               </p>
             </section>
-
-            {isOwner && (
-              <section
-                style={{
-                  ...cardStyle,
-                  background: "#eaf3eb",
-                  borderColor: "#d8e6da",
-                }}
-              >
-                <h3 style={{ fontSize: 15, margin: "0 0 8px", color: "#315640" }}>
-                  Hosting this property?
-                </h3>
-
-                <p
-                  style={{
-                    color: "#536e5a",
-                    fontSize: 12,
-                    lineHeight: 1.7,
-                    margin: "0 0 15px",
-                  }}
-                >
-                  Update your listing or manage your property's calendar from the host centre.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => navigate(`/property-calendar/${property.id}`)}
-                  style={{ ...secondaryButtonStyle, width: "100%" }}
-                >
-                  Manage calendar →
-                </button>
-              </section>
-            )}
           </aside>
         </div>
 
