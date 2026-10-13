@@ -24,6 +24,7 @@ import BlogDetail from "./pages/BlogDetail";
 import HostCompliance from "./pages/HostCompliance";
 import PropertyCalendar from "./pages/PropertyCalendar";
 import HostDashboard from "./pages/HostDashboard";
+import HostSubscriptions from "./pages/HostSubscriptions";
 
 function NotFound() {
   return (
@@ -199,6 +200,10 @@ export default function App() {
             path="/property-calendar/:propertyId"
             element={<PropertyCalendar />}
           />
+          <Route
+  path="/host-subscriptions"
+  element={<HostSubscriptions />}
+/>
 
           <Route path="*" element={<NotFound />} />
         </Routes>
