@@ -2,6 +2,7 @@
 import { Routes, Route, Link } from "react-router-dom";
 
 import Home from "./pages/Home";
+import EditProperty from "./pages/EditProperty";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Properties from "./pages/Properties";
@@ -159,6 +160,7 @@ export default function App() {
           <Route path="/properties" element={<Properties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/add-property" element={<AddProperty />} />
+          <Route path="/edit-property/:id" element={<EditProperty />} />
 
           <Route path="/my-properties" element={<Properties />} />
           <Route
