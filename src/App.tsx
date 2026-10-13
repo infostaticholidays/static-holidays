@@ -73,18 +73,23 @@ export default function App() {
           <Link to="/properties" style={{ color: "white" }}>
             Properties
           </Link>
+
           <Link to="/events" style={{ color: "white" }}>
             Events
           </Link>
+
           <Link to="/businesses" style={{ color: "white" }}>
             Businesses
           </Link>
+
           <Link to="/shop" style={{ color: "white" }}>
             Shop
           </Link>
+
           <Link to="/host-dashboard" style={{ color: "white" }}>
             Host Dashboard
           </Link>
+
           <Link to="/login" style={{ color: "white" }}>
             Login
           </Link>
@@ -126,10 +131,12 @@ export default function App() {
             path="/host-dashboard"
             element={<HostDashboard />}
           />
+
           <Route
             path="/host-compliance"
             element={<HostCompliance />}
           />
+
           <Route
             path="/property-calendar/:propertyId"
             element={<PropertyCalendar />}
@@ -152,4 +159,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-```
