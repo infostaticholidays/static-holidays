@@ -3,6 +3,33 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
+const green = "#176b50";
+const darkGreen = "#124936";
+const sage = "#f3f7f2";
+const muted = "#68766e";
+const border = "#e5ebe5";
+
+const cardStyle: React.CSSProperties = {
+  background: "#ffffff",
+  border: `1px solid ${border}`,
+  borderRadius: 18,
+  padding: 24,
+  boxShadow: "0 5px 20px rgba(24, 65, 43, 0.04)",
+};
+
+const buttonStyle: React.CSSProperties = {
+  display: "inline-block",
+  padding: "11px 18px",
+  background: green,
+  color: "#ffffff",
+  border: "none",
+  borderRadius: 10,
+  textDecoration: "none",
+  fontSize: 14,
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
 export default function Account() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -12,86 +39,100 @@ export default function Account() {
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [newsletterSaving, setNewsletterSaving] = useState(false);
 
   const navigate = useNavigate();
 
   async function loadAccount() {
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (!user) {
-      navigate("/");
-      return;
-    }
+      if (!user) {
+        navigate("/");
+        return;
+      }
 
-    setUser(user);
+      setUser(user);
 
-    const { data: profileData, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+      const { data: profileData, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
-    if (error) {
-      console.error(error);
-      setLoading(false);
-      return;
-    }
+      if (error) {
+        console.error("Could not load profile:", error);
+        return;
+      }
 
-    setProfile(profileData);
+      setProfile(profileData);
 
-    const { data: favData } = await supabase
-      .from("favourites")
-      .select(`
-        id,
-        properties (
+      const { data: favData, error: favError } = await supabase
+        .from("favourites")
+        .select(`
           id,
-          title,
-          location,
-          images,
-          price_per_night
-        )
-      `)
-      .eq("user_id", user.id);
+          properties (
+            id,
+            title,
+            location,
+            images,
+            price_per_night
+          )
+        `)
+        .eq("user_id", user.id);
 
-    setFavourites(favData || []);
+      if (favError) {
+        console.error("Could not load favourites:", favError);
+      }
 
-    const { data: tripsData } = await supabase
-      .from("trips")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("start_date", { ascending: true });
+      setFavourites(favData || []);
 
-    if (tripsData) {
-      const today = new Date();
+      const { data: tripsData, error: tripsError } = await supabase
+        .from("trips")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("start_date", { ascending: true });
 
-      const previous = tripsData.filter(
-        (t) => new Date(t.end_date) < today
-      );
+      if (tripsError) {
+        console.error("Could not load trips:", tripsError);
+      }
 
-      const upcoming = tripsData
-        .filter((t) => new Date(t.end_date) >= today)
-        .sort(
-          (a, b) =>
-            new Date(a.start_date).getTime() -
-            new Date(b.start_date).getTime()
+      if (tripsData) {
+        const today = new Date();
+
+        const previous = tripsData.filter(
+          (t) => new Date(t.end_date) < today
         );
 
-      setPreviousTrips(previous);
-      setTrip(upcoming[0] || null);
+        const upcoming = tripsData
+          .filter((t) => new Date(t.end_date) >= today)
+          .sort(
+            (a, b) =>
+              new Date(a.start_date).getTime() -
+              new Date(b.start_date).getTime()
+          );
+
+        setPreviousTrips(previous);
+        setTrip(upcoming[0] || null);
+      }
+
+      const { data: reviewData, error: reviewError } = await supabase
+        .from("reviews")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (reviewError) {
+        console.error("Could not load reviews:", reviewError);
+      }
+
+      setReviews(reviewData || []);
+    } finally {
+      setLoading(false);
     }
-
-    const { data: reviewData } = await supabase
-      .from("reviews")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    setReviews(reviewData || []);
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -99,231 +140,798 @@ export default function Account() {
   }, []);
 
   useEffect(() => {
-    if (!trip?.start_date) return;
+    if (!trip?.start_date) {
+      setTimeLeft("");
+      return;
+    }
 
-    const start = new Date(trip.start_date).getTime();
-
-    const timer = setInterval(() => {
+    function updateCountdown() {
+      const start = new Date(trip.start_date).getTime();
       const diff = start - Date.now();
 
       if (diff <= 0) {
-        setTimeLeft("🎉 Your holiday has started!");
+        setTimeLeft("Your holiday has started!");
         return;
       }
 
-      const days = Math.floor(
-        diff / (1000 * 60 * 60 * 24)
-      );
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
 
-      const hours = Math.floor(
-        (diff / (1000 * 60 * 60)) % 24
-      );
+      setTimeLeft(`${days} days, ${hours} hours, ${minutes} minutes`);
+    }
 
-      const minutes = Math.floor(
-        (diff / (1000 * 60)) % 60
-      );
-
-      setTimeLeft(`${days}d ${hours}h ${minutes}m`);
-    }, 1000);
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 60000);
 
     return () => clearInterval(timer);
   }, [trip]);
 
   async function toggleNewsletter(value: boolean) {
-    if (!user) return;
+    if (!user || newsletterSaving) return;
 
-    setProfile((prev: any) => ({
-      ...prev,
-      newsletter: value,
-    }));
+    const oldValue = profile?.newsletter || false;
+    setProfile((prev: any) => ({ ...prev, newsletter: value }));
+    setNewsletterSaving(true);
 
-    await supabase
+    const { error } = await supabase
       .from("profiles")
       .update({ newsletter: value })
       .eq("id", user.id);
+
+    if (error) {
+      console.error("Could not update newsletter preference:", error);
+      setProfile((prev: any) => ({ ...prev, newsletter: oldValue }));
+      alert("Sorry, we couldn't update your newsletter preference. Please try again.");
+    }
+
+    setNewsletterSaving(false);
   }
 
   async function removeFavourite(id: string) {
-    await supabase
+    const { error } = await supabase
       .from("favourites")
       .delete()
       .eq("id", id);
 
-    setFavourites((prev) =>
-      prev.filter((f) => f.id !== id)
-    );
+    if (error) {
+      console.error("Could not remove favourite:", error);
+      alert("Sorry, we couldn't remove this favourite. Please try again.");
+      return;
+    }
+
+    setFavourites((prev) => prev.filter((f) => f.id !== id));
   }
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      alert("Sorry, we couldn't log you out. Please try again.");
+      return;
+    }
+
     window.location.href = "/";
   }
 
   if (loading) {
-    return <div style={{ padding: 40 }}>Loading...</div>;
+    return (
+      <div
+        style={{
+          minHeight: "70vh",
+          display: "grid",
+          placeItems: "center",
+          background: sage,
+          color: green,
+          fontSize: 17,
+        }}
+      >
+        Loading your holiday dashboard...
+      </div>
+    );
   }
+
+  const firstName =
+    profile?.full_name?.trim()?.split(/\s+/)[0] || "traveller";
 
   return (
     <div
       style={{
-        padding: 40,
-        maxWidth: 900,
-        margin: "0 auto",
+        minHeight: "100vh",
+        background: sage,
+        color: "#24372c",
+        fontFamily: "inherit",
+        padding: "28px 18px 60px",
       }}
     >
-      <h1>👤 My Account</h1>
-
-      {/* ACCOUNT */}
-      <div
-        style={{
-          background: "#f5f5f5",
-          padding: 20,
-        }}
-      >
-        <h2>Account Information</h2>
-
-        <p>Email: {user?.email}</p>
-        <p>Full name: {profile?.full_name || "Not set"}</p>
-        <p>Phone: {profile?.phone || "Not set"}</p>
-
-        <p>
-          Address: {profile?.address || "Not set"}
-
-          {profile?.address && (
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                profile.address
-              )}`}
-              target="_blank"
-              rel="noreferrer"
-              style={{ marginLeft: 8 }}
-            >
-              View on map
-            </a>
-          )}
-        </p>
-
-        <label>
-          <input
-            type="checkbox"
-            checked={profile?.newsletter || false}
-            onChange={(e) =>
-              toggleNewsletter(e.target.checked)
-            }
+      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        {/* WELCOME BANNER */}
+        <section
+          style={{
+            background: `linear-gradient(125deg, ${darkGreen}, ${green})`,
+            borderRadius: 24,
+            padding: "36px 30px",
+            color: "#ffffff",
+            position: "relative",
+            overflow: "hidden",
+            marginBottom: 26,
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              right: -25,
+              top: -65,
+              width: 230,
+              height: 230,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.06)",
+            }}
           />
-          Subscribe to newsletter
-        </label>
-      </div>
 
-      {/* TRIP */}
-      <div
-        style={{
-          background: "#f5f5f5",
-          padding: 20,
-          marginTop: 20,
-        }}
-      >
-        <h2>🏖️ My Next Trip</h2>
-
-        {!trip ? (
-          <p>No trip booked yet.</p>
-        ) : (
-          <>
-            <p>
-              <strong>Destination:</strong> {trip.destination}
-            </p>
-
-            <p>
-              <strong>Countdown:</strong> {timeLeft}
-            </p>
-          </>
-        )}
-      </div>
-
-      {/* FAVOURITES */}
-      <div
-        style={{
-          background: "#f5f5f5",
-          padding: 20,
-          marginTop: 20,
-        }}
-      >
-        <h2>❤️ My Favourite Properties</h2>
-
-        {favourites.length === 0 ? (
-          <p>No favourites yet.</p>
-        ) : (
-          favourites.map((fav) => {
-            const p = fav.properties;
-
-            return (
-              <div
-                key={fav.id}
-                style={{
-                  background: "white",
-                  padding: 10,
-                }}
-              >
-                <img
-                  src={p?.images}
-                  alt={p?.title || "Favourite property"}
-                  style={{
-                    width: "100%",
-                  }}
-                />
-
-                <h3>{p?.title}</h3>
-                <p>{p?.location}</p>
-
-                <Link to={`/property/${p?.id}`}>
-                  <button>View</button>
-                </Link>
-
-                <button
-                  onClick={() => removeFavourite(fav.id)}
-                >
-                  Remove
-                </button>
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      {/* REVIEWS */}
-      <div
-        style={{
-          background: "#f5f5f5",
-          padding: 20,
-          marginTop: 20,
-        }}
-      >
-        <h2>⭐ My Reviews</h2>
-
-        {reviews.length === 0 ? (
-          <p>No reviews yet.</p>
-        ) : (
-          reviews.map((r) => (
-            <div
-              key={r.id}
+          <div style={{ position: "relative" }}>
+            <p
               style={{
-                background: "white",
-                padding: 10,
+                margin: "0 0 10px",
+                fontSize: 12,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#d0e6d6",
+                fontWeight: 700,
               }}
             >
-              <p>{r.rating} ⭐</p>
-              <p>{r.review_text}</p>
-            </div>
-          ))
-        )}
-      </div>
+              YOUR STATIC HOLIDAYS
+            </p>
 
-      <button
-        onClick={handleLogout}
-        style={{ marginTop: 20 }}
-      >
-        Logout
-      </button>
+            <h1
+              style={{
+                fontSize: "clamp(28px, 4vw, 42px)",
+                lineHeight: 1.15,
+                margin: "0 0 12px",
+                fontWeight: 750,
+              }}
+            >
+              Welcome back, {firstName}!
+            </h1>
+
+            <p
+              style={{
+                margin: "0 0 24px",
+                maxWidth: 540,
+                lineHeight: 1.7,
+                color: "#e0eee4",
+                fontSize: 15,
+              }}
+            >
+              Your next escape starts here. Keep track of your trips,
+              save your favourite stays and get ready for your next adventure.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                flexWrap: "wrap",
+              }}
+            >
+              <Link
+                to="/properties"
+                style={{
+                  ...buttonStyle,
+                  background: "#ffffff",
+                  color: darkGreen,
+                }}
+              >
+                Explore properties →
+              </Link>
+
+              <a
+                href="#account-details"
+                style={{
+                  ...buttonStyle,
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                }}
+              >
+                My details
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* DASHBOARD STATISTICS */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            gap: 16,
+            marginBottom: 28,
+          }}
+        >
+          {[
+            {
+              icon: "♡",
+              label: "Saved stays",
+              value: favourites.length,
+            },
+            {
+              icon: "✈",
+              label: "Upcoming trip",
+              value: trip ? "Planned" : "Not yet",
+            },
+            {
+              icon: "★",
+              label: "Reviews",
+              value: reviews.length,
+            },
+            {
+              icon: "✓",
+              label: "Past trips",
+              value: previousTrips.length,
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                ...cardStyle,
+                padding: "20px 18px",
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 12,
+                  background: "#e8f2e9",
+                  color: green,
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: 23,
+                  marginBottom: 14,
+                }}
+              >
+                {item.icon}
+              </div>
+
+              <p
+                style={{
+                  margin: "0 0 5px",
+                  fontSize: 13,
+                  color: muted,
+                }}
+              >
+                {item.label}
+              </p>
+
+              <strong style={{ fontSize: 22, color: darkGreen }}>
+                {item.value}
+              </strong>
+            </div>
+          ))}
+        </div>
+
+        {/* NEXT TRIP */}
+        <section style={{ ...cardStyle, marginBottom: 26 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
+              marginBottom: 18,
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 6px",
+                  fontSize: 12,
+                  color: green,
+                  fontWeight: 700,
+                  letterSpacing: 1.5,
+                }}
+              >
+                YOUR NEXT ADVENTURE
+              </p>
+              <h2 style={{ margin: 0, fontSize: 23 }}>
+                My next trip
+              </h2>
+            </div>
+
+            <span style={{ fontSize: 30 }}>🏖️</span>
+          </div>
+
+          {!trip ? (
+            <div
+              style={{
+                background: sage,
+                borderRadius: 15,
+                padding: 24,
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: 38, marginBottom: 10 }}>🌿</div>
+              <h3 style={{ margin: "0 0 8px" }}>
+                Your next escape awaits
+              </h3>
+              <p
+                style={{
+                  color: muted,
+                  lineHeight: 1.6,
+                  margin: "0 auto 18px",
+                  maxWidth: 430,
+                }}
+              >
+                You don't have an upcoming trip listed yet. Find somewhere
+                special for your next break.
+              </p>
+              <Link to="/properties" style={buttonStyle}>
+                Find your getaway
+              </Link>
+            </div>
+          ) : (
+            <div
+              style={{
+                background: sage,
+                borderRadius: 16,
+                padding: 24,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 20,
+                flexWrap: "wrap",
+              }}
+            >
+              <div>
+                <h3 style={{ fontSize: 23, margin: "0 0 12px" }}>
+                  {trip.destination || "Your upcoming holiday"}
+                </h3>
+
+                <p style={{ margin: "0 0 8px", color: muted }}>
+                  <strong>Check-in:</strong>{" "}
+                  {trip.start_date
+                    ? new Date(trip.start_date).toLocaleDateString("en-GB")
+                    : "Not set"}
+                </p>
+
+                <p style={{ margin: "0 0 8px", color: muted }}>
+                  <strong>Check-out:</strong>{" "}
+                  {trip.end_date
+                    ? new Date(trip.end_date).toLocaleDateString("en-GB")
+                    : "Not set"}
+                </p>
+
+                <p
+                  style={{
+                    margin: "16px 0 0",
+                    color: green,
+                    fontWeight: 700,
+                  }}
+                >
+                  ⏳ {timeLeft}
+                </p>
+              </div>
+
+              <div style={{ fontSize: 56 }}>✈️</div>
+            </div>
+          )}
+        </section>
+
+        {/* FAVOURITE PROPERTIES */}
+        <section style={{ marginBottom: 28 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
+              marginBottom: 16,
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 5px",
+                  color: green,
+                  fontWeight: 700,
+                  fontSize: 12,
+                  letterSpacing: 1.5,
+                }}
+              >
+                SAVED FOR LATER
+              </p>
+              <h2 style={{ margin: 0, fontSize: 25 }}>
+                Your favourite stays
+              </h2>
+            </div>
+
+            <Link
+              to="/properties"
+              style={{
+                color: green,
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+            >
+              Browse stays →
+            </Link>
+          </div>
+
+          {favourites.length === 0 ? (
+            <div style={{ ...cardStyle, textAlign: "center", padding: 32 }}>
+              <div style={{ fontSize: 38 }}>♡</div>
+              <h3>No favourites saved yet</h3>
+              <p style={{ color: muted, lineHeight: 1.6 }}>
+                When you find a property you love, save it here for easy access.
+              </p>
+              <Link to="/properties" style={buttonStyle}>
+                Discover properties
+              </Link>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(245px, 1fr))",
+                gap: 20,
+              }}
+            >
+              {favourites.map((fav) => {
+                const p = Array.isArray(fav.properties)
+                  ? fav.properties[0]
+                  : fav.properties;
+
+                const image = Array.isArray(p?.images)
+                  ? p.images[0]
+                  : p?.images;
+
+                return (
+                  <article
+                    key={fav.id}
+                    style={{
+                      background: "#ffffff",
+                      border: `1px solid ${border}`,
+                      borderRadius: 18,
+                      overflow: "hidden",
+                      boxShadow: "0 5px 20px rgba(24,65,43,0.05)",
+                    }}
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={p?.title || "Favourite holiday property"}
+                        style={{
+                          width: "100%",
+                          height: 200,
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          height: 200,
+                          background: "#e8f0e7",
+                          display: "grid",
+                          placeItems: "center",
+                          fontSize: 48,
+                        }}
+                      >
+                        🏡
+                      </div>
+                    )}
+
+                    <div style={{ padding: 18 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 8px",
+                          fontSize: 19,
+                          color: darkGreen,
+                        }}
+                      >
+                        {p?.title || "Holiday property"}
+                      </h3>
+
+                      <p
+                        style={{
+                          margin: "0 0 12px",
+                          color: muted,
+                          fontSize: 14,
+                        }}
+                      >
+                        📍 {p?.location || "Location not listed"}
+                      </p>
+
+                      {p?.price_per_night != null && (
+                        <p
+                          style={{
+                            margin: "0 0 16px",
+                            color: green,
+                            fontWeight: 700,
+                          }}
+                        >
+                          £{Number(p.price_per_night).toFixed(2)}{" "}
+                          <span
+                            style={{
+                              color: muted,
+                              fontWeight: 400,
+                            }}
+                          >
+                            / night
+                          </span>
+                        </p>
+                      )}
+
+                      <div style={{ display: "flex", gap: 10 }}>
+                        {p?.id ? (
+                          <Link
+                            to={`/property/${p.id}`}
+                            style={{ ...buttonStyle, flex: 1, textAlign: "center" }}
+                          >
+                            View stay
+                          </Link>
+                        ) : (
+                          <span style={{ color: muted, fontSize: 13 }}>
+                            Property unavailable
+                          </span>
+                        )}
+
+                        <button
+                          onClick={() => removeFavourite(fav.id)}
+                          style={{
+                            background: "#ffffff",
+                            border: `1px solid ${border}`,
+                            borderRadius: 10,
+                            padding: "10px 12px",
+                            color: "#8a4545",
+                            cursor: "pointer",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* ACCOUNT DETAILS AND NEWSLETTER */}
+        <section
+          id="account-details"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 22,
+            marginBottom: 28,
+            scrollMarginTop: 20,
+          }}
+        >
+          <div style={cardStyle}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>👤</div>
+            <h2 style={{ margin: "0 0 20px", fontSize: 22 }}>
+              Account details
+            </h2>
+
+            {[
+              ["Full name", profile?.full_name],
+              ["Email address", user?.email],
+              ["Phone", profile?.phone],
+              ["Address", profile?.address],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                style={{
+                  padding: "13px 0",
+                  borderBottom: `1px solid ${border}`,
+                }}
+              >
+                <p
+                  style={{
+                    color: muted,
+                    fontSize: 12,
+                    margin: "0 0 5px",
+                  }}
+                >
+                  {label}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {value || "Not set"}
+                </p>
+
+                {label === "Address" && value && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      String(value)
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display: "inline-block",
+                      marginTop: 7,
+                      color: green,
+                      fontSize: 13,
+                    }}
+                  >
+                    View on map →
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div style={cardStyle}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>✉️</div>
+            <h2 style={{ margin: "0 0 12px", fontSize: 22 }}>
+              Stay in the loop
+            </h2>
+
+            <p style={{ color: muted, lineHeight: 1.7, fontSize: 14 }}>
+              Get updates and holiday inspiration from Static Holidays.
+              You can change your preference whenever you like.
+            </p>
+
+            <label
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 12,
+                background: sage,
+                padding: 16,
+                borderRadius: 12,
+                marginTop: 20,
+                cursor: "pointer",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={profile?.newsletter || false}
+                disabled={newsletterSaving}
+                onChange={(e) => toggleNewsletter(e.target.checked)}
+                style={{
+                  width: 18,
+                  height: 18,
+                  accentColor: green,
+                  marginTop: 2,
+                }}
+              />
+
+              <span>
+                <strong style={{ display: "block", marginBottom: 5 }}>
+                  Subscribe to our newsletter
+                </strong>
+                <span style={{ color: muted, fontSize: 13 }}>
+                  {newsletterSaving
+                    ? "Saving your preference..."
+                    : "I would like to receive holiday news and offers."}
+                </span>
+              </span>
+            </label>
+
+            <p style={{ color: muted, fontSize: 12, lineHeight: 1.6 }}>
+              Only subscribe if you want to receive these updates.
+            </p>
+          </div>
+        </section>
+
+        {/* REVIEWS */}
+        <section style={{ ...cardStyle, marginBottom: 28 }}>
+          <div style={{ marginBottom: 20 }}>
+            <p
+              style={{
+                margin: "0 0 5px",
+                color: green,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: 1.5,
+              }}
+            >
+              YOUR FEEDBACK
+            </p>
+            <h2 style={{ margin: 0, fontSize: 24 }}>My reviews</h2>
+          </div>
+
+          {reviews.length === 0 ? (
+            <div
+              style={{
+                background: sage,
+                padding: 22,
+                borderRadius: 12,
+                color: muted,
+              }}
+            >
+              <span style={{ fontSize: 26 }}>⭐</span>
+              <p style={{ marginBottom: 0 }}>
+                Your reviews will appear here when available.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: 12 }}>
+              {reviews.map((r) => (
+                <article
+                  key={r.id}
+                  style={{
+                    background: sage,
+                    borderRadius: 12,
+                    padding: 18,
+                  }}
+                >
+                  <p
+                    style={{
+                      color: "#b78327",
+                      margin: "0 0 8px",
+                      letterSpacing: 2,
+                    }}
+                  >
+                    {"★".repeat(
+                      Math.max(0, Math.min(5, Number(r.rating) || 0))
+                    )}
+                    {"☆".repeat(
+                      5 - Math.max(0, Math.min(5, Number(r.rating) || 0))
+                    )}
+                  </p>
+                  <p style={{ margin: 0, lineHeight: 1.7 }}>
+                    {r.review_text}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* ACCOUNT FOOTER */}
+        <footer
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 16,
+            flexWrap: "wrap",
+            padding: "22px 4px",
+            borderTop: `1px solid ${border}`,
+          }}
+        >
+          <div>
+            <strong style={{ color: darkGreen }}>Static Holidays</strong>
+            <p
+              style={{
+                color: muted,
+                fontSize: 13,
+                margin: "5px 0 0",
+              }}
+            >
+              Your next escape is closer than you think.
+            </p>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "#ffffff",
+              border: "1px solid #e2d5d5",
+              color: "#934444",
+              borderRadius: 10,
+              padding: "11px 18px",
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            Log out
+          </button>
+        </footer>
+      </div>
     </div>
   );
 }
