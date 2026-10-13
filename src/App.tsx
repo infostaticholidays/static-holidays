@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -27,9 +27,9 @@ import HostDashboard from "./pages/HostDashboard";
 
 function NotFound() {
   return (
-    <div style={{ padding: "40px", textAlign: "center" }}>
+    <div style={{ padding: 40, textAlign: "center" }}>
       <h1>Page not found</h1>
-      <p>The page you are looking for does not exist.</p>
+      <p>The page you requested could not be found.</p>
       <Link to="/">Return home</Link>
     </div>
   );
@@ -37,14 +37,22 @@ function NotFound() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        background: "#ffffff",
+        color: "#1f2937",
+      }}
+    >
       <header
         style={{
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: "16px",
+          gap: 16,
           padding: "18px 24px",
           background: "#14532d",
           color: "#ffffff",
@@ -54,7 +62,7 @@ export default function App() {
           to="/"
           style={{
             color: "#ffffff",
-            fontSize: "22px",
+            fontSize: 22,
             fontWeight: 700,
             textDecoration: "none",
           }}
@@ -66,37 +74,35 @@ export default function App() {
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: "16px",
+            gap: 16,
             alignItems: "center",
           }}
         >
-          <Link to="/properties" style={{ color: "white" }}>
+          <Link to="/properties" style={{ color: "#ffffff" }}>
             Properties
           </Link>
-
-          <Link to="/events" style={{ color: "white" }}>
+          <Link to="/events" style={{ color: "#ffffff" }}>
             Events
           </Link>
-
-          <Link to="/businesses" style={{ color: "white" }}>
+          <Link to="/businesses" style={{ color: "#ffffff" }}>
             Businesses
           </Link>
-
-          <Link to="/shop" style={{ color: "white" }}>
+          <Link to="/shop" style={{ color: "#ffffff" }}>
             Shop
           </Link>
-
-          <Link to="/host-dashboard" style={{ color: "white" }}>
+          <Link to="/host-dashboard" style={{ color: "#ffffff" }}>
             Host Dashboard
           </Link>
-
-          <Link to="/login" style={{ color: "white" }}>
+          <Link to="/login" style={{ color: "#ffffff" }}>
             Login
+          </Link>
+          <Link to="/signup" style={{ color: "#ffffff" }}>
+            Sign up
           </Link>
         </nav>
       </header>
 
-      <main style={{ minHeight: "70vh" }}>
+      <main style={{ flex: 1, width: "100%" }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -131,12 +137,10 @@ export default function App() {
             path="/host-dashboard"
             element={<HostDashboard />}
           />
-
           <Route
             path="/host-compliance"
             element={<HostCompliance />}
           />
-
           <Route
             path="/property-calendar/:propertyId"
             element={<PropertyCalendar />}
@@ -148,7 +152,7 @@ export default function App() {
 
       <footer
         style={{
-          padding: "24px",
+          padding: 24,
           textAlign: "center",
           background: "#f3f4f6",
           color: "#374151",
@@ -156,6 +160,6 @@ export default function App() {
       >
         © {new Date().getFullYear()} Static Holidays
       </footer>
-    </BrowserRouter>
+    </div>
   );
 }
