@@ -1,1036 +1,535 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
 
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "January", "February", "March", "April",
+  "May", "June", "July", "August",
+  "September", "October", "November", "December",
 ];
 
-
+type DateStatus = "available" | "blocked" | "booked" | "offer" | "season";
 
 type DateInfo = {
-
-  status:
-    | "available"
-    | "blocked"
-    | "booked"
-    | "offer"
-    | "season";
-
+  status: DateStatus;
   price?: number;
-
-  discount?: number;
-
-  seasonName?: string;
-
 };
 
+const green = "#14532d";
 
-
-
-
-const getDaysInMonth = (
-  year:number,
-  month:number
-) => {
-
-  return new Date(
-    year,
-    month + 1,
-    0
-  ).getDate();
-
+const buttonStyle: React.CSSProperties = {
+  background: green,
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: 8,
+  cursor: "pointer",
+  fontWeight: 600,
 };
 
+function localDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
+function formatDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
 
+function getRangeDates(first: string, last: string) {
+  const start = first <= last ? first : last;
+  const end = first <= last ? last : first;
+  const dates: string[] = [];
 
-const formatDate = (date:string) => {
+  const [sy, sm, sd] = start.split("-").map(Number);
+  const [ey, em, ed] = end.split("-").map(Number);
 
-  const d = new Date(date);
+  const current = new Date(sy, sm - 1, sd);
+  const finalDate = new Date(ey, em - 1, ed);
 
+  while (current <= finalDate) {
+    dates.push(localDateKey(current));
+    current.setDate(current.getDate() + 1);
+  }
 
-  return d.toLocaleDateString(
-    "en-GB",
-    {
-      day:"numeric",
-      month:"long",
-      year:"numeric",
-    }
-  );
+  return dates;
+}
 
-};
-
-
-
-
-
-export default function PropertyCalendar(){
-
-  
-  const { propertyId } = useParams();
-
+export default function PropertyCalendar() {
+  const { propertyId } = useParams<{ propertyId: string }>();
   const navigate = useNavigate();
 
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [calendarDates, setCalendarDates] =
+    useState<Record<string, DateInfo>>({});
+  const [rangeStart, setRangeStart] = useState<string | null>(null);
+  const [rangeEnd, setRangeEnd] = useState<string | null>(null);
+  const [nightlyPrice, setNightlyPrice] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error">("success");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
 
+  const loadCalendar = useCallback(async () => {
+    if (!propertyId) {
+      setMessage("The property ID is missing from the address.");
+      setMessageType("error");
+      setLoading(false);
+      return;
+    }
 
+    setLoading(true);
+    setMessage("");
 
-  // Current year
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
-  const [year,setYear] =
-  useState(
-    new Date().getFullYear()
-  );
+      if (authError) throw authError;
 
+      if (!user) {
+        navigate("/login");
+        return;
+      }
 
+      const { data: property, error: propertyError } = await supabase
+        .from("properties")
+        .select("id, owner_id")
+        .eq("id", propertyId)
+        .maybeSingle();
 
+      if (propertyError) throw propertyError;
 
+      if (!property || property.owner_id !== user.id) {
+        setMessage("This property was not found or you do not have permission to manage its calendar.");
+        setMessageType("error");
+        return;
+      }
 
-  // All calendar information
+      setOwnerId(user.id);
 
-  const [calendarDates,setCalendarDates] =
-  useState<Record<string,DateInfo>>({});
+      const { data, error } = await supabase
+        .from("property_calendar_dates")
+        .select("calendar_date, status, price")
+        .eq("property_id", propertyId);
 
+      if (error) throw error;
 
+      const saved: Record<string, DateInfo> = {};
 
+      for (const row of data ?? []) {
+        saved[row.calendar_date] = {
+          status: row.status as DateStatus,
+          ...(row.price !== null && row.price !== undefined
+            ? { price: Number(row.price) }
+            : {}),
+        };
+      }
 
+      setCalendarDates(saved);
+    } catch (error) {
+      console.error("LOAD CALENDAR ERROR:", error);
+      setMessage(
+        error instanceof Error ? error.message : "Could not load the calendar."
+      );
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
+  }, [propertyId, navigate]);
 
-  // Range selection
+  useEffect(() => {
+    void loadCalendar();
+  }, [loadCalendar]);
 
-  const [rangeStart,setRangeStart] =
-  useState<string | null>(null);
+  function handleDateClick(date: string) {
+    setMessage("");
 
-
-  const [rangeEnd,setRangeEnd] =
-  useState<string | null>(null);
-
-
-
-
-
-  // Price input
-
-  const [nightlyPrice,setNightlyPrice] =
-  useState("");
-
-
-
-
-
-  const handleDateClick = (
-    date:string
-  ) => {
-
-
-    if(!rangeStart || rangeEnd){
-
-
+    if (!rangeStart || rangeEnd) {
       setRangeStart(date);
-
       setRangeEnd(null);
-
-
-    }
-
-    else {
-
-
+    } else {
       setRangeEnd(date);
-
-
     }
+  }
 
-
-  };
-
-
-
-
-
-
-  const updateDateStatus = (
-    status:DateInfo["status"]
-  ) => {
-
-
-    if(!rangeStart || !rangeEnd)
+  async function saveDates(
+    dates: string[],
+    updates: (date: string) => Partial<DateInfo>
+  ) {
+    if (!propertyId || !ownerId || dates.length === 0) {
+      setMessage("Select a date or date range first.");
+      setMessageType("error");
       return;
-
-
-
-    const start =
-    new Date(rangeStart);
-
-
-
-    const end =
-    new Date(rangeEnd);
-
-
-
-    const updated = {
-      ...calendarDates
-    };
-
-
-
-
-
-    while(start <= end){
-
-
-
-      const key =
-      start.toISOString()
-      .split("T")[0];
-
-
-
-      updated[key] = {
-
-
-        ...updated[key],
-
-
-        status:status,
-
-
-      };
-
-
-
-      start.setDate(
-        start.getDate()+1
-      );
-
-
-
     }
 
+    setSaving(true);
+    setMessage("");
 
+    try {
+      const rows = dates.map((date) => {
+        const oldInfo = calendarDates[date] ?? { status: "available" as const };
+        const changed = updates(date);
 
-    setCalendarDates(updated);
+        return {
+          property_id: propertyId,
+          owner_id: ownerId,
+          calendar_date: date,
+          status: changed.status ?? oldInfo.status,
+          price:
+            changed.price !== undefined
+              ? changed.price
+              : oldInfo.price ?? null,
+          updated_at: new Date().toISOString(),
+        };
+      });
 
+      const { error } = await supabase
+        .from("property_calendar_dates")
+        .upsert(rows, { onConflict: "property_id,calendar_date" });
 
+      if (error) throw error;
 
-  };
+      setCalendarDates((current) => {
+        const updated = { ...current };
 
+        for (const row of rows) {
+          updated[row.calendar_date] = {
+            status: row.status as DateStatus,
+            ...(row.price !== null ? { price: Number(row.price) } : {}),
+          };
+        }
 
+        return updated;
+      });
 
+      setMessage(`Successfully saved ${dates.length} date${dates.length === 1 ? "" : "s"}.`);
+      setMessageType("success");
+    } catch (error) {
+      console.error("SAVE CALENDAR ERROR:", error);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not save your changes. Please try again."
+      );
+      setMessageType("error");
+    } finally {
+      setSaving(false);
+    }
+  }
 
+  async function updateDateStatus(status: DateStatus) {
+    if (!rangeStart || !rangeEnd) return;
 
+    const dates = getRangeDates(rangeStart, rangeEnd);
 
+    await saveDates(dates, () => ({ status }));
+  }
 
-
-  const updatePrice = () => {
-
-
-    if(!rangeStart || !rangeEnd)
+  async function updatePrice() {
+    if (!rangeStart || !rangeEnd) {
+      setMessage("Select a start and end date before saving a price.");
+      setMessageType("error");
       return;
-
-
-
-    const start =
-    new Date(rangeStart);
-
-
-
-    const end =
-    new Date(rangeEnd);
-
-
-
-
-    const updated = {
-
-      ...calendarDates
-
-    };
-
-
-
-
-
-    while(start <= end){
-
-
-      const key =
-      start.toISOString()
-      .split("T")[0];
-
-
-
-      updated[key] = {
-
-
-        ...(updated[key] || {
-          status:"available"
-        }),
-
-
-        price:
-        Number(nightlyPrice),
-
-
-      };
-
-
-
-
-      start.setDate(
-        start.getDate()+1
-      );
-
-
-
     }
 
+    if (nightlyPrice.trim() === "" || !Number.isFinite(Number(nightlyPrice)) || Number(nightlyPrice) < 0) {
+      setMessage("Enter a valid nightly price of £0 or more.");
+      setMessageType("error");
+      return;
+    }
 
+    const dates = getRangeDates(rangeStart, rangeEnd);
+    const price = Number(Number(nightlyPrice).toFixed(2));
 
-
-    setCalendarDates(updated);
-
-
-
-  };
-
+    await saveDates(dates, () => ({ price }));
+  }
 
   return (
-
-    <div
-      style={{
-        maxWidth:1400,
-        margin:"40px auto",
-        padding:30,
-        fontFamily:"Arial, sans-serif",
-      }}
-    >
-
-
-      <h1>
-        📅 Property Calendar
-      </h1>
-
-
-      <p>
-        <strong>Property ID:</strong> {propertyId}
-      </p>
-
-
-
-
-      <div
-        style={{
-          background:"#f5f5f5",
-          padding:20,
-          borderRadius:12,
-          marginBottom:30,
-        }}
-      >
-
-
-        <h2>
-          Availability & Pricing
-        </h2>
-
-
-        <p>
-          Manage availability, nightly prices, blocked dates, offers and seasons.
+    <main style={{
+      maxWidth: 1400,
+      margin: "0 auto",
+      padding: "28px 16px 50px",
+      fontFamily: "Arial, sans-serif",
+      color: "#1f2937",
+    }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ color: green }}>📅 Property Calendar</h1>
+        <p><strong>Property ID:</strong> {propertyId}</p>
+        <p style={{ color: "#6b7280" }}>
+          Select dates, manage availability and save nightly prices.
+          Your saved changes will be loaded when you return.
         </p>
+      </div>
 
-
-
-
-
+      {message && (
         <div
+          role="status"
           style={{
-            display:"flex",
-            justifyContent:"space-between",
-            alignItems:"center",
+            padding: 14,
+            borderRadius: 8,
+            marginBottom: 20,
+            overflowWrap: "anywhere",
+            background: messageType === "success" ? "#dcfce7" : "#fee2e2",
+            color: messageType === "success" ? "#166534" : "#991b1b",
+            border: `1px solid ${messageType === "success" ? "#86efac" : "#fca5a5"}`,
           }}
         >
+          {message}
+        </div>
+      )}
 
+      <section style={{
+        background: "#f5f7f5",
+        padding: 20,
+        borderRadius: 12,
+        marginBottom: 24,
+      }}>
+        <h2>Availability &amp; Pricing</h2>
 
-          <button
-            style={greenBtn}
-            onClick={() => setYear(year - 1)}
-          >
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+          flexWrap: "wrap",
+        }}>
+          <button style={buttonStyle} onClick={() => setYear((value) => value - 1)}>
             ← Previous Year
           </button>
 
+          <h2>{year}</h2>
 
-
-
-          <h2>
-            {year}
-          </h2>
-
-
-
-
-          <button
-            style={greenBtn}
-            onClick={() => setYear(year + 1)}
-          >
+          <button style={buttonStyle} onClick={() => setYear((value) => value + 1)}>
             Next Year →
           </button>
-
-
         </div>
 
-
-      </div>
-
-
-
-
-
-
-      <div
-        style={{
-          display:"grid",
-          gridTemplateColumns:"repeat(3,1fr)",
-          gap:20,
-        }}
-      >
-
-
-
-
-      {months.map((month,index)=>{
-
-
-        const days =
-        getDaysInMonth(year,index);
-
-
-
-
-        return (
-
-          <div
-            key={month}
-            style={{
-              border:"1px solid #ddd",
-              borderRadius:12,
-              padding:15,
-              background:"#fff",
-            }}
-          >
-
-
-
-            <h3
-              style={{
-                textAlign:"center",
-                color:"#14532d",
-              }}
-            >
-              {month} {year}
-            </h3>
-
-
-
-
-
-
-            <div
-              style={{
-                display:"grid",
-                gridTemplateColumns:"repeat(7,1fr)",
-                gap:5,
-              }}
-            >
-
-
-
-
-            {Array.from({length:days}).map((_,day)=>{
-
-
-
-              const date =
-
-              `${year}-${String(index+1).padStart(2,"0")}-${String(day+1).padStart(2,"0")}`;
-
-
-
-
-
-              const dayInfo =
-              calendarDates[date];
-
-
-
-
-
-              const isBlocked =
-              dayInfo?.status === "blocked";
-
-
-
-              const isBooked =
-              dayInfo?.status === "booked";
-
-
-
-              const isOffer =
-              dayInfo?.status === "offer";
-
-
-
-              const isSeason =
-              dayInfo?.status === "season";
-
-
-
-
-
-              const isStart =
-              rangeStart === date;
-
-
-
-
-              const isRange =
-
-              rangeStart &&
-
-              rangeEnd &&
-
-              date >= rangeStart &&
-
-              date <= rangeEnd;
-
-
-
-
-
-              return (
-
-
-
-                <div
-
-                  key={date}
-
-                  onClick={() =>
-                    handleDateClick(date)
-                  }
-
-
-                  style={{
-
-
-                    height:45,
-
-
-                    border:"1px solid #ddd",
-
-
-                    borderRadius:6,
-
-
-                    display:"flex",
-
-
-                    flexDirection:"column",
-
-
-                    alignItems:"center",
-
-
-                    justifyContent:"center",
-
-
-                    cursor:"pointer",
-
-
-
-                    background:
-
-                    isBlocked
-
-                    ? "#dc2626"
-
-
-                    : isBooked
-
-                    ? "#f97316"
-
-
-                    : isOffer
-
-                    ? "#facc15"
-
-
-                    : isSeason
-
-                    ? "#2563eb"
-
-
-                    : isRange
-
-                    ? "#bbf7d0"
-
-
-                    : isStart
-
-                    ? "#14532d"
-
-
-                    : "#f8faf8",
-
-
-
-
-
-                    color:
-
-
-                    isBlocked ||
-
-                    isBooked ||
-
-                    isSeason ||
-
-                    isStart
-
-                    ? "white"
-
-                    : "black",
-
-
-
-                    fontSize:12,
-
-                  }}
-
-                >
-
-
-
-                  <div>
-
-                    {day + 1}
-
-                  </div>
-
-
-
-
-                  {dayInfo?.price && (
-
-                    <div>
-
-                      £{dayInfo.price}
-
-                    </div>
-
-                  )}
-
-
-
+        <div style={{
+          display: "flex",
+          gap: 12,
+          flexWrap: "wrap",
+          marginTop: 16,
+          fontSize: 13,
+        }}>
+          <span>🟩 Available</span>
+          <span>🟥 Blocked</span>
+          <span>🟧 Booked</span>
+          <span>🟨 Offer</span>
+          <span>🟦 Season</span>
+        </div>
+      </section>
+
+      {loading ? (
+        <p>Loading your saved dates and prices...</p>
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 18,
+        }}>
+          {months.map((month, monthIndex) => {
+            const days = getDaysInMonth(year, monthIndex);
+            const firstDay = new Date(year, monthIndex, 1).getDay();
+            const mondayOffset = (firstDay + 6) % 7;
+
+            return (
+              <section
+                key={month}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 12,
+                  padding: 14,
+                  background: "#ffffff",
+                }}
+              >
+                <h3 style={{ textAlign: "center", color: green }}>
+                  {month} {year}
+                </h3>
+
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+                  gap: 4,
+                  textAlign: "center",
+                  marginBottom: 6,
+                  fontSize: 11,
+                  color: "#6b7280",
+                }}>
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                    <div key={day}>{day}</div>
+                  ))}
                 </div>
 
-
-
-              );
-
-
-
-            })}
-
-
-
-
-
-            </div>
-
-
-
-
-          </div>
-
-
-        );
-
-
-      })}
-
-
-
-
-
-      </div>
-
-      
-
-
-
-      {rangeStart && (
-
-        <div
-
-          style={{
-
-            marginTop:30,
-
-            padding:20,
-
-            background:"#fff",
-
-            border:"1px solid #ddd",
-
-            borderRadius:12,
-
-          }}
-
-        >
-
-
-
-          <h2>
-            Selected Dates
-          </h2>
-
-
-
-          <p>
-
-            From:
-
-            <strong>
-
-              {" "}
-
-              {formatDate(rangeStart)}
-
-            </strong>
-
-          </p>
-
-
-
-
-          {rangeEnd && (
-
-            <p>
-
-              To:
-
-              <strong>
-
-                {" "}
-
-                {formatDate(rangeEnd)}
-
-              </strong>
-
-
-            </p>
-
-          )}
-
-
-
-
-
-
-          {rangeStart && rangeEnd && (
-
-
-            <>
-
-
-
-              <h3>
-                Availability
-              </h3>
-
-
-
-              <div
-
-                style={{
-
-                  display:"flex",
-
-                  gap:10,
-
-                  flexWrap:"wrap",
-
-                }}
-
-              >
-
-
-
-                <button
-
-                  style={{
-
-                    ...greenBtn,
-
-                    background:"#16a34a",
-
-                  }}
-
-
-                  onClick={()=>
-
-                    updateDateStatus(
-                      "available"
-                    )
-
-                  }
-
-                >
-
-                  🟩 Available
-
-                </button>
-
-
-
-
-
-
-                <button
-
-                  style={{
-
-                    ...greenBtn,
-
-                    background:"#dc2626",
-
-                  }}
-
-
-
-                  onClick={()=>
-
-                    updateDateStatus(
-                      "blocked"
-                    )
-
-                  }
-
-                >
-
-                  🟥 Block Dates
-
-                </button>
-
-
-
-
-
-
-                <button
-
-                  style={{
-
-                    ...greenBtn,
-
-                    background:"#f97316",
-
-                  }}
-
-
-
-                  onClick={()=>
-
-                    updateDateStatus(
-                      "booked"
-                    )
-
-                  }
-
-                >
-
-                  🟧 Booked
-
-                </button>
-
-
-
-
-              </div>
-
-
-
-
-
-
-              <h3>
-
-                Nightly Price
-
-              </h3>
-
-
-
-
-              <input
-
-
-                type="number"
-
-
-                placeholder="£ per night"
-
-
-
-                value={nightlyPrice}
-
-
-
-                onChange={(e)=>
-
-                  setNightlyPrice(
-                    e.target.value
-                  )
-
-                }
-
-
-
-                style={{
-
-                  padding:10,
-
-                  borderRadius:6,
-
-                  border:"1px solid #ccc",
-
-                  fontSize:16,
-
-                  marginRight:10,
-
-                }}
-
-              />
-
-
-
-
-
-              <button
-
-                style={greenBtn}
-
-
-                onClick={updatePrice}
-
-              >
-
-                💷 Save Price
-
-              </button>
-
-
-
-
-            </>
-
-          )}
-
-
-
-
-
-
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+                  gap: 4,
+                }}>
+                  {Array.from({ length: mondayOffset }).map((_, index) => (
+                    <div key={`empty-${index}`} />
+                  ))}
+
+                  {Array.from({ length: days }, (_, dayIndex) => {
+                    const date = `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(dayIndex + 1).padStart(2, "0")}`;
+                    const info = calendarDates[date];
+                    const selected = Boolean(
+                      rangeStart &&
+                      rangeEnd &&
+                      date >= (rangeStart < rangeEnd ? rangeStart : rangeEnd) &&
+                      date <= (rangeStart > rangeEnd ? rangeStart : rangeEnd)
+                    );
+                    const isStart = rangeStart === date;
+                    const background: Record<DateStatus, string> = {
+                      available: "#dcfce7",
+                      blocked: "#dc2626",
+                      booked: "#f97316",
+                      offer: "#facc15",
+                      season: "#2563eb",
+                    };
+
+                    return (
+                      <button
+                        key={date}
+                        type="button"
+                        title={`${formatDate(date)}${info?.price !== undefined ? ` — £${info.price} per night` : ""}${info ? ` — ${info.status}` : ""}`}
+                        onClick={() => handleDateClick(date)}
+                        style={{
+                          minWidth: 0,
+                          minHeight: 46,
+                          padding: "4px 1px",
+                          border: isStart || selected ? "2px solid #14532d" : "1px solid #e5e7eb",
+                          borderRadius: 6,
+                          cursor: "pointer",
+                          background: info ? background[info.status] : selected ? "#bbf7d0" : "#f9fafb",
+                          color: info && ["blocked", "booked", "season"].includes(info.status) ? "#ffffff" : "#1f2937",
+                          fontSize: 12,
+                          fontWeight: selected || isStart ? 700 : 400,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <span>{dayIndex + 1}</span>
+                        {info?.price !== undefined && (
+                          <span style={{ fontSize: 9, marginTop: 2 }}>
+                            £{info.price}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
         </div>
-
-
       )}
 
+      {rangeStart && (
+        <section style={{
+          marginTop: 28,
+          padding: 20,
+          background: "#ffffff",
+          border: "1px solid #e5e7eb",
+          borderRadius: 12,
+        }}>
+          <h2>Selected Dates</h2>
+          <p><strong>First selected:</strong> {formatDate(rangeStart)}</p>
 
+          {rangeEnd ? (
+            <>
+              <p><strong>Last selected:</strong> {formatDate(rangeEnd)}</p>
+              <p style={{ color: "#6b7280", fontSize: 14 }}>
+                {getRangeDates(rangeStart, rangeEnd).length} calendar date(s) selected, including both endpoints.
+              </p>
 
+              <h3>Set availability</h3>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <button disabled={saving} style={{ ...buttonStyle, background: "#16a34a", opacity: saving ? 0.6 : 1 }} onClick={() => void updateDateStatus("available")}>
+                  🟩 Available
+                </button>
+                <button disabled={saving} style={{ ...buttonStyle, background: "#dc2626", opacity: saving ? 0.6 : 1 }} onClick={() => void updateDateStatus("blocked")}>
+                  🟥 Block Dates
+                </button>
+                <button disabled={saving} style={{ ...buttonStyle, background: "#f97316", opacity: saving ? 0.6 : 1 }} onClick={() => void updateDateStatus("booked")}>
+                  🟧 Booked
+                </button>
+              </div>
 
+              <h3 style={{ marginTop: 24 }}>Nightly Price</h3>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="£ per night"
+                  value={nightlyPrice}
+                  onChange={(event) => setNightlyPrice(event.target.value)}
+                  style={{
+                    padding: 11,
+                    borderRadius: 7,
+                    border: "1px solid #d1d5db",
+                    fontSize: 16,
+                    maxWidth: 220,
+                  }}
+                />
+                <button
+                  disabled={saving}
+                  style={{ ...buttonStyle, opacity: saving ? 0.6 : 1 }}
+                  onClick={() => void updatePrice()}
+                >
+                  {saving ? "Saving..." : "💷 Save Price"}
+                </button>
+              </div>
 
+              {saving && <p>Saving your changes to the database...</p>}
+            </>
+          ) : (
+            <p style={{ color: "#6b7280" }}>
+              Select another date to complete your date range.
+            </p>
+          )}
+        </section>
+      )}
 
+      <div style={{
+        display: "flex",
+        gap: 12,
+        flexWrap: "wrap",
+        marginTop: 28,
+      }}>
+        <button
+          onClick={() => navigate("/host-dashboard")}
+          style={buttonStyle}
+        >
+          ← Back to Dashboard
+        </button>
 
-      <button
-
-
-        onClick={() =>
-
-          navigate("/host-dashboard")
-
-        }
-
-
-
-        style={{
-
-          marginTop:40,
-
-          background:"#14532d",
-
-          color:"white",
-
-          border:"none",
-
-          padding:"12px 20px",
-
-          borderRadius:8,
-
-          cursor:"pointer",
-
-        }}
-
-      >
-
-        ← Back to Dashboard
-
-      </button>
-
-
-
-
-    </div>
-
+        <button
+          onClick={() => void loadCalendar()}
+          disabled={loading || saving}
+          style={{ ...buttonStyle, background: "#4b5563" }}
+        >
+          ↻ Reload Saved Calendar
+        </button>
+      </div>
+    </main>
   );
-
 }
-
-
-
-
-
-const greenBtn = {
-
-
-  background:"#14532d",
-
-
-  color:"white",
-
-
-  border:"none",
-
-
-  padding:"10px 18px",
-
-
-  borderRadius:8,
-
-
-  cursor:"pointer",
-
-
-};
