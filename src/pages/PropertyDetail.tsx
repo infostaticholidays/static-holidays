@@ -673,7 +673,7 @@ if (!checkout?.checkout_url) {
 
 window.location.assign(checkout.checkout_url);
 return;
-```
+
     } catch (error) {
       console.error("Could not create booking:", error);
       setBookingMessage(
