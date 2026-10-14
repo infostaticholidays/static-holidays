@@ -638,21 +638,42 @@ export default function PropertyDetail() {
         return;
       }
 
-      const { error: insertError } = await supabase.from("bookings").insert({
-        property_id: property.id,
-        owner_id: property.owner_id,
-        guest_id: user.id,
-        check_in: startDate,
-        check_out: endDate,
-        total_price: Number(freshTotal.toFixed(2)),
-        booking_status: "pending",
-      });
+    ```tsx
+const { data: newBooking, error: insertError } = await supabase
+  .from("bookings")
+  .insert({
+    property_id: property.id,
+    owner_id: property.owner_id,
+    guest_id: user.id,
+    check_in: startDate,
+    check_out: endDate,
+    total_price: Number(freshTotal.toFixed(2)),
+    booking_status: "pending",
+  })
+  .select("id")
+  .single();
 
-      if (insertError) throw insertError;
+if (insertError) throw insertError;
 
-      setBookingMessage("Your booking request has been sent to the host.");
-      setBookingMessageType("success");
-      navigate("/bookings");
+const { data: checkout, error: checkoutError } =
+  await supabase.functions.invoke("create-checkout-session", {
+    body: { booking_id: newBooking.id },
+  });
+
+if (checkoutError) {
+  console.error("Could not start checkout:", checkoutError);
+  throw new Error(
+    "Your booking was created, but checkout could not start. Please contact us before trying again."
+  );
+}
+
+if (!checkout?.checkout_url) {
+  throw new Error("Stripe did not return a checkout link. Please contact us.");
+}
+
+window.location.assign(checkout.checkout_url);
+return;
+```
     } catch (error) {
       console.error("Could not create booking:", error);
       setBookingMessage(
