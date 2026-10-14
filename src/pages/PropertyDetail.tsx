@@ -915,7 +915,7 @@ export default function PropertyDetail() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) minmax(280px, 350px)",
+         gridTemplateColumns: "minmax(0, 1fr)",
             alignItems: "start",
             gap: 22,
           }}
