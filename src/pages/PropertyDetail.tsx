@@ -638,7 +638,7 @@ export default function PropertyDetail() {
         return;
       }
 
-    ```tsx
+
 const { data: newBooking, error: insertError } = await supabase
   .from("bookings")
   .insert({
