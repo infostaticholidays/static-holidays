@@ -111,7 +111,7 @@ export default function Bookings() {
               Payment status: {booking.payment_status || "Not recorded"}
             </p>
 
-            <Link to={`/booking/${booking.id}`}>
+           <Link to={"/booking/" + booking.id}>
               View booking details
             </Link>
           </article>
