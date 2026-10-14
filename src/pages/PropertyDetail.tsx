@@ -1479,14 +1479,14 @@ export default function PropertyDetail() {
                             gap: 3,
                           }}
                         >
-                          <span style={{ fontSize: 11, fontWeight: 700 }}>
+                          <span style={{ fontSize: 13, fontWeight: 800 }}>
                             {day}
                           </span>
 
                           {datePrice !== null && (
                             <span
                               style={{
-                                fontSize: 9,
+                             fontSize: 11,
                                 lineHeight: 1.2,
                                 fontWeight: 700,
                                 whiteSpace: "nowrap",
