@@ -195,6 +195,7 @@ export default function PropertyDetail() {
   const [saved, setSaved] = useState(false);
   const [savingFav, setSavingFav] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [agreedToPaymentTerms, setAgreedToPaymentTerms] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
 
