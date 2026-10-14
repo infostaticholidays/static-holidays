@@ -1429,6 +1429,10 @@ export default function PropertyDetail() {
                             ? "#9a3412"
                             : "#203128";
 
+                  
+                      const datePrice =
+                        getPositivePrice(entry?.price) ?? basePrice;
+
                       cells.push(
                         <button
                           key={date}
@@ -1436,7 +1440,11 @@ export default function PropertyDetail() {
                           disabled={date < today() || !available}
                           title={`${formatDate(date)} — ${
                             status ?? "not set"
-                          }${entry?.price != null ? ` — ${formatPrice(Number(entry.price))} per night` : ""}`}
+                          }${
+                            datePrice !== null
+                              ? ` — ${formatPrice(datePrice)} per night`
+                              : ""
+                          }`}
                           onClick={() => {
                             setBookingMessage("");
 
@@ -1449,8 +1457,8 @@ export default function PropertyDetail() {
                           }}
                           style={{
                             minWidth: 0,
-                            height: 35,
-                            padding: 0,
+                            minHeight: 54,
+                            padding: "5px 1px",
                             border: selected
                               ? "2px solid #14532d"
                               : between
@@ -1459,18 +1467,38 @@ export default function PropertyDetail() {
                             borderRadius: 7,
                             background: between ? "#bbf7d0" : bg,
                             color: fg,
-                            fontSize: 11,
-                            fontWeight: selected ? 800 : 500,
                             cursor:
                               date < today() || !available
                                 ? "not-allowed"
                                 : "pointer",
                             opacity: date < today() ? 0.45 : 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 3,
                           }}
                         >
-                          {day}
+                          <span style={{ fontSize: 11, fontWeight: 700 }}>
+                            {day}
+                          </span>
+
+                          {datePrice !== null && (
+                            <span
+                              style={{
+                                fontSize: 9,
+                                lineHeight: 1.2,
+                                fontWeight: 700,
+                                whiteSpace: "nowrap",
+                                color: selected ? "#ffffff" : fg,
+                              }}
+                            >
+                              {formatPrice(datePrice)}
+                            </span>
+                          )}
                         </button>
                       );
+
                     }
 
                     return cells;
