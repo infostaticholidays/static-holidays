@@ -1,6 +1,4 @@
-Replace your current `Home.tsx` with this code:
 
-```tsx
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
