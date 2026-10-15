@@ -294,6 +294,9 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
         }
 
         setProfile(profileData);
+        setBookingMode(
+  profileData.booking_mode === "automatic" ? "automatic" : "manual"
+);
 
         if (profileData.role && profileData.role !== "host") {
           navigate("/account");
