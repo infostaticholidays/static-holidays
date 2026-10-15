@@ -698,38 +698,85 @@ export default function PropertyDetail() {
       const { data: ownerProfile, error: profileError } = await supabase
         .from("profiles")
         .select("booking_mode")
-        .eq("id", property.owner_id)
-        .maybeSingle();
+        .eq("id", property.owne```tsx
+  async function createBooking() {
+    if (!property || bookingLoading) return;
 
-      if (profileError) throw profileError;
+    setBookingMessage("");
 
-      const bookingMode = String(ownerProfile?.booking_mode ?? "")
-        .trim()
-        .toLowerCase();
+    const showError = (message: string) => {
+      setBookingMessage(message);
+      setBookingMessageType("error");
+    };
 
-      const isManualBooking = [
-        "manual",
-        "request",
-        "manual_approval",
-      ].includes(bookingMode);
+    if (!startDate || !endDate) {
+      showError("Please select check-in and check-out dates.");
+      return;
+    }
 
-      const isAutomaticBooking = [
-        "automatic",
-        "instant",
-      ].includes(bookingMode);
+    const nights = countNights(startDate, endDate);
 
-      if (!isManualBooking && !isAutomaticBooking) {
-        throw new Error(
-          "The host's booking mode is missing or unrecognised. Please contact the host."
-        );
+    if (startDate < today() || nights <= 0) {
+      showError(
+        "Please choose valid dates. Check-out must be after check-in."
+      );
+      return;
+    }
+
+    if (isOwner) {
+      showError("You cannot book your own property.");
+      return;
+    }
+
+    if (calendarLoading || calendarError) {
+      showError(
+        "Availability has not been verified. Please reload the page and try again."
+      );
+      return;
+    }
+
+    if (stayPriceInfo.unavailable.length > 0) {
+      showError(
+        `These dates are unavailable: ${stayPriceInfo.unavailable
+          .map(formatDate)
+          .join(", ")}. Please choose different dates.`
+      );
+      return;
+    }
+
+    if (stayPriceInfo.unpriced.length > 0) {
+      showError(
+        "The host hasn't set a price for every night of this stay."
+      );
+      return;
+    }
+
+    if (!stayPriceInfo.valid || stayPriceInfo.total <= 0) {
+      showError("A valid price is not available for this stay.");
+      return;
+    }
+
+    setBookingLoading(true);
+
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) throw authError;
+
+      if (!user) {
+        navigate("/login");
+        return;
       }
 
-      const responseDeadline = isManualBooking
-        ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
-        : null;
+      if (user.id === property.owner_id) {
+        showError("You cannot book your own property.");
+        return;
+      }
 
-    
-      // Find out whether this host uses manual or automatic booking.
+      // Read the host's booking preference once.
       const { data: ownerProfile, error: profileError } = await supabase
         .from("profiles")
         .select("booking_mode")
@@ -759,11 +806,116 @@ export default function PropertyDetail() {
         );
       }
 
-      // Give manual requests 48 hours for the host to respond.
+      // Recheck the calendar immediately before inserting the booking.
+      const { data: freshCalendar, error: calendarCheckError } =
+        await supabase
+          .from("property_calendar_dates")
+          .select("calendar_date, status, price")
+          .eq("property_id", property.id)
+          .gte("calendar_date", startDate)
+          .lt("calendar_date", endDate);
+
+      if (calendarCheckError) throw calendarCheckError;
+
+      const freshByDate = new Map(
+        (freshCalendar ?? []).map((entry) => [
+          entry.calendar_date,
+          entry as CalendarDate,
+        ])
+      );
+
+      const nowUnavailable = stayDates.filter(
+        (date) => freshByDate.get(date)?.status !== "available"
+      );
+
+      if (nowUnavailable.length > 0) {
+        showError(
+          `Availability has changed for ${nowUnavailable
+            .map(formatDate)
+            .join(", ")}. Please choose different dates.`
+        );
+        return;
+      }
+
+      // Recalculate the total using the latest saved calendar prices.
+      let freshTotal = 0;
+
+      for (const date of stayDates) {
+        const entry = freshByDate.get(date);
+        const datePrice = getPositivePrice(entry?.price);
+        const effectivePrice = datePrice ?? basePrice;
+
+        if (effectivePrice === null) {
+          showError(
+            `The host hasn't set a price for ${formatDate(date)}.`
+          );
+          return;
+        }
+
+        freshTotal += effectivePrice;
+      }
+
+      if (!Number.isFinite(freshTotal) || freshTotal <= 0) {
+        showError("A valid price is not available for this stay.");
+        return;
+      }
+
+      // Prevent overlapping requests and active bookings.
+      const { data: overlaps, error: overlapError } = await supabase
+        .from("bookings")
+        .select("check_in, check_out, booking_status, status")
+        .eq("property_id", property.id)
+        .lt("check_in", endDate)
+        .gt("check_out", startDate);
+
+      if (overlapError) {
+        console.error("Could not check overlapping bookings:", overlapError);
+        throw overlapError;
+      }
+
+      const inactiveStatuses = [
+        "cancelled",
+        "canceled",
+        "rejected",
+        "declined",
+        "expired",
+      ];
+
+      const conflict = (overlaps ?? []).some((booking) => {
+        const bookingStatus = String(
+          booking.booking_status ?? booking.status ?? ""
+        )
+          .trim()
+          .toLowerCase();
+
+        const generalStatus = String(booking.status ?? "")
+          .trim()
+          .toLowerCase();
+
+        const isInactive =
+          inactiveStatuses.includes(bookingStatus) ||
+          inactiveStatuses.includes(generalStatus);
+
+        return (
+          !isInactive &&
+          booking.check_in < endDate &&
+          booking.check_out > startDate
+        );
+      });
+
+      if (conflict) {
+        showError(
+          "These dates overlap an existing booking or booking request. Please select different dates."
+        );
+        return;
+      }
+
+      // Manual requests have 48 hours for the host to respond.
       const responseDeadline = isManualBooking
         ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
         : null;
 
+      // Create one booking record, regardless of booking mode.
       const { data: newBooking, error: insertError } = await supabase
         .from("bookings")
         .insert({
@@ -782,52 +934,51 @@ export default function PropertyDetail() {
 
       if (insertError) throw insertError;
 
-  .insert({
-    property_id: property.id,
-    owner_id: property.owner_id,
-    guest_id: user.id,
-    check_in: startDate,
-    check_out: endDate,
-    total_price: Number(freshTotal.toFixed(2)),
-    booking_status: "pending",
-  })
-  .select("id")
-  .single();
+      if (!newBooking?.id) {
+        throw new Error(
+          "The booking was created without returning a booking ID. Please contact support."
+        );
+      }
 
-if (insertError) throw insertError;
+      // Start the existing Stripe Checkout flow.
+      const { data: checkout, error: checkoutError } =
+        await supabase.functions.invoke("create-checkout-session", {
+          body: {
+            booking_id: newBooking.id,
+          },
+        });
 
-const { data: checkout, error: checkoutError } =
-  await supabase.functions.invoke("create-checkout-session", {
-    body: { booking_id: newBooking.id },
-  });
+      if (checkoutError) {
+        console.error("Could not start Stripe Checkout:", checkoutError);
 
-if (checkoutError) {
-  console.error("Could not start checkout:", checkoutError);
-  throw new Error(
-    "Your booking was created, but checkout could not start. Please contact us before trying again."
-  );
-}
+        throw new Error(
+          "Your booking request was created, but checkout could not start. Please contact support before trying again."
+        );
+      }
 
-if (!checkout?.checkout_url) {
-  throw new Error("Stripe did not return a checkout link. Please contact us.");
-}
+      if (!checkout?.checkout_url) {
+        throw new Error(
+          "Stripe did not return a checkout link. Please contact support."
+        );
+      }
 
-window.location.assign(checkout.checkout_url);
-return;
-
+      // The Stripe function must implement the appropriate payment flow
+      // for manual versus automatic bookings on the server.
+      window.location.assign(checkout.checkout_url);
     } catch (error) {
       console.error("Could not create booking:", error);
+
       setBookingMessage(
         error instanceof Error
           ? error.message
-          : "Could not send your booking request. Please try again."
+          : "Could not create your booking. Please try again."
       );
       setBookingMessageType("error");
     } finally {
       setBookingLoading(false);
     }
   }
-
+```
   function scrollToCalendar() {
     document.getElementById("availability-calendar")?.scrollIntoView({
       behavior: "smooth",
