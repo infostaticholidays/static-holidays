@@ -1,4 +1,3 @@
-```tsx
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -6,6 +5,7 @@ import { supabase } from "../lib/supabase";
 type Booking = {
   id: string;
   property_id: string;
+  owner_id?: string | null;
   check_in: string;
   check_out: string;
   status: string | null;
@@ -20,19 +20,21 @@ type Property = {
   title?: string;
 };
 
-function formatDate(value: string) {
+function formatDate(value: string | null | undefined): string {
   if (!value) return "Not set";
 
-  const dateValue = value.slice(0, 10) + "T12:00:00";
+  const date = new Date(value.slice(0, 10) + "T12:00:00");
 
-  return new Date(dateValue).toLocaleDateString("en-GB", {
+  if (Number.isNaN(date.getTime())) return "Not set";
+
+  return date.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 }
 
-function getTimeRemaining(deadline: string | null) {
+function getTimeRemaining(deadline: string | null): string {
   if (!deadline) return "Deadline unavailable";
 
   const remaining = new Date(deadline).getTime() - Date.now();
@@ -65,35 +67,48 @@ export default function BookingDetail() {
       return;
     }
 
-    const { data: bookingData, error: bookingError } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+    try {
+      const result = await supabase
+        .from("bookings")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
 
-    if (bookingError || !bookingData) {
-      setError(bookingError?.message || "Booking not found.");
-      setLoading(false);
-      return;
-    }
+      if (result.error || !result.data) {
+        setError(result.error?.message || "Booking not found.");
+        setBooking(null);
+        setProperty(null);
+        setLoading(false);
+        return;
+      }
 
-    const currentBooking = bookingData as Booking;
-    setBooking(currentBooking);
+      const currentBooking = result.data as Booking;
+      setBooking(currentBooking);
 
-    const { data: propertyData, error: propertyError } = await supabase
-      .from("properties")
-      .select("id, owner_id, title")
-      .eq("id", currentBooking.property_id)
-      .maybeSingle();
+      if (!currentBooking.property_id) {
+        setProperty(null);
+        setError("This booking has no linked property.");
+        setLoading(false);
+        return;
+      }
 
-    if (propertyError) {
-      setError(propertyError.message);
-      setProperty(null);
-    } else if (propertyData) {
-      setProperty(propertyData as Property);
-    } else {
-      setProperty(null);
-      setError("The property for this booking could not be found.");
+      const propertyResult = await supabase
+        .from("properties")
+        .select("id, owner_id, title")
+        .eq("id", currentBooking.property_id)
+        .maybeSingle();
+
+      if (propertyResult.error || !propertyResult.data) {
+        setProperty(null);
+        setError(
+          propertyResult.error?.message ||
+            "The property for this booking could not be found."
+        );
+      } else {
+        setProperty(propertyResult.data as Property);
+      }
+    } catch {
+      setError("Unable to load the booking. Please try again.");
     }
 
     setLoading(false);
@@ -109,45 +124,43 @@ export default function BookingDetail() {
     setError("");
     setMessage("");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      setError("Please sign in as the property owner.");
-      return;
-    }
-
-    if (property.owner_id !== user.id) {
-      setError("Only the property owner can manage this booking.");
-      return;
-    }
-
-    if (
-      booking.status !== "pending" ||
-      booking.booking_status !== "pending"
-    ) {
-      setError(
-        "Both booking status fields must be pending before this request can be changed. Refresh the page or check the booking record."
-      );
-      return;
-    }
-
-    if (
-      !booking.response_deadline ||
-      new Date(booking.response_deadline).getTime() <= Date.now()
-    ) {
-      setError(
-        "The 48-hour response deadline has passed. This request can no longer be changed here."
-      );
-      return;
-    }
-
-    setSaving(true);
-
     try {
-      const { data, error: updateError } = await supabase
+      const userResult = await supabase.auth.getUser();
+      const user = userResult.data.user;
+
+      if (userResult.error || !user) {
+        setError("Please sign in as the property owner.");
+        return;
+      }
+
+      if (property.owner_id !== user.id) {
+        setError("Only the property owner can manage this booking.");
+        return;
+      }
+
+      if (
+        booking.status !== "pending" ||
+        booking.booking_status !== "pending"
+      ) {
+        setError(
+          "Both booking status fields must be pending. Refresh the page and check the booking record."
+        );
+        return;
+      }
+
+      if (
+        !booking.response_deadline ||
+        new Date(booking.response_deadline).getTime() <= Date.now()
+      ) {
+        setError(
+          "The response deadline has passed or is missing. This request cannot be changed here."
+        );
+        return;
+      }
+
+      setSaving(true);
+
+      const result = await supabase
         .from("bookings")
         .update({
           status: nextStatus,
@@ -160,28 +173,28 @@ export default function BookingDetail() {
         .select("*")
         .maybeSingle();
 
-      if (updateError) {
-        setError(updateError.message);
+      if (result.error) {
+        setError(result.error.message);
         return;
       }
 
-      if (!data) {
+      if (!result.data) {
         setError(
-          "The booking could not be updated. It may have changed, or you may not have permission. Refresh and try again."
+          "The booking was not updated. It may have changed, or you may not have permission. Refresh and try again."
         );
         await loadBooking();
         return;
       }
 
-      setBooking(data as Booking);
+      setBooking(result.data as Booking);
 
       if (nextStatus === "confirmed") {
         setMessage(
-          "Booking accepted. Stripe payment authorisation and capture still need to be connected."
+          "Booking accepted. Stripe payment capture is not connected yet, so this action does not capture the deposit."
         );
       } else {
         setMessage(
-          "Booking declined. The Stripe authorisation cancellation flow still needs to be connected."
+          "Booking declined. Stripe authorisation cancellation is not connected yet."
         );
       }
     } catch {
@@ -310,24 +323,12 @@ export default function BookingDetail() {
               gap: 16,
             }}
           >
-            <div
-              style={{
-                background: "#f8fafc",
-                padding: 16,
-                borderRadius: 10,
-              }}
-            >
+            <div style={{ background: "#f8fafc", padding: 16, borderRadius: 10 }}>
               <p style={{ color: "#64748b", fontSize: 12 }}>CHECK-IN</p>
               <strong>{formatDate(booking.check_in)}</strong>
             </div>
 
-            <div
-              style={{
-                background: "#f8fafc",
-                padding: 16,
-                borderRadius: 10,
-              }}
-            >
+            <div style={{ background: "#f8fafc", padding: 16, borderRadius: 10 }}>
               <p style={{ color: "#64748b", fontSize: 12 }}>CHECK-OUT</p>
               <strong>{formatDate(booking.check_out)}</strong>
             </div>
@@ -379,8 +380,8 @@ export default function BookingDetail() {
             <h2 style={{ marginTop: 0 }}>Your decision</h2>
 
             <p style={{ color: "#64748b" }}>
-              Review the requested dates before making your decision.
-              Accepting does not yet capture a payment.
+              Review the requested dates before deciding. Accepting here does
+              not capture a payment.
             </p>
 
             <div
@@ -432,8 +433,8 @@ export default function BookingDetail() {
 
         {isPending && deadlinePassed && (
           <p>
-            The response deadline has passed. Automatic expiry still needs
-            to be configured.
+            The response deadline has passed or is missing. Automatic expiry
+            still needs to be configured.
           </p>
         )}
       </div>
