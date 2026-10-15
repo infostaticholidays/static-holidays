@@ -1,3 +1,4 @@
+```tsx
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -8,6 +9,7 @@ type Booking = {
   check_in: string;
   check_out: string;
   status: string | null;
+  booking_status: string | null;
   created_at: string;
   response_deadline: string | null;
 };
@@ -51,6 +53,9 @@ export default function BookingDetail() {
   const [error, setError] = useState("");
 
   async function loadBooking() {
+    setLoading(true);
+    setError("");
+
     if (!id) {
       setError("Booking reference is missing.");
       setLoading(false);
@@ -74,30 +79,37 @@ export default function BookingDetail() {
 
     const { data: propertyData, error: propertyError } = await supabase
       .from("properties")
-      .select("*")
+      .select("id, owner_id, title")
       .eq("id", currentBooking.property_id)
       .maybeSingle();
 
     if (propertyError) {
       setError(propertyError.message);
+      setProperty(null);
     } else if (propertyData) {
       setProperty(propertyData as Property);
+    } else {
+      setProperty(null);
+      setError("The property for this booking could not be found.");
     }
 
     setLoading(false);
   }
 
   useEffect(() => {
-    loadBooking();
+    void loadBooking();
   }, [id]);
 
   async function updateStatus(nextStatus: "confirmed" | "declined") {
-    if (!booking || !property) return;
+    if (!booking || !property || saving) return;
 
     setError("");
     setMessage("");
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
       setError("Please sign in as the property owner to manage this booking.");
@@ -109,7 +121,17 @@ export default function BookingDetail() {
       return;
     }
 
-    if (booking.status !== "pending") {
+    const currentStatus = (
+      booking.booking_status || booking.status || ""
+    ).trim().toLowerCase();
+
+    if (
+      currentStatus !== "pending" ||
+      (booking.status &&
+        booking.status.toLowerCase() !== "pending") ||
+      (booking.booking_status &&
+        booking.booking_status.toLowerCase() !== "pending")
+    ) {
       setError("This booking is no longer pending and cannot be changed here.");
       return;
     }
@@ -118,34 +140,61 @@ export default function BookingDetail() {
       !booking.response_deadline ||
       new Date(booking.response_deadline).getTime() <= Date.now()
     ) {
-      setError("The 48-hour response deadline has passed. This request can no longer be accepted or declined here.");
+      setError(
+        "The 48-hour response deadline has passed. This request can no longer be accepted or declined here."
+      );
       return;
     }
 
     setSaving(true);
 
-    const { data, error: updateError } = await supabase
-      .from("bookings")
-      .update({ status: nextStatus })
-      .eq("id", booking.id)
-      .eq("status", "pending")
-      .select("*")
-      .maybeSingle();
+    try {
+      let query = supabase
+        .from("bookings")
+        .update({
+          status: nextStatus,
+          booking_status: nextStatus,
+        })
+        .eq("id", booking.id)
+        .eq("owner_id", user.id);
 
-    if (updateError) {
-      setError(updateError.message);
-    } else if (!data) {
-      setError("The booking was changed elsewhere or you do not have permission to update it. Refresh and try again.");
-    } else {
+      if (booking.status === "pending") {
+        query = query.eq("status", "pending");
+      }
+
+      if (booking.booking_status === "pending") {
+        query = query.eq("booking_status", "pending");
+      }
+
+      const { data, error: updateError } = await query
+        .select("*")
+        .maybeSingle();
+
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      if (!data) {
+        setError(
+          "The booking may have changed or your account does not have permission to update it. Refresh the page and try again."
+        );
+        await loadBooking();
+        return;
+      }
+
       setBooking(data as Booking);
+
       setMessage(
         nextStatus === "confirmed"
-          ? "Booking accepted. Please verify the calendar reflects the confirmed dates."
-          : "Booking declined. Please verify the calendar releases the requested dates."
+          ? "Booking accepted. The guest payment step still needs to be connected before the guest can pay."
+          : "Booking declined. No payment has been initiated by this action."
       );
+    } catch {
+      setError("Something went wrong while updating the booking.");
+    } finally {
+      setSaving(false);
     }
-
-    setSaving(false);
   }
 
   if (loading) {
@@ -162,8 +211,14 @@ export default function BookingDetail() {
     );
   }
 
-  const status = booking.status?.trim() || "Not specified";
+  const status = (
+    booking.booking_status ||
+    booking.status ||
+    "Not specified"
+  ).trim();
+
   const isPending = status.toLowerCase() === "pending";
+
   const deadlinePassed =
     !booking.response_deadline ||
     new Date(booking.response_deadline).getTime() <= Date.now();
@@ -197,7 +252,11 @@ export default function BookingDetail() {
           >
             HOST MANAGEMENT
           </p>
-          <h1 style={{ fontSize: 32, marginBottom: 8 }}>Booking details</h1>
+
+          <h1 style={{ fontSize: 32, marginBottom: 8 }}>
+            Booking details
+          </h1>
+
           <p style={{ color: "#64748b", overflowWrap: "anywhere" }}>
             Reference: {booking.id}
           </p>
@@ -245,6 +304,7 @@ export default function BookingDetail() {
           <p style={{ color: "#64748b", fontSize: 12, fontWeight: 700 }}>
             PROPERTY
           </p>
+
           <h2 style={{ marginTop: 0 }}>
             {property?.title || "Your holiday property"}
           </h2>
@@ -256,11 +316,24 @@ export default function BookingDetail() {
               gap: 16,
             }}
           >
-            <div style={{ background: "#f8fafc", padding: 16, borderRadius: 10 }}>
+            <div
+              style={{
+                background: "#f8fafc",
+                padding: 16,
+                borderRadius: 10,
+              }}
+            >
               <p style={{ color: "#64748b", fontSize: 12 }}>CHECK-IN</p>
               <strong>{formatDate(booking.check_in)}</strong>
             </div>
-            <div style={{ background: "#f8fafc", padding: 16, borderRadius: 10 }}>
+
+            <div
+              style={{
+                background: "#f8fafc",
+                padding: 16,
+                borderRadius: 10,
+              }}
+            >
               <p style={{ color: "#64748b", fontSize: 12 }}>CHECK-OUT</p>
               <strong>{formatDate(booking.check_out)}</strong>
             </div>
@@ -268,6 +341,7 @@ export default function BookingDetail() {
 
           <p style={{ marginTop: 22 }}>
             <strong>Current status: </strong>
+
             <span
               style={{
                 display: "inline-block",
@@ -310,8 +384,10 @@ export default function BookingDetail() {
             }}
           >
             <h2 style={{ marginTop: 0 }}>Your decision</h2>
+
             <p style={{ color: "#64748b" }}>
               Review the requested dates before making your decision.
+              Accepting a request does not take payment from the guest.
             </p>
 
             <div
@@ -325,7 +401,7 @@ export default function BookingDetail() {
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => updateStatus("confirmed")}
+                onClick={() => void updateStatus("confirmed")}
                 style={{
                   background: "#166534",
                   color: "#fff",
@@ -343,7 +419,7 @@ export default function BookingDetail() {
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => updateStatus("declined")}
+                onClick={() => void updateStatus("declined")}
                 style={{
                   background: "#991b1b",
                   color: "#fff",
@@ -371,3 +447,4 @@ export default function BookingDetail() {
     </main>
   );
 }
+```
