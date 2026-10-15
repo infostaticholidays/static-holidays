@@ -698,83 +698,175 @@ const bookingMode = String(
         .from("profiles")
         .select("booking_mode")
         .eq("id", property.owner_id)
-  async function createBooking() {
-    if (!property || bookingLoading) return;
+ ```tsx
+async function createBooking() {
+  if (!property || bookingLoading) return;
 
-    setBookingMessage("");
+  setBookingMessage("");
 
-    const showError = (message: string) => {
-      setBookingMessage(message);
-      setBookingMessageType("error");
-    };
+  const showError = (message: string) => {
+    setBookingMessage(message);
+    setBookingMessageType("error");
+  };
 
-    if (!startDate || !endDate) {
-      showError("Please select check-in and check-out dates.");
+  if (!startDate || !endDate) {
+    showError("Please select check-in and check-out dates.");
+    return;
+  }
+
+  const nights = countNights(startDate, endDate);
+
+  if (startDate < today() || nights <= 0) {
+    showError(
+      "Please choose valid dates. Check-out must be after check-in."
+    );
+    return;
+  }
+
+  if (isOwner) {
+    showError("You cannot book your own property.");
+    return;
+  }
+
+  if (calendarLoading || calendarError) {
+    showError(
+      "Availability has not been verified. Please reload the page and try again."
+    );
+    return;
+  }
+
+  if (stayPriceInfo.unavailable.length > 0) {
+    showError(
+      `These dates are unavailable: ${stayPriceInfo.unavailable
+        .map(formatDate)
+        .join(", ")}. Please choose different dates.`
+    );
+    return;
+  }
+
+  if (stayPriceInfo.unpriced.length > 0) {
+    showError(
+      "The host hasn't set a price for every night of this stay."
+    );
+    return;
+  }
+
+  if (!stayPriceInfo.valid || stayPriceInfo.total <= 0) {
+    showError("A valid price is not available for this stay.");
+    return;
+  }
+
+  setBookingLoading(true);
+
+  try {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) throw authError;
+
+    if (!user) {
+      navigate("/login");
       return;
     }
 
-    const nights = countNights(startDate, endDate);
-
-    if (startDate < today() || nights <= 0) {
-      showError(
-        "Please choose valid dates. Check-out must be after check-in."
-      );
-      return;
-    }
-
-    if (isOwner) {
+    if (user.id === property.owner_id) {
       showError("You cannot book your own property.");
       return;
     }
 
-    if (calendarLoading || calendarError) {
+    const { data: ownerProfile, error: profileError } =
+      await supabase
+        .from("profiles")
+        .select("booking_mode")
+        .eq("id", property.owner_id)
+        .maybeSingle();
+
+    if (profileError) throw profileError;
+
+    const bookingMode = ownerProfile?.booking_mode ?? "manual";
+
+    if (
+      !["manual", "request", "manual_approval", "automatic", "instant"].includes(
+        bookingMode
+      )
+    ) {
+      throw new Error("The host's booking settings are invalid.");
+    }
+
+    // Recheck existing bookings before creating a new booking.
+    const { data: existingBookings, error: availabilityError } =
+      await supabase
+        .from("bookings")
+        .select("check_in, check_out, booking_status")
+        .eq("property_id", property.id)
+        .not("booking_status", "in", '("cancelled","canceled","rejected","declined","expired")')
+        .lt("check_in", endDate)
+        .gt("check_out", startDate);
+
+    if (availabilityError) throw availabilityError;
+
+    if (existingBookings && existingBookings.length > 0) {
       showError(
-        "Availability has not been verified. Please reload the page and try again."
+        "Sorry, these dates may have just been booked. Please choose different dates."
       );
       return;
     }
 
-    if (stayPriceInfo.unavailable.length > 0) {
-      showError(
-        `These dates are unavailable: ${stayPriceInfo.unavailable
-          .map(formatDate)
-          .join(", ")}. Please choose different dates.`
+    const responseDeadline = new Date(
+      Date.now() + 48 * 60 * 60 * 1000
+    ).toISOString();
+
+    const { data: booking, error: bookingError } = await supabase
+      .from("bookings")
+      .insert({
+        property_id: property.id,
+        owner_id: property.owner_id,
+        guest_id: user.id,
+        check_in: startDate,
+        check_out: endDate,
+        total_price: stayPriceInfo.total,
+        status: "pending",
+        booking_status: "pending",
+        response_deadline: responseDeadline,
+      })
+      .select("id")
+      .single();
+
+    if (bookingError) throw bookingError;
+
+    const { data: checkout, error: checkoutError } =
+      await supabase.functions.invoke("create-checkout-session", {
+        body: {
+          booking_id: booking.id,
+        },
+      });
+
+    if (checkoutError) {
+      throw checkoutError;
+    }
+
+    if (!checkout?.checkout_url) {
+      throw new Error(
+        "Checkout could not be started. Please try again."
       );
-      return;
     }
 
-    if (stayPriceInfo.unpriced.length > 0) {
-      showError(
-        "The host hasn't set a price for every night of this stay."
-      );
-      return;
-    }
+    window.location.assign(checkout.checkout_url);
+  } catch (error) {
+    console.error("Booking error:", error);
 
-    if (!stayPriceInfo.valid || stayPriceInfo.total <= 0) {
-      showError("A valid price is not available for this stay.");
-      return;
-    }
-
-    setBookingLoading(true);
-
-    try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError) throw authError;
-
-      if (!user) {
-        navigate("/login");
-        return;
-      }
-
-      if (user.id === property.owner_id) {
-        showError("You cannot book your own property.");
-        return;
-      }
-
+    showError(
+      error instanceof Error
+        ? error.message
+        : "Something went wrong while creating your booking. Please try again."
+    );
+  } finally {
+    setBookingLoading(false);
+  }
+}
+```
       // Read the host's booking preference once.
       const { data: ownerProfile, error: profileError } = await supabase
         .from("profiles")
