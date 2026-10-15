@@ -660,7 +660,6 @@ export default function PropertyDetail() {
         return;
       }
 
-```tsx
       // Read the owner's booking preference before creating the booking.
       const { data: ownerProfile, error: profileError } = await supabase
         .from("profiles")
