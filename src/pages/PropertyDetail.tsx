@@ -728,6 +728,42 @@ export default function PropertyDetail() {
         ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
         : null;
 
+    
+      // Find out whether this host uses manual or automatic booking.
+      const { data: ownerProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("booking_mode")
+        .eq("id", property.owner_id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+
+      const bookingMode = String(ownerProfile?.booking_mode ?? "")
+        .trim()
+        .toLowerCase();
+
+      const isManualBooking = [
+        "manual",
+        "request",
+        "manual_approval",
+      ].includes(bookingMode);
+
+      const isAutomaticBooking = [
+        "automatic",
+        "instant",
+      ].includes(bookingMode);
+
+      if (!isManualBooking && !isAutomaticBooking) {
+        throw new Error(
+          "The host's booking mode is missing or unrecognised. Please contact the host."
+        );
+      }
+
+      // Give manual requests 48 hours for the host to respond.
+      const responseDeadline = isManualBooking
+        ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+        : null;
+
       const { data: newBooking, error: insertError } = await supabase
         .from("bookings")
         .insert({
@@ -745,7 +781,7 @@ export default function PropertyDetail() {
         .single();
 
       if (insertError) throw insertError;
-```
+
   .insert({
     property_id: property.id,
     owner_id: property.owner_id,
