@@ -1,28 +1,22 @@
-```tsx
-import { Link } from "react-router-dom";
+mport { Link } from "react-router-dom";
 
 export default function Bookings() {
-  return (
-    <main
-      style={{
-        padding: "40px 24px",
-        maxWidth: 900,
-        margin: "0 auto",
-      }}
-    >
-      <h1>My Bookings</h1>
+return (
+<main
+style={{
+padding: "40px 24px",
+maxWidth: 900,
+margin: "0 auto",
+}}
+>
+<h1>My Bookings</h1>
 
-      <p>Your bookings will appear here.</p>
+  <p>Your bookings will appear here.</p>
 
-      <p>
-        <Link to="/">Back to Home</Link>
-      </p>
-    </main>
-  );
+  <p>
+    <Link to="/">Back to Home</Link>
+  </p>
+</main>
+
+);
 }
-```
-      </p>
-    </main>
-  );
-}
-```
