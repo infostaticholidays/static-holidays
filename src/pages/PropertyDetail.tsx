@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -47,12 +46,6 @@ type CalendarDate = {
   price: number | string | null;
 };
 
-type BookingRecord = {
-  check_in: string;
-  check_out: string;
-  booking_status: string | null;
-  status?: string | null;
-};
 
 const fallbackImage =
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
@@ -225,113 +218,14 @@ export default function PropertyDetail() {
   >("error");
 
   
-useEffect(() => {
-  let cancelled = false;
+  // Load the property and its photos.
+  useEffect(() => {
+    let cancelled = false;
 
-  async function loadCalendar() {
-    if (!propertyId) {
-      setCalendarLoading(false);
-      return;
-    }
-
-    setCalendarLoading(true);
-    setCalendarError("");
-
-    try {
-      const [
-        { data: calendarRows, error: calendarQueryError },
-        { data: bookingRows, error: bookingQueryError },
-      ] = await Promise.all([
-        supabase
-          .from("property_calendar_dates")
-          .select("calendar_date, status, price")
-          .eq("property_id", propertyId),
-
-        supabase
-          .from("bookings")
-          .select("check_in, check_out, status, booking_status")
-          .eq("property_id", propertyId),
-      ]);
-
-      if (cancelled) return;
-
-      if (calendarQueryError) throw calendarQueryError;
-      if (bookingQueryError) throw bookingQueryError;
-
-      const dates: Record<string, CalendarDate> = {};
-
-      for (const row of calendarRows ?? []) {
-        dates[row.calendar_date] = row as CalendarDate;
-      }
-
-      const occupied = new Set<string>();
-      const inactiveStatuses = [
-        "cancelled",
-        "canceled",
-        "declined",
-        "rejected",
-        "expired",
-      ];
-
-      for (const booking of bookingRows ?? []) {
-        const bookingStatus = String(booking.booking_status ?? "")
-          .trim()
-          .toLowerCase();
-
-        const generalStatus = String(booking.status ?? "")
-          .trim()
-          .toLowerCase();
-
-        // Exclude a booking only when both status fields indicate
-        // that it is inactive. This avoids overlooking records where
-        // one field has not been synchronised.
-        const inactive =
-          inactiveStatuses.includes(bookingStatus) &&
-          inactiveStatuses.includes(generalStatus);
-
-        if (inactive || !booking.check_in || !booking.check_out) {
-          continue;
-        }
-
-        for (const date of getStayDates(
-          booking.check_in.slice(0, 10),
-          booking.check_out.slice(0, 10)
-        )) {
-          occupied.add(date);
-
-          const existing = dates[date];
-
-          dates[date] = {
-            calendar_date: date,
-            status: "booked",
-            price: existing?.price ?? null,
-          };
-        }
-      }
-
-      setCalendarDates(dates);
-      setBookedDates(occupied);
-    } catch (error) {
-      console.error("Could not load property availability:", error);
-
-      if (!cancelled) {
-        setCalendarError(
-          "We couldn't load availability. Please try again shortly."
-        );
-      }
-    } finally {
-      if (!cancelled) setCalendarLoading(false);
-    }
-  }
-
-  void loadCalendar();
-
-  return () => {
-    cancelled = true;
-  };
-}, [propertyId]);
-
+    async function loadProperty() {
       if (!propertyId) {
+        setProperty(null);
+        setImages([]);
         setLoading(false);
         return;
       }
@@ -350,7 +244,7 @@ useEffect(() => {
         if (error || !data) {
           console.error("Could not load property:", error);
           setProperty(null);
-          setLoading(false);
+          setImages([]);
           return;
         }
 
@@ -376,7 +270,10 @@ useEffect(() => {
         }
       } catch (error) {
         console.error("Could not load property:", error);
-        if (!cancelled) setProperty(null);
+        if (!cancelled) {
+          setProperty(null);
+          setImages([]);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -389,11 +286,14 @@ useEffect(() => {
     };
   }, [propertyId]);
 
+  // Load host calendar dates and occupied dates without exposing booking records.
   useEffect(() => {
     let cancelled = false;
 
     async function loadCalendar() {
       if (!propertyId) {
+        setCalendarDates({});
+        setBookedDates(new Set());
         setCalendarLoading(false);
         return;
       }
@@ -401,30 +301,59 @@ useEffect(() => {
       setCalendarLoading(true);
       setCalendarError("");
 
-      const { data, error } = await supabase
-        .from("property_calendar_dates")
-        .select("calendar_date, status, price")
-        .eq("property_id", propertyId);
+      try {
+        const [
+          { data: calendarRows, error: calendarQueryError },
+          { data: bookedRows, error: bookedQueryError },
+        ] = await Promise.all([
+          supabase
+            .from("property_calendar_dates")
+            .select("calendar_date, status, price")
+            .eq("property_id", propertyId),
+          supabase.rpc("get_public_booked_dates", {
+            p_property_id: propertyId,
+          }),
+        ]);
 
-      if (cancelled) return;
+        if (cancelled) return;
+        if (calendarQueryError) throw calendarQueryError;
+        if (bookedQueryError) throw bookedQueryError;
 
-      if (error) {
-        console.error("Could not load property calendar:", error);
-        setCalendarDates({});
-        setCalendarError(
-          "We couldn't load availability. Please try again shortly."
-        );
-      } else {
         const dates: Record<string, CalendarDate> = {};
-
-        for (const row of data ?? []) {
+        for (const row of calendarRows ?? []) {
           dates[row.calendar_date] = row as CalendarDate;
         }
 
-        setCalendarDates(dates);
-      }
+        const occupied = new Set<string>();
+        for (const row of bookedRows ?? []) {
+          const date = String(row.calendar_date).slice(0, 10);
+          if (!date) continue;
 
-      setCalendarLoading(false);
+          occupied.add(date);
+          const existing = dates[date];
+          dates[date] = {
+            calendar_date: date,
+            status: "booked",
+            price: existing?.price ?? null,
+          };
+        }
+
+        if (!cancelled) {
+          setCalendarDates(dates);
+          setBookedDates(occupied);
+        }
+      } catch (error) {
+        console.error("Could not load property availability:", error);
+        if (!cancelled) {
+          setCalendarDates({});
+          setBookedDates(new Set());
+          setCalendarError(
+            "We couldn't verify availability. Please try again shortly."
+          );
+        }
+      } finally {
+        if (!cancelled) setCalendarLoading(false);
+      }
     }
 
     void loadCalendar();
@@ -434,7 +363,7 @@ useEffect(() => {
     };
   }, [propertyId]);
 
-  useEffect(() => {
+useEffect(() => {
     let cancelled = false;
 
     async function loadUserAndFavourite() {
@@ -756,50 +685,27 @@ useEffect(() => {
         return;
       }
 
-      // Check for overlapping bookings and booking requests.
-      const { data: overlaps, error: overlapError } = await supabase
-        .from("bookings")
-        .select("check_in, check_out, booking_status, status")
-        .eq("property_id", property.id)
-        .lt("check_in", endDate)
-        .gt("check_out", startDate);
+      // Check occupied nights through the public-safe RPC. Do not read
+      // other guests' booking records from the browser.
+      const { data: occupiedRows, error: occupiedError } = await supabase.rpc(
+        "get_public_booked_dates",
+        { p_property_id: property.id }
+      );
 
-      if (overlapError) {
-        console.error("Could not check overlapping bookings:", overlapError);
-        throw overlapError;
+      if (occupiedError) {
+        console.error("Could not verify occupied dates:", occupiedError);
+        throw new Error(
+          "We couldn't recheck availability. Please reload and try again."
+        );
       }
 
-      const inactiveStatuses = [
-        "cancelled",
-        "canceled",
-        "rejected",
-        "declined",
-        "expired",
-      ];
-
-      const conflict = ((overlaps ?? []) as BookingRecord[]).some(
-        (booking) => {
-          const bookingStatus = String(
-            booking.booking_status ?? booking.status ?? ""
-          )
-            .trim()
-            .toLowerCase();
-
-          const generalStatus = String(booking.status ?? "")
-            .trim()
-            .toLowerCase();
-
-          const inactive =
-            inactiveStatuses.includes(bookingStatus) ||
-            inactiveStatuses.includes(generalStatus);
-
-          return (
-            !inactive &&
-            booking.check_in < endDate &&
-            booking.check_out > startDate
-          );
-        }
+      const occupiedSet = new Set(
+        (occupiedRows ?? []).map((row: { calendar_date: string }) =>
+          String(row.calendar_date).slice(0, 10)
+        )
       );
+
+      const conflict = stayDates.some((date) => occupiedSet.has(date));
 
       if (conflict) {
         showError(
