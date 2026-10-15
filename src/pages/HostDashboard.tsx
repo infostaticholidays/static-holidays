@@ -788,6 +788,45 @@ const handleSaveBookingMode = async () => {
           </div>
         )}
 
+        <section style={{ ...styles.card, marginBottom: 20 }}>
+  <h2 style={styles.sectionTitle}>Booking preferences</h2>
+
+  <p style={styles.muted}>
+    Choose how you want to handle booking requests.
+  </p>
+
+  <label style={{ display: "block", marginBottom: 12 }}>
+    <input
+      type="radio"
+      name="bookingMode"
+      checked={bookingMode === "manual"}
+      onChange={() => setBookingMode("manual")}
+      disabled={savingBookingMode}
+    />
+    {" "}Manual approval — I approve each booking myself.
+  </label>
+
+  <label style={{ display: "block", marginBottom: 16 }}>
+    <input
+      type="radio"
+      name="bookingMode"
+      checked={bookingMode === "automatic"}
+      onChange={() => setBookingMode("automatic")}
+      disabled={savingBookingMode}
+    />
+    {" "}Automatic booking — eligible bookings are confirmed automatically.
+  </label>
+
+  <button
+    type="button"
+    style={styles.primaryButton}
+    onClick={() => void handleSaveBookingMode()}
+    disabled={savingBookingMode}
+  >
+    {savingBookingMode ? "Saving..." : "Save booking preference"}
+  </button>
+</section>
+
         {!isVerified && (
           <section
             style={{
