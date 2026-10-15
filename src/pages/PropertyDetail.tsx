@@ -698,7 +698,7 @@ export default function PropertyDetail() {
       const { data: ownerProfile, error: profileError } = await supabase
         .from("profiles")
         .select("booking_mode")
-        .eq("id", property.owne```tsx
+        .eq("id", property.owner_id)
   async function createBooking() {
     if (!property || bookingLoading) return;
 
