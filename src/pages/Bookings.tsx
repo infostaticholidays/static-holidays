@@ -115,7 +115,7 @@ export default function Bookings() {
                 <strong>Check-out:</strong> {booking.check_out}
               </p>
               <p>
-                <strong>Status:</strong> {booking.status}
+                <strong>Status:</strong> {booking.status || "Not specified"}
               </p>
               <p>
                 <Link to={`/booking/${booking.id}`}>View booking</Link>
