@@ -50,7 +50,8 @@ type CalendarDate = {
 type BookingRecord = {
   check_in: string;
   check_out: string;
-  booking_status: string;
+  booking_status: string | null;
+  status?: string | null;
 };
 
 const fallbackImage =
@@ -135,6 +136,7 @@ function countNights(checkIn: string, checkOut: string) {
 
 function getStayDates(checkIn: string, checkOut: string) {
   const dates: string[] = [];
+
   if (!checkIn || !checkOut || checkOut <= checkIn) return dates;
 
   const cursor = new Date(`${checkIn}T12:00:00Z`);
@@ -195,11 +197,9 @@ export default function PropertyDetail() {
   const [saved, setSaved] = useState(false);
   const [savingFav, setSavingFav] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
-  const [agreedToPaymentTerms, setAgreedToPaymentTerms] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
 
-  // NEW: track which month the guest is viewing.
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -493,57 +493,55 @@ export default function PropertyDetail() {
 
     setBookingMessage("");
 
-    if (!startDate || !endDate) {
-      setBookingMessage("Please select check-in and check-out dates.");
+    const showError = (message: string) => {
+      setBookingMessage(message);
       setBookingMessageType("error");
+    };
+
+    if (!startDate || !endDate) {
+      showError("Please select check-in and check-out dates.");
       return;
     }
 
     const nights = countNights(startDate, endDate);
 
     if (startDate < today() || nights <= 0) {
-      setBookingMessage(
+      showError(
         "Please choose valid dates. Check-out must be after check-in."
       );
-      setBookingMessageType("error");
       return;
     }
 
     if (isOwner) {
-      setBookingMessage("You cannot book your own property.");
-      setBookingMessageType("error");
+      showError("You cannot book your own property.");
       return;
     }
 
     if (calendarLoading || calendarError) {
-      setBookingMessage(
+      showError(
         "Availability has not been verified. Please reload the page and try again."
       );
-      setBookingMessageType("error");
       return;
     }
 
     if (stayPriceInfo.unavailable.length > 0) {
-      setBookingMessage(
+      showError(
         `These dates are unavailable: ${stayPriceInfo.unavailable
           .map(formatDate)
           .join(", ")}. Please choose different dates.`
       );
-      setBookingMessageType("error");
       return;
     }
 
     if (stayPriceInfo.unpriced.length > 0) {
-      setBookingMessage(
+      showError(
         "The host hasn't set a price for every night of this stay."
       );
-      setBookingMessageType("error");
       return;
     }
 
     if (!stayPriceInfo.valid || stayPriceInfo.total <= 0) {
-      setBookingMessage("A valid price is not available for this stay.");
-      setBookingMessageType("error");
+      showError("A valid price is not available for this stay.");
       return;
     }
 
@@ -552,7 +550,10 @@ export default function PropertyDetail() {
     try {
       const {
         data: { user },
+        error: authError,
       } = await supabase.auth.getUser();
+
+      if (authError) throw authError;
 
       if (!user) {
         navigate("/login");
@@ -560,314 +561,11 @@ export default function PropertyDetail() {
       }
 
       if (user.id === property.owner_id) {
-        setBookingMessage("You cannot book your own property.");
-        setBookingMessageType("error");
+        showError("You cannot book your own property.");
         return;
       }
 
-      const { data: freshCalendar, error: calendarCheckError } =
-        await supabase
-          .from("property_calendar_dates")
-          .select("calendar_date, status, price")
-          .eq("property_id", property.id)
-          .gte("calendar_date", startDate)
-          .lt("calendar_date", endDate);
-
-      if (calendarCheckError) throw calendarCheckError;
-
-      const freshByDate = new Map(
-        (freshCalendar ?? []).map((entry) => [
-          entry.calendar_date,
-          entry as CalendarDate,
-        ])
-      );
-
-      const nowUnavailable = stayDates.filter(
-        (date) => freshByDate.get(date)?.status !== "available"
-      );
-
-      if (nowUnavailable.length > 0) {
-        setBookingMessage(
-          `Availability has changed for ${nowUnavailable
-            .map(formatDate)
-            .join(", ")}. Please choose different dates.`
-        );
-        setBookingMessageType("error");
-        return;
-      }
-
-      let freshTotal = 0;
-
-      for (const date of stayDates) {
-        const entry = freshByDate.get(date);
-        const datePrice = getPositivePrice(entry?.price);
-        const effectivePrice = datePrice ?? basePrice;
-
-        if (effectivePrice === null) {
-          setBookingMessage(
-            `The host hasn't set a price for ${formatDate(date)}.`
-          );
-          setBookingMessageType("error");
-          return;
-        }
-
-        freshTotal += effectivePrice;
-      }
-
-           const { data: overlaps, error: overlapError } = await supabase
-        .from("bookings")
-        .select("check_in, check_out, booking_status")
-        .eq("property_id", property.id)
-        .lt("check_in", endDate)
-        .gt("check_out", startDate);
-
-      if (overlapError) {
-        console.error("Could not check overlapping bookings:", overlapError);
-        throw overlapError;
-      }
-     console.log("Booking overlap check:", {
-  propertyId: property.id,
-  requestedCheckIn: startDate,
-  requestedCheckOut: endDate,
-  existingBookings: overlaps,
-});
-      const conflict = ((overlaps ?? []) as BookingRecord[]).some(
-        (booking) => {
-          const status = String(booking.booking_status ?? "")
-            .trim()
-            .toLowerCase();
-
-          return (
-            status !== "cancelled" &&
-            status !== "rejected" &&
-            booking.check_in < endDate &&
-            booking.check_out > startDate
-          );
-        }
-      );
-
-      if (conflict) {
-        console.error("Booking date conflict detected:", {
-          requestedCheckIn: startDate,
-          requestedCheckOut: endDate,
-          existingBookings: overlaps,
-        });
-
-        setBookingMessage(
-          "These dates overlap an existing booking request. Please select different dates."
-        );
-        setBookingMessageType("error");
-        return;
-      }
-
-          // Check the property owner's booking preference.
-    const { data: ownerProfile, error: profileError } = await supabase
-      .from("profiles")
-      .select("booking_mode")
-      .eq("id", property.owner_id)
-      .maybeSingle();
-
-    if (profileError) throw profileError;
-const bookingMode = String(
-  ownerProfile?.booking_mode ?? "manual"
-).toLowerCase();
-      
-
-      const isManualBooking =
-        bookingMode === "manual" ||
-        bookingMode === "request" ||
-        bookingMode === "manual_approval";
-
-      const isAutomaticBooking =
-        bookingMode === "automatic" ||
-        bookingMode === "instant";
-
-      if (!isManualBooking && !isAutomaticBooking) {
-        throw new Error(
-          "The host's booking mode is missing or unrecognised. Please contact the host before continuing."
-        );
-      }
-
-      // Manual requests must have a response deadline.
-      const responseDeadline = isManualBooking
-        ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
-        : null;
-
-      // Check the property owner's booking preference.
-      const { data: ownerProfile, error: profileError } = await supabase
-        .from("profiles")
-        .select("booking_mode")
-        .eq("id", property.owner_id)
- ```tsx
-async function createBooking() {
-  if (!property || bookingLoading) return;
-
-  setBookingMessage("");
-
-  const showError = (message: string) => {
-    setBookingMessage(message);
-    setBookingMessageType("error");
-  };
-
-  if (!startDate || !endDate) {
-    showError("Please select check-in and check-out dates.");
-    return;
-  }
-
-  const nights = countNights(startDate, endDate);
-
-  if (startDate < today() || nights <= 0) {
-    showError(
-      "Please choose valid dates. Check-out must be after check-in."
-    );
-    return;
-  }
-
-  if (isOwner) {
-    showError("You cannot book your own property.");
-    return;
-  }
-
-  if (calendarLoading || calendarError) {
-    showError(
-      "Availability has not been verified. Please reload the page and try again."
-    );
-    return;
-  }
-
-  if (stayPriceInfo.unavailable.length > 0) {
-    showError(
-      `These dates are unavailable: ${stayPriceInfo.unavailable
-        .map(formatDate)
-        .join(", ")}. Please choose different dates.`
-    );
-    return;
-  }
-
-  if (stayPriceInfo.unpriced.length > 0) {
-    showError(
-      "The host hasn't set a price for every night of this stay."
-    );
-    return;
-  }
-
-  if (!stayPriceInfo.valid || stayPriceInfo.total <= 0) {
-    showError("A valid price is not available for this stay.");
-    return;
-  }
-
-  setBookingLoading(true);
-
-  try {
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError) throw authError;
-
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
-    if (user.id === property.owner_id) {
-      showError("You cannot book your own property.");
-      return;
-    }
-
-    const { data: ownerProfile, error: profileError } =
-      await supabase
-        .from("profiles")
-        .select("booking_mode")
-        .eq("id", property.owner_id)
-        .maybeSingle();
-
-    if (profileError) throw profileError;
-
-    const bookingMode = ownerProfile?.booking_mode ?? "manual";
-
-    if (
-      !["manual", "request", "manual_approval", "automatic", "instant"].includes(
-        bookingMode
-      )
-    ) {
-      throw new Error("The host's booking settings are invalid.");
-    }
-
-    // Recheck existing bookings before creating a new booking.
-    const { data: existingBookings, error: availabilityError } =
-      await supabase
-        .from("bookings")
-        .select("check_in, check_out, booking_status")
-        .eq("property_id", property.id)
-        .not("booking_status", "in", '("cancelled","canceled","rejected","declined","expired")')
-        .lt("check_in", endDate)
-        .gt("check_out", startDate);
-
-    if (availabilityError) throw availabilityError;
-
-    if (existingBookings && existingBookings.length > 0) {
-      showError(
-        "Sorry, these dates may have just been booked. Please choose different dates."
-      );
-      return;
-    }
-
-    const responseDeadline = new Date(
-      Date.now() + 48 * 60 * 60 * 1000
-    ).toISOString();
-
-    const { data: booking, error: bookingError } = await supabase
-      .from("bookings")
-      .insert({
-        property_id: property.id,
-        owner_id: property.owner_id,
-        guest_id: user.id,
-        check_in: startDate,
-        check_out: endDate,
-        total_price: stayPriceInfo.total,
-        status: "pending",
-        booking_status: "pending",
-        response_deadline: responseDeadline,
-      })
-      .select("id")
-      .single();
-
-    if (bookingError) throw bookingError;
-
-    const { data: checkout, error: checkoutError } =
-      await supabase.functions.invoke("create-checkout-session", {
-        body: {
-          booking_id: booking.id,
-        },
-      });
-
-    if (checkoutError) {
-      throw checkoutError;
-    }
-
-    if (!checkout?.checkout_url) {
-      throw new Error(
-        "Checkout could not be started. Please try again."
-      );
-    }
-
-    window.location.assign(checkout.checkout_url);
-  } catch (error) {
-    console.error("Booking error:", error);
-
-    showError(
-      error instanceof Error
-        ? error.message
-        : "Something went wrong while creating your booking. Please try again."
-    );
-  } finally {
-    setBookingLoading(false);
-  }
-}
-```
-      // Read the host's booking preference once.
+      // Read the owner's booking preference once.
       const { data: ownerProfile, error: profileError } = await supabase
         .from("profiles")
         .select("booking_mode")
@@ -892,12 +590,7 @@ async function createBooking() {
       ].includes(bookingMode);
 
       if (!isManualBooking && !isAutomaticBooking) {
-  throw new Error(`Unsupported booking mode: ${bookingMode}`);
-}
-
-const responseDeadline = isManualBooking
-  ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
-  : null;
+        throw new Error(
           "The host's booking mode is missing or unrecognised. Please contact the host."
         );
       }
@@ -933,7 +626,7 @@ const responseDeadline = isManualBooking
         return;
       }
 
-      // Recalculate the total using the latest saved calendar prices.
+      // Recalculate the total from the latest calendar prices.
       let freshTotal = 0;
 
       for (const date of stayDates) {
@@ -956,7 +649,7 @@ const responseDeadline = isManualBooking
         return;
       }
 
-      // Prevent overlapping requests and active bookings.
+      // Check for overlapping bookings and booking requests.
       const { data: overlaps, error: overlapError } = await supabase
         .from("bookings")
         .select("check_in, check_out, booking_status, status")
@@ -977,27 +670,29 @@ const responseDeadline = isManualBooking
         "expired",
       ];
 
-      const conflict = (overlaps ?? []).some((booking) => {
-        const bookingStatus = String(
-          booking.booking_status ?? booking.status ?? ""
-        )
-          .trim()
-          .toLowerCase();
+      const conflict = ((overlaps ?? []) as BookingRecord[]).some(
+        (booking) => {
+          const bookingStatus = String(
+            booking.booking_status ?? booking.status ?? ""
+          )
+            .trim()
+            .toLowerCase();
 
-        const generalStatus = String(booking.status ?? "")
-          .trim()
-          .toLowerCase();
+          const generalStatus = String(booking.status ?? "")
+            .trim()
+            .toLowerCase();
 
-        const isInactive =
-          inactiveStatuses.includes(bookingStatus) ||
-          inactiveStatuses.includes(generalStatus);
+          const inactive =
+            inactiveStatuses.includes(bookingStatus) ||
+            inactiveStatuses.includes(generalStatus);
 
-        return (
-          !isInactive &&
-          booking.check_in < endDate &&
-          booking.check_out > startDate
-        );
-      });
+          return (
+            !inactive &&
+            booking.check_in < endDate &&
+            booking.check_out > startDate
+          );
+        }
+      );
 
       if (conflict) {
         showError(
@@ -1011,7 +706,7 @@ const responseDeadline = isManualBooking
         ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
         : null;
 
-      // Create one booking record, regardless of booking mode.
+      // Create one booking record.
       const { data: newBooking, error: insertError } = await supabase
         .from("bookings")
         .insert({
@@ -1046,7 +741,6 @@ const responseDeadline = isManualBooking
 
       if (checkoutError) {
         console.error("Could not start Stripe Checkout:", checkoutError);
-
         throw new Error(
           "Your booking request was created, but checkout could not start. Please contact support before trying again."
         );
@@ -1058,23 +752,20 @@ const responseDeadline = isManualBooking
         );
       }
 
-      // The Stripe function must implement the appropriate payment flow
-      // for manual versus automatic bookings on the server.
       window.location.assign(checkout.checkout_url);
     } catch (error) {
       console.error("Could not create booking:", error);
 
-      setBookingMessage(
+      showError(
         error instanceof Error
           ? error.message
           : "Could not create your booking. Please try again."
       );
-      setBookingMessageType("error");
     } finally {
       setBookingLoading(false);
     }
   }
-```
+
   function scrollToCalendar() {
     document.getElementById("availability-calendar")?.scrollIntoView({
       behavior: "smooth",
@@ -1234,7 +925,8 @@ const responseDeadline = isManualBooking
           aria-label="Property photos"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
             gap: 12,
             marginBottom: 26,
           }}
@@ -1325,7 +1017,7 @@ const responseDeadline = isManualBooking
         <div
           style={{
             display: "grid",
-         gridTemplateColumns: "minmax(0, 1fr)",
+            gridTemplateColumns: "minmax(0, 1fr)",
             alignItems: "start",
             gap: 22,
           }}
@@ -1648,16 +1340,40 @@ const responseDeadline = isManualBooking
                   marginBottom: 17,
                 }}
               >
-                <span style={{ background: "#dcfce7", padding: "5px 8px", borderRadius: 6 }}>
+                <span
+                  style={{
+                    background: "#dcfce7",
+                    padding: "5px 8px",
+                    borderRadius: 6,
+                  }}
+                >
                   Available
                 </span>
-                <span style={{ background: "#fee2e2", padding: "5px 8px", borderRadius: 6 }}>
+                <span
+                  style={{
+                    background: "#fee2e2",
+                    padding: "5px 8px",
+                    borderRadius: 6,
+                  }}
+                >
                   Blocked
                 </span>
-                <span style={{ background: "#ffedd5", padding: "5px 8px", borderRadius: 6 }}>
+                <span
+                  style={{
+                    background: "#ffedd5",
+                    padding: "5px 8px",
+                    borderRadius: 6,
+                  }}
+                >
                   Booked
                 </span>
-                <span style={{ background: "#f3f4f6", padding: "5px 8px", borderRadius: 6 }}>
+                <span
+                  style={{
+                    background: "#f3f4f6",
+                    padding: "5px 8px",
+                    borderRadius: 6,
+                  }}
+                >
                   Not set
                 </span>
               </div>
@@ -1693,7 +1409,6 @@ const responseDeadline = isManualBooking
                     marginBottom: 20,
                   }}
                 >
-                  {/* NEW: month navigation */}
                   <div
                     style={{
                       gridColumn: "1 / -1",
@@ -1779,7 +1494,6 @@ const responseDeadline = isManualBooking
                   ))}
 
                   {(() => {
-                    // Use the month selected by the guest.
                     const start = new Date(calendarMonth);
                     start.setDate(1);
                     start.setHours(12, 0, 0, 0);
@@ -1839,7 +1553,6 @@ const responseDeadline = isManualBooking
                             ? "#9a3412"
                             : "#203128";
 
-                  
                       const datePrice =
                         getPositivePrice(entry?.price) ?? basePrice;
 
@@ -1896,7 +1609,7 @@ const responseDeadline = isManualBooking
                           {datePrice !== null && (
                             <span
                               style={{
-                             fontSize: 11,
+                                fontSize: 11,
                                 lineHeight: 1.2,
                                 fontWeight: 700,
                                 whiteSpace: "nowrap",
@@ -1908,7 +1621,6 @@ const responseDeadline = isManualBooking
                           )}
                         </button>
                       );
-
                     }
 
                     return cells;
@@ -2039,7 +1751,9 @@ const responseDeadline = isManualBooking
                   >
                     <span>
                       {countNights(startDate, endDate)}{" "}
-                      {countNights(startDate, endDate) === 1 ? "night" : "nights"}
+                      {countNights(startDate, endDate) === 1
+                        ? "night"
+                        : "nights"}
                     </span>
                     <span>
                       {stayPriceInfo.valid
