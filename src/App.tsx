@@ -177,8 +177,17 @@ export default function App() {
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetail />} />
 
-          <Route path="/bookings" element={<Bookings />} />
-          <Route path="/booking/:id" element={<BookingDetail />} />
+          <Route
+  path="/bookings"
+  element={
+    <div style={{ padding: "40px" }}>
+      <h1>Bookings route is working</h1>
+      <p>If you can see this, the route is loading correctly.</p>
+      <Link to="/">Back to Home</Link>
+    </div>
+  }
+/>
+<Route path="/booking/:id" element={<BookingDetail />} />
 
           <Route path="/businesses" element={<Businesses />} />
           <Route path="/services" element={<Services />} />
