@@ -281,7 +281,10 @@ function PropertyCard({ property }: { property: Property }) {
   const price = getPropertyPrice(property);
 
   return (
-    <a className="sh-property-card" href={`/property/${property.id}`}>
+   <a
+  className="sh-property-card"
+  href={"/property/" + property.id}
+>
       <div className="sh-property-image">
         {image ? (
           <img
