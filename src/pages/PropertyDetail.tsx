@@ -614,30 +614,46 @@ export default function PropertyDetail() {
         freshTotal += effectivePrice;
       }
 
-      const { data: overlaps, error: overlapError } = await supabase
+           const { data: overlaps, error: overlapError } = await supabase
         .from("bookings")
         .select("check_in, check_out, booking_status")
         .eq("property_id", property.id)
         .lt("check_in", endDate)
         .gt("check_out", startDate);
 
-      if (overlapError) throw overlapError;
+      if (overlapError) {
+        console.error("Could not check overlapping bookings:", overlapError);
+        throw overlapError;
+      }
 
       const conflict = ((overlaps ?? []) as BookingRecord[]).some(
-        (booking) =>
-          !["cancelled", "rejected"].includes(
-            String(booking.booking_status).toLowerCase()
-          )
+        (booking) => {
+          const status = String(booking.booking_status ?? "")
+            .trim()
+            .toLowerCase();
+
+          return (
+            status !== "cancelled" &&
+            status !== "rejected" &&
+            booking.check_in < endDate &&
+            booking.check_out > startDate
+          );
+        }
       );
 
       if (conflict) {
+        console.error("Booking date conflict detected:", {
+          requestedCheckIn: startDate,
+          requestedCheckOut: endDate,
+          existingBookings: overlaps,
+        });
+
         setBookingMessage(
           "These dates overlap an existing booking request. Please select different dates."
         );
         setBookingMessageType("error");
         return;
       }
-
 
 const { data: newBooking, error: insertError } = await supabase
   .from("bookings")
