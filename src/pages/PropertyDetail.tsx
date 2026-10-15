@@ -188,6 +188,7 @@ export default function PropertyDetail() {
   const [calendarDates, setCalendarDates] = useState<
     Record<string, CalendarDate>
   >({});
+  
   const [bookedDates, setBookedDates] = useState<Set<string>>(
   () => new Set()
 );
@@ -223,10 +224,113 @@ export default function PropertyDetail() {
     "success" | "error"
   >("error");
 
-  useEffect(() => {
-    let cancelled = false;
+  
+useEffect(() => {
+  let cancelled = false;
 
-    async function loadProperty() {
+  async function loadCalendar() {
+    if (!propertyId) {
+      setCalendarLoading(false);
+      return;
+    }
+
+    setCalendarLoading(true);
+    setCalendarError("");
+
+    try {
+      const [
+        { data: calendarRows, error: calendarQueryError },
+        { data: bookingRows, error: bookingQueryError },
+      ] = await Promise.all([
+        supabase
+          .from("property_calendar_dates")
+          .select("calendar_date, status, price")
+          .eq("property_id", propertyId),
+
+        supabase
+          .from("bookings")
+          .select("check_in, check_out, status, booking_status")
+          .eq("property_id", propertyId),
+      ]);
+
+      if (cancelled) return;
+
+      if (calendarQueryError) throw calendarQueryError;
+      if (bookingQueryError) throw bookingQueryError;
+
+      const dates: Record<string, CalendarDate> = {};
+
+      for (const row of calendarRows ?? []) {
+        dates[row.calendar_date] = row as CalendarDate;
+      }
+
+      const occupied = new Set<string>();
+      const inactiveStatuses = [
+        "cancelled",
+        "canceled",
+        "declined",
+        "rejected",
+        "expired",
+      ];
+
+      for (const booking of bookingRows ?? []) {
+        const bookingStatus = String(booking.booking_status ?? "")
+          .trim()
+          .toLowerCase();
+
+        const generalStatus = String(booking.status ?? "")
+          .trim()
+          .toLowerCase();
+
+        // Exclude a booking only when both status fields indicate
+        // that it is inactive. This avoids overlooking records where
+        // one field has not been synchronised.
+        const inactive =
+          inactiveStatuses.includes(bookingStatus) &&
+          inactiveStatuses.includes(generalStatus);
+
+        if (inactive || !booking.check_in || !booking.check_out) {
+          continue;
+        }
+
+        for (const date of getStayDates(
+          booking.check_in.slice(0, 10),
+          booking.check_out.slice(0, 10)
+        )) {
+          occupied.add(date);
+
+          const existing = dates[date];
+
+          dates[date] = {
+            calendar_date: date,
+            status: "booked",
+            price: existing?.price ?? null,
+          };
+        }
+      }
+
+      setCalendarDates(dates);
+      setBookedDates(occupied);
+    } catch (error) {
+      console.error("Could not load property availability:", error);
+
+      if (!cancelled) {
+        setCalendarError(
+          "We couldn't load availability. Please try again shortly."
+        );
+      }
+    } finally {
+      if (!cancelled) setCalendarLoading(false);
+    }
+  }
+
+  void loadCalendar();
+
+  return () => {
+    cancelled = true;
+  };
+}, [propertyId]);
+
       if (!propertyId) {
         setLoading(false);
         return;
