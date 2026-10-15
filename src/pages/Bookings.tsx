@@ -42,7 +42,7 @@ export default function Bookings() {
       const { data: ownedProperties, error: propertiesError } =
         await supabase
           .from("properties")
-          .select("id, title, name")
+          .select("*")
           .eq("owner_id", user.id);
 
       if (propertiesError) {
