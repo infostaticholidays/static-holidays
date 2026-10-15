@@ -660,8 +660,58 @@ export default function PropertyDetail() {
         return;
       }
 
-const { data: newBooking, error: insertError } = await supabase
-  .from("bookings")
+```tsx
+      // Read the owner's booking preference before creating the booking.
+      const { data: ownerProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("booking_mode")
+        .eq("id", property.owner_id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+
+      const bookingMode = String(ownerProfile?.booking_mode ?? "")
+        .trim()
+        .toLowerCase();
+
+      const isManualBooking =
+        bookingMode === "manual" ||
+        bookingMode === "request" ||
+        bookingMode === "manual_approval";
+
+      const isAutomaticBooking =
+        bookingMode === "automatic" ||
+        bookingMode === "instant";
+
+      if (!isManualBooking && !isAutomaticBooking) {
+        throw new Error(
+          "The host's booking mode is missing or unrecognised. Please contact the host before continuing."
+        );
+      }
+
+      // Manual requests must have a response deadline.
+      const responseDeadline = isManualBooking
+        ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+        : null;
+
+      const { data: newBooking, error: insertError } = await supabase
+        .from("bookings")
+        .insert({
+          property_id: property.id,
+          owner_id: property.owner_id,
+          guest_id: user.id,
+          check_in: startDate,
+          check_out: endDate,
+          total_price: Number(freshTotal.toFixed(2)),
+          status: "pending",
+          booking_status: "pending",
+          response_deadline: responseDeadline,
+        })
+        .select("id")
+        .single();
+
+      if (insertError) throw insertError;
+```
   .insert({
     property_id: property.id,
     owner_id: property.owner_id,
