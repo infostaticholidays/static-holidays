@@ -115,27 +115,22 @@ export default function BookingDetail() {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      setError("Please sign in as the property owner to manage this booking.");
+      setError("Please sign in as the property owner.");
       return;
     }
 
     if (property.owner_id !== user.id) {
-      setError("Only the owner of this property can manage this booking.");
+      setError("Only the property owner can manage this booking.");
       return;
     }
 
-    const currentStatus = (
-      booking.booking_status || booking.status || ""
-    ).trim().toLowerCase();
-
     if (
-      currentStatus !== "pending" ||
-      (booking.status &&
-        booking.status.toLowerCase() !== "pending") ||
-      (booking.booking_status &&
-        booking.booking_status.toLowerCase() !== "pending")
+      booking.status !== "pending" ||
+      booking.booking_status !== "pending"
     ) {
-      setError("This booking is no longer pending and cannot be changed here.");
+      setError(
+        "Both booking status fields must be pending before this request can be changed. Refresh the page or check the booking record."
+      );
       return;
     }
 
@@ -144,7 +139,7 @@ export default function BookingDetail() {
       new Date(booking.response_deadline).getTime() <= Date.now()
     ) {
       setError(
-        "The 48-hour response deadline has passed. This request can no longer be accepted or declined here."
+        "The 48-hour response deadline has passed. This request can no longer be changed here."
       );
       return;
     }
@@ -152,24 +147,16 @@ export default function BookingDetail() {
     setSaving(true);
 
     try {
-      let query = supabase
+      const { data, error: updateError } = await supabase
         .from("bookings")
         .update({
           status: nextStatus,
           booking_status: nextStatus,
         })
         .eq("id", booking.id)
-        .eq("owner_id", user.id);
-
-      if (booking.status === "pending") {
-        query = query.eq("status", "pending");
-      }
-
-      if (booking.booking_status === "pending") {
-        query = query.eq("booking_status", "pending");
-      }
-
-      const { data, error: updateError } = await query
+        .eq("owner_id", user.id)
+        .eq("status", "pending")
+        .eq("booking_status", "pending")
         .select("*")
         .maybeSingle();
 
@@ -180,7 +167,7 @@ export default function BookingDetail() {
 
       if (!data) {
         setError(
-          "The booking may have changed or your account does not have permission to update it. Refresh the page and try again."
+          "The booking could not be updated. It may have changed, or you may not have permission. Refresh and try again."
         );
         await loadBooking();
         return;
@@ -188,11 +175,15 @@ export default function BookingDetail() {
 
       setBooking(data as Booking);
 
-      setMessage(
-        nextStatus === "confirmed"
-          ? "Booking accepted. The guest payment step still needs to be connected before the guest can pay."
-          : "Booking declined. No payment has been initiated by this action."
-      );
+      if (nextStatus === "confirmed") {
+        setMessage(
+          "Booking accepted. Stripe payment authorisation and capture still need to be connected."
+        );
+      } else {
+        setMessage(
+          "Booking declined. The Stripe authorisation cancellation flow still needs to be connected."
+        );
+      }
     } catch {
       setError("Something went wrong while updating the booking.");
     } finally {
@@ -201,9 +192,251 @@ export default function BookingDetail() {
   }
 
   if (loading) {
-    return <main style={{ padding: 40 }}>Loading booking details…</main>;
+    return <main style={{ padding: 40 }}>Loading booking details...</main>;
   }
 
   if (!booking) {
     return (
-      <main style={{
+      <main style={{ padding: 40 }}>
+        <h1>Booking not found</h1>
+        <p>{error}</p>
+        <Link to="/host-bookings">Back to bookings</Link>
+      </main>
+    );
+  }
+
+  const status = (
+    booking.booking_status ||
+    booking.status ||
+    "Not specified"
+  ).trim();
+
+  const isPending = status.toLowerCase() === "pending";
+
+  const deadlinePassed =
+    !booking.response_deadline ||
+    new Date(booking.response_deadline).getTime() <= Date.now();
+
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#f5f7fa",
+        padding: "40px 20px 60px",
+        color: "#172033",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div style={{ maxWidth: 850, margin: "0 auto" }}>
+        <Link
+          to="/host-bookings"
+          style={{ color: "#52647a", textDecoration: "none" }}
+        >
+          Back to bookings
+        </Link>
+
+        <header style={{ margin: "28px 0" }}>
+          <p
+            style={{
+              color: "#64748b",
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: 2,
+            }}
+          >
+            HOST MANAGEMENT
+          </p>
+
+          <h1 style={{ fontSize: 32, marginBottom: 8 }}>
+            Booking details
+          </h1>
+
+          <p style={{ color: "#64748b", overflowWrap: "anywhere" }}>
+            Reference: {booking.id}
+          </p>
+        </header>
+
+        {error && (
+          <div
+            role="alert"
+            style={{
+              background: "#fee2e2",
+              color: "#991b1b",
+              padding: 16,
+              borderRadius: 10,
+              marginBottom: 18,
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {message && (
+          <div
+            role="status"
+            style={{
+              background: "#dcfce7",
+              color: "#166534",
+              padding: 16,
+              borderRadius: 10,
+              marginBottom: 18,
+            }}
+          >
+            {message}
+          </div>
+        )}
+
+        <section
+          style={{
+            background: "#fff",
+            border: "1px solid #e7ebf0",
+            borderRadius: 16,
+            padding: 24,
+            marginBottom: 20,
+          }}
+        >
+          <p style={{ color: "#64748b", fontSize: 12, fontWeight: 700 }}>
+            PROPERTY
+          </p>
+
+          <h2 style={{ marginTop: 0 }}>
+            {property?.title || "Your holiday property"}
+          </h2>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                background: "#f8fafc",
+                padding: 16,
+                borderRadius: 10,
+              }}
+            >
+              <p style={{ color: "#64748b", fontSize: 12 }}>CHECK-IN</p>
+              <strong>{formatDate(booking.check_in)}</strong>
+            </div>
+
+            <div
+              style={{
+                background: "#f8fafc",
+                padding: 16,
+                borderRadius: 10,
+              }}
+            >
+              <p style={{ color: "#64748b", fontSize: 12 }}>CHECK-OUT</p>
+              <strong>{formatDate(booking.check_out)}</strong>
+            </div>
+          </div>
+
+          <p style={{ marginTop: 22 }}>
+            <strong>Current status: </strong>
+            <span
+              style={{
+                display: "inline-block",
+                background: isPending ? "#fef3c7" : "#e5e7eb",
+                color: isPending ? "#92400e" : "#374151",
+                borderRadius: 20,
+                padding: "6px 12px",
+                fontWeight: 700,
+              }}
+            >
+              {status}
+            </span>
+          </p>
+
+          {isPending && (
+            <div
+              style={{
+                background: "#fffbeb",
+                border: "1px solid #fde68a",
+                borderRadius: 12,
+                padding: 16,
+                marginTop: 20,
+              }}
+            >
+              <strong>Owner response deadline</strong>
+              <p style={{ marginBottom: 0 }}>
+                {getTimeRemaining(booking.response_deadline)}
+              </p>
+            </div>
+          )}
+        </section>
+
+        {property && isPending && !deadlinePassed && (
+          <section
+            style={{
+              background: "#fff",
+              border: "1px solid #e7ebf0",
+              borderRadius: 16,
+              padding: 24,
+            }}
+          >
+            <h2 style={{ marginTop: 0 }}>Your decision</h2>
+
+            <p style={{ color: "#64748b" }}>
+              Review the requested dates before making your decision.
+              Accepting does not yet capture a payment.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 12,
+                marginTop: 20,
+              }}
+            >
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => void updateStatus("confirmed")}
+                style={{
+                  background: "#166534",
+                  color: "#fff",
+                  border: 0,
+                  borderRadius: 9,
+                  padding: "13px 20px",
+                  fontWeight: 700,
+                  cursor: saving ? "wait" : "pointer",
+                  opacity: saving ? 0.6 : 1,
+                }}
+              >
+                {saving ? "Saving..." : "Accept booking"}
+              </button>
+
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => void updateStatus("declined")}
+                style={{
+                  background: "#991b1b",
+                  color: "#fff",
+                  border: 0,
+                  borderRadius: 9,
+                  padding: "13px 20px",
+                  fontWeight: 700,
+                  cursor: saving ? "wait" : "pointer",
+                  opacity: saving ? 0.6 : 1,
+                }}
+              >
+                {saving ? "Saving..." : "Decline booking"}
+              </button>
+            </div>
+          </section>
+        )}
+
+        {isPending && deadlinePassed && (
+          <p>
+            The response deadline has passed. Automatic expiry still needs
+            to be configured.
+          </p>
+        )}
+      </div>
+    </main>
+  );
+}
