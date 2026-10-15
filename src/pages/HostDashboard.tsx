@@ -233,6 +233,11 @@ export default function HostDashboard() {
 
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  setBookingMode(
+  profileData.booking_mode === "automatic" ? "automatic" : "manual"
+);
+  const [bookingMode, setBookingMode] = useState<"manual" | "automatic">("manual");
+const [savingBookingMode, setSavingBookingMode] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [conversations, setConversations] = useState<any[]>([]);
