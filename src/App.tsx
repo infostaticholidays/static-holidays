@@ -198,10 +198,18 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
 
-          <Route
-            path="/host-dashboard"
-            element={<HostDashboard />}
-          />
+      <Route
+  path="/host-dashboard"
+  element={<HostDashboard />}
+/>
+<Route
+  path="/host-bookings"
+  element={<Bookings />}
+/>
+<Route
+  path="/host-compliance"
+  element={<HostCompliance />}
+/>
           <Route
             path="/host-compliance"
             element={<HostCompliance />}
