@@ -660,18 +660,18 @@ export default function PropertyDetail() {
         return;
       }
 
-      // Read the owner's booking preference before creating the booking.
-      const { data: ownerProfile, error: profileError } = await supabase
-        .from("profiles")
-        .select("booking_mode")
-        .eq("id", property.owner_id)
-        .maybeSingle();
+          // Check the property owner's booking preference.
+    const { data: ownerProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("booking_mode")
+      .eq("id", property.owner_id)
+      .maybeSingle();
 
-      if (profileError) throw profileError;
-
-      const bookingMode = String(ownerProfile?.booking_mode ?? "")
-        .trim()
-        .toLowerCase();
+    if (profileError) throw profileError;
+const bookingMode = String(
+  ownerProfile?.booking_mode ?? "manual"
+).toLowerCase();
+      
 
       const isManualBooking =
         bookingMode === "manual" ||
