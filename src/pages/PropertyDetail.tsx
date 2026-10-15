@@ -800,7 +800,12 @@ const bookingMode = String(
       ].includes(bookingMode);
 
       if (!isManualBooking && !isAutomaticBooking) {
-        throw new Error(
+  throw new Error(`Unsupported booking mode: ${bookingMode}`);
+}
+
+const responseDeadline = isManualBooking
+  ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+  : null;
           "The host's booking mode is missing or unrecognised. Please contact the host."
         );
       }
