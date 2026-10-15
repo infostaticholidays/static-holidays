@@ -424,7 +424,37 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
 
   const estimatedCommission = grossEarnings * commissionRate;
   const estimatedNet = grossEarnings - estimatedCommission;
+const handleSaveBookingMode = async () => {
+  if (!user?.id) {
+    setPageError("Please sign in again.");
+    return;
+  }
 
+  setSavingBookingMode(true);
+  setPageError("");
+  setNotice("");
+
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        booking_mode: bookingMode,
+      })
+      .eq("id", user.id);
+
+    if (error) throw error;
+
+    setNotice("Booking preference saved successfully.");
+  } catch (error) {
+    console.error(error);
+    setPageError("Could not save booking preference.");
+  } finally {
+    setSavingBookingMode(false);
+  }
+};
+  
+  
+  
   const handlePlanUpgrade = async (planId: PlanId) => {
     if (planId === "host") {
       setNotice("Host Free is the free plan.");
