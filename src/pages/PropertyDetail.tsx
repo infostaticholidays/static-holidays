@@ -625,7 +625,8 @@ export default function PropertyDetail() {
         console.error("Could not check overlapping bookings:", overlapError);
         throw overlapError;
       }
-
+     console.log("Requested dates:", { startDate, endDate, propertyId: property.id });
+console.log("Bookings returned by overlap check:", overlaps);
       const conflict = ((overlaps ?? []) as BookingRecord[]).some(
         (booking) => {
           const status = String(booking.booking_status ?? "")
