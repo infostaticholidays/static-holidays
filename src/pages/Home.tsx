@@ -866,7 +866,7 @@ export default function Home() {
       `}</style>
 
       <header className="sh-nav">
-        <a href="/" className="sh-brand" aria-label="Static Holidays homepage">
+     <Link to="/" className="sh-brand" aria-label="Static Holidays homepage">
           <span className="sh-brand-icon">⌂</span>
           <span>
             <span className="sh-brand-name" style={{ display: "block" }}>
