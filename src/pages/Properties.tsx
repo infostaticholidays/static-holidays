@@ -529,7 +529,7 @@ export default function Properties() {
                     </div>
 
                     <button
-                      onClick={() => navigate(/property/${id}, {
+                    onClick={() => navigate(`/property/${id}`, {
                         state: { checkIn, checkOut, guests },
                       })}
                       style={{
