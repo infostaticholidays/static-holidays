@@ -523,7 +523,7 @@ export default function Properties() {
                     </p>
                     <div style={{ marginBottom: "18px" }}>
                       <strong style={{ color: "#17643b", fontSize: "24px" }}>
-                        {price != null ? £${price} : "Price on request"}
+                     {price != null ? `£${price}` : "Price on request"}
                       </strong>
                       {price != null && <span style={{ color: "#718078", fontSize: "13px" }}> / night</span>}
                     </div>
