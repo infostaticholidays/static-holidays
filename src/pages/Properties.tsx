@@ -47,14 +47,34 @@ export default function Properties() {
 
   const navigate = useNavigate();
 
+  
+  const location = useLocation();
+
   useEffect(() => {
     async function fetchProperties() {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("*");
+      setLoading(true);
+
+      let query = supabase.from("properties").select("*");
+
+      if (location.pathname === "/my-properties") {
+        const { data: { user }, error: userError } =
+          await supabase.auth.getUser();
+
+        if (userError || !user) {
+          console.error("Could not identify the logged-in owner:", userError);
+          setProperties([]);
+          setLoading(false);
+          return;
+        }
+
+        query = query.eq("owner_id", user.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error("Could not load properties:", error);
+        setProperties([]);
       } else {
         setProperties((data || []) as Property[]);
       }
@@ -63,7 +83,8 @@ export default function Properties() {
     }
 
     fetchProperties();
-  }, []);
+  }, [location.pathname]);
+
 
   function toggleFavorite(id: string) {
     setFavorites((current) =>
