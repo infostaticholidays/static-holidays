@@ -95,9 +95,7 @@ export default function App() {
         color: "#1f2937",
       }}
     >
-      <header
-        style={{
-          display: "flex",
+   
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "space-between",
