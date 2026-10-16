@@ -158,10 +158,14 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
 
-          <Route
-            path="/host-dashboard"
-            element={<HostDashboard />}
-          />
+         <Route
+  path="/host-dashboard"
+  element={<HostDashboard />}
+/>
+<Route
+  path="/dashboard"
+  element={<HostDashboard />}
+/>
 
           <Route
             path="/host-bookings"
