@@ -54,7 +54,11 @@ export default function Properties() {
     async function fetchProperties() {
       setLoading(true);
 
-      let query = supabase.from("properties").select("*");
+      let query = supabase
+  .from("properties")
+  .select("*")
+  .eq("is_published", true)
+  .eq("status", "published");
 
       if (location.pathname === "/my-properties") {
         const { data: { user }, error: userError } =
