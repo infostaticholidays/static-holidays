@@ -96,59 +96,6 @@ export default function App() {
       }}
     >
    
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "16px",
-          padding: "18px 24px",
-          background: "#14532d",
-          color: "#ffffff",
-        }}
-      >
-        <Link
-          to="/"
-          style={{
-            color: "#ffffff",
-            fontSize: "22px",
-            fontWeight: 700,
-            textDecoration: "none",
-          }}
-        >
-          Static Holidays
-        </Link>
-
-        <nav
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "16px",
-            alignItems: "center",
-          }}
-        >
-          <Link to="/properties" style={{ color: "#ffffff" }}>
-            Properties
-          </Link>
-          <Link to="/events" style={{ color: "#ffffff" }}>
-            Events
-          </Link>
-          <Link to="/businesses" style={{ color: "#ffffff" }}>
-            Businesses
-          </Link>
-          <Link to="/shop" style={{ color: "#ffffff" }}>
-            Shop
-          </Link>
-          <Link to="/host-dashboard" style={{ color: "#ffffff" }}>
-            Host Dashboard
-          </Link>
-          <Link to="/login" style={{ color: "#ffffff" }}>
-            Login
-          </Link>
-          <Link to="/signup" style={{ color: "#ffffff" }}>
-            Sign up
-          </Link>
-        </nav>
-      </header>
-
       <main style={{ flex: 1, width: "100%" }}>
         <Routes>
           <Route path="/" element={<Home />} />
