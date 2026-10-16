@@ -876,7 +876,9 @@ export default function Home() {
               Your next escape awaits
             </span>
           </span>
-        </a>
+       
+        </Link>
+
 
         <nav className="sh-nav-links" aria-label="Main navigation">
           <a className="sh-hide-mobile" href="/properties">Explore stays</a>
