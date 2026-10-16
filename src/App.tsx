@@ -46,6 +46,7 @@ function PromoteProperty() {
       }}
     >
       <h1 style={{ color: "#14532d" }}>Promote a Property</h1>
+
       <p>
         Promote your holiday property to help more guests discover it.
       </p>
@@ -59,12 +60,15 @@ function PromoteProperty() {
         }}
       >
         <h2>Property Promotion</h2>
+
         <p>
           A 30-day promotion option is planned at £4.99 per property.
         </p>
+
         <p>
           Promotion payments are not enabled on this temporary page.
         </p>
+
         <Link
           to="/my-properties"
           style={{
@@ -95,44 +99,55 @@ export default function App() {
         color: "#1f2937",
       }}
     >
-   
       <main style={{ flex: 1, width: "100%" }}>
         <Routes>
           <Route path="/" element={<Home />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
           <Route path="/properties" element={<Properties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/add-property" element={<AddProperty />} />
-          <Route path="/edit-property/:id" element={<EditProperty />} />
+          <Route
+            path="/edit-property/:id"
+            element={<EditProperty />}
+          />
 
           <Route path="/my-properties" element={<Properties />} />
+
           <Route
             path="/promote-property"
             element={<PromoteProperty />}
           />
 
           <Route path="/adverts" element={<Adverts />} />
+
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/:id" element={<ShopDetail />} />
 
-          <Route path="/holidayowners" element={<HolidayOwners />} />
+          <Route
+            path="/holidayowners"
+            element={<HolidayOwners />}
+          />
 
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetail />} />
 
           <Route
-  path="/bookings"
-  element={
-    <div style={{ padding: "40px" }}>
-      <Route path="/bookings" element={<Bookings />} />
-<Route path="/booking/:id" element={<BookingDetail />} />
-      <Link to="/">Back to Home</Link>
-    </div>
-  }
-/>
-<Route path="/booking/:id" element={<BookingDetail />} />
+            path="/bookings"
+            element={
+              <div style={{ padding: "40px" }}>
+                <Bookings />
+                <Link to="/">Back to Home</Link>
+              </div>
+            }
+          />
+
+          <Route
+            path="/booking/:id"
+            element={<BookingDetail />}
+          />
 
           <Route path="/businesses" element={<Businesses />} />
           <Route path="/services" element={<Services />} />
@@ -143,22 +158,21 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
 
-      <Route
-  path="/host-dashboard"
-  element={<HostDashboard />}
-/>
-<Route
-  path="/host-bookings"
-  element={<Bookings />}
-/>
-<Route
-  path="/host-compliance"
-  element={<HostCompliance />}
-/>
+          <Route
+            path="/host-dashboard"
+            element={<HostDashboard />}
+          />
+
+          <Route
+            path="/host-bookings"
+            element={<Bookings />}
+          />
+
           <Route
             path="/host-compliance"
             element={<HostCompliance />}
           />
+
           <Route
             path="/property-calendar/:propertyId"
             element={<PropertyCalendar />}
@@ -181,4 +195,3 @@ export default function App() {
     </div>
   );
 }
-
