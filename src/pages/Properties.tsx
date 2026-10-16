@@ -1,23 +1,52 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
+type Property = {
+  id: string;
+  title: string | null;
+  description?: string | null;
+  location: string | null;
+  price_per_night?: number | null;
+  nightly_price?: number | null;
+  images?: string | null;
+  cover_image_url?: string | null;
+  featured?: boolean | null;
+  has_pool?: boolean;
+  pet_friendly?: boolean;
+  has_hot_tub?: boolean;
+  sea_view?: boolean;
+  parking?: boolean;
+  wifi?: boolean;
+  family_friendly?: boolean;
+  sleeps?: number | null;
+  features?: string[];
+  holiday_types?: string[];
+  is_published?: boolean;
+  status?: string;
+};
+
 export default function Properties() {
+  const [properties, setProperties] = useState<Property[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState("");
   const [guests, setGuests] = useState("Any");
-  const navigate = useNavigate();
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
-  function toggleFavorite(id: string) {
-    setFavorites((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
-    );
-  }
+  const [hotTub, setHotTub] = useState(false);
+  const [pool, setPool] = useState(false);
+  const [seaView, setSeaView] = useState(false);
+  const [petFriendly, setPetFriendly] = useState(false);
+  const [wifi, setWifi] = useState(false);
+  const [parking, setParking] = useState(false);
+  const [familyFriendly, setFamilyFriendly] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchProperties() {
@@ -28,7 +57,7 @@ export default function Properties() {
       if (error) {
         console.error("Could not load properties:", error);
       } else {
-        setProperties(data || []);
+        setProperties((data || []) as Property[]);
       }
 
       setLoading(false);
@@ -37,55 +66,137 @@ export default function Properties() {
     fetchProperties();
   }, []);
 
+  function toggleFavorite(id: string) {
+    setFavorites((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+
   const filteredProperties = properties.filter((property) => {
     const term = search.trim().toLowerCase();
 
     const matchesSearch =
       !term ||
       String(property.title || "").toLowerCase().includes(term) ||
-      String(property.location || "").toLowerCase().includes(term);
+      String(property.location || "").toLowerCase().includes(term) ||
+      String(property.description || "").toLowerCase().includes(term);
 
-    const capacity = Number(
-      property.max_guests ?? property.guest_capacity ?? property.sleeps ?? 0
+    const capacity = Number(property.sleeps || 0);
+
+    return (
+      matchesSearch &&
+      (guests === "Any" ||
+        (guests === "4+" ? capacity >= 4 : capacity >= Number(guests))) &&
+      (!hotTub || property.has_hot_tub === true) &&
+      (!pool || property.has_pool === true || property.pool_type !== "none") &&
+      (!seaView || property.sea_view === true) &&
+      (!petFriendly || property.pet_friendly === true) &&
+      (!wifi || property.wifi === true) &&
+      (!parking || property.parking === true) &&
+      (!familyFriendly || property.family_friendly === true)
     );
-
-    const matchesGuests =
-      guests === "Any" ||
-      guests === "4+" ? guests === "Any" || capacity >= 4
-        : capacity >= Number(guests);
-
-    return matchesSearch && matchesGuests;
   });
+
+  function clearFilters() {
+    setSearch("");
+    setGuests("Any");
+    setCheckIn("");
+    setCheckOut("");
+    setHotTub(false);
+    setPool(false);
+    setSeaView(false);
+    setPetFriendly(false);
+    setWifi(false);
+    setParking(false);
+    setFamilyFriendly(false);
+  }
+
+  const activeFilterCount = [
+    hotTub,
+    pool,
+    seaView,
+    petFriendly,
+    wifi,
+    parking,
+    familyFriendly,
+  ].filter(Boolean).length;
 
   return (
     <div style={{
       minHeight: "100vh",
       background: "#f8faf8",
       color: "#172b21",
-      fontFamily: "Arial, sans-serif"
+      fontFamily: "Arial, sans-serif",
     }}>
+      <header style={{
+        padding: "20px 24px",
+        background: "#ffffff",
+        borderBottom: "1px solid #e3ebe4",
+      }}>
+        <div style={{
+          maxWidth: "1240px",
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}>
+          <Link to="/" aria-label="Static Holidays homepage" style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            color: "#153e2a",
+            textDecoration: "none",
+            fontWeight: 800,
+            fontSize: "22px",
+          }}>
+            <span style={{
+              display: "grid",
+              placeItems: "center",
+              width: "38px",
+              height: "38px",
+              borderRadius: "12px",
+              background: "#17643b",
+              color: "#ffffff",
+              fontSize: "24px",
+            }}>⌂</span>
+            Static Holidays
+          </Link>
+
+          <Link to="/" style={{
+            color: "#17643b",
+            textDecoration: "none",
+            fontWeight: 600,
+          }}>
+            ← Home
+          </Link>
+        </div>
+      </header>
+
       <section style={{
-        padding: "64px 24px 42px",
+        padding: "54px 24px 40px",
         textAlign: "center",
-        background: "linear-gradient(180deg, #eff8f0 0%, #ffffff 100%)"
+        background: "linear-gradient(180deg, #eff8f0 0%, #ffffff 100%)",
       }}>
         <p style={{
           color: "#287447",
           fontWeight: 700,
           letterSpacing: "2px",
           fontSize: "12px",
-          textTransform: "uppercase"
         }}>
-          YOUR NEXT ESCAPE STARTS HERE
+          YOUR NEXT UK GETAWAY
         </p>
 
         <h1 style={{
-          fontSize: "clamp(32px, 5vw, 52px)",
-          lineHeight: 1.1,
-          letterSpacing: "-1.5px",
-          margin: "16px auto",
+          fontSize: "clamp(32px, 5vw, 50px)",
+          lineHeight: 1.12,
+          letterSpacing: "-1px",
+          margin: "14px auto",
           maxWidth: "760px",
-          color: "#153e2a"
+          color: "#153e2a",
         }}>
           Find your perfect holiday stay
         </h1>
@@ -95,81 +206,215 @@ export default function Properties() {
           margin: "0 auto",
           lineHeight: 1.7,
           color: "#607166",
-          fontSize: "17px"
+          fontSize: "17px",
         }}>
           Discover welcoming holiday homes, coastal escapes, caravans and
           lodges for your next UK getaway.
         </p>
 
         <div style={{
-          maxWidth: "900px",
-          margin: "32px auto 0",
-          padding: "12px",
+          maxWidth: "1000px",
+          margin: "30px auto 0",
+          padding: "14px",
           display: "flex",
           flexWrap: "wrap",
           gap: "12px",
           background: "#ffffff",
           border: "1px solid #e1e9e2",
           borderRadius: "18px",
-          boxShadow: "0 12px 36px rgba(21, 62, 42, 0.08)"
+          boxShadow: "0 12px 36px rgba(21, 62, 42, 0.08)",
+          textAlign: "left",
         }}>
-          <input
-            aria-label="Search destination or property"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Where would you like to go?"
-            style={{
-              flex: "2 1 240px",
-              minWidth: 0,
-              padding: "15px",
-              border: "1px solid #e5ebe6",
-              borderRadius: "10px",
-              fontSize: "15px"
-            }}
-          />
+          <label style={{ flex: "2 1 200px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
+            DESTINATION
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Where would you like to go?"
+              style={{
+                display: "block",
+                boxSizing: "border-box",
+                width: "100%",
+                marginTop: "7px",
+                padding: "13px",
+                border: "1px solid #e1e9e2",
+                borderRadius: "9px",
+                fontSize: "14px",
+              }}
+            />
+          </label>
 
-          <select
-            aria-label="Number of guests"
-            value={guests}
-            onChange={(event) => setGuests(event.target.value)}
-            style={{
-              flex: "1 1 140px",
-              padding: "15px",
-              border: "1px solid #e5ebe6",
-              borderRadius: "10px",
-              background: "#fff",
-              fontSize: "15px"
-            }}
-          >
-            <option value="Any">Any guests</option>
-            <option value="1">1+ guest</option>
-            <option value="2">2+ guests</option>
-            <option value="3">3+ guests</option>
-            <option value="4+">4+ guests</option>
-          </select>
+          <label style={{ flex: "1 1 140px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
+            CHECK-IN
+            <input
+              type="date"
+              min={today}
+              value={checkIn}
+              onChange={(event) => {
+                setCheckIn(event.target.value);
+                if (checkOut && event.target.value >= checkOut) setCheckOut("");
+              }}
+              style={{
+                display: "block",
+                boxSizing: "border-box",
+                width: "100%",
+                marginTop: "7px",
+                padding: "13px",
+                border: "1px solid #e1e9e2",
+                borderRadius: "9px",
+                fontSize: "14px",
+              }}
+            />
+          </label>
+
+          <label style={{ flex: "1 1 140px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
+            CHECK-OUT
+            <input
+              type="date"
+              min={checkIn || today}
+              value={checkOut}
+              onChange={(event) => setCheckOut(event.target.value)}
+              style={{
+                display: "block",
+                boxSizing: "border-box",
+                width: "100%",
+                marginTop: "7px",
+                padding: "13px",
+                border: "1px solid #e1e9e2",
+                borderRadius: "9px",
+                fontSize: "14px",
+              }}
+            />
+          </label>
+
+          <label style={{ flex: "1 1 125px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
+            GUESTS
+            <select
+              value={guests}
+              onChange={(event) => setGuests(event.target.value)}
+              style={{
+                display: "block",
+                boxSizing: "border-box",
+                width: "100%",
+                marginTop: "7px",
+                padding: "13px",
+                border: "1px solid #e1e9e2",
+                borderRadius: "9px",
+                background: "#ffffff",
+                fontSize: "14px",
+              }}
+            >
+              <option value="Any">Any guests</option>
+              <option value="1">1+ guest</option>
+              <option value="2">2+ guests</option>
+              <option value="3">3+ guests</option>
+              <option value="4+">4+ guests</option>
+            </select>
+          </label>
 
           <button
-            onClick={() => document.getElementById("property-list")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => {
+              if (checkIn && checkOut && checkOut <= checkIn) {
+                alert("Check-out must be after check-in.");
+                return;
+              }
+              document.getElementById("property-list")?.scrollIntoView({ behavior: "smooth" });
+            }}
             style={{
-              flex: "1 1 120px",
-              padding: "15px 24px",
+              alignSelf: "end",
+              flex: "1 1 130px",
+              padding: "14px 20px",
               border: 0,
               borderRadius: "10px",
               background: "#17643b",
-              color: "#fff",
+              color: "#ffffff",
               fontWeight: 700,
-              cursor: "pointer"
+              cursor: "pointer",
             }}
           >
             Search stays
           </button>
+        </div>
+
+        <div style={{ maxWidth: "1000px", margin: "12px auto 0", textAlign: "left" }}>
+          <button
+            type="button"
+            aria-expanded={showFilters}
+            onClick={() => setShowFilters((open) => !open)}
+            style={{
+              padding: "10px 14px",
+              border: "1px solid #dce7de",
+              borderRadius: "10px",
+              background: "#ffffff",
+              color: "#17643b",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            More filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ""} {showFilters ? "▲" : "▼"}
+          </button>
+
+          {showFilters && (
+            <div style={{
+              marginTop: "12px",
+              padding: "20px",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: "16px",
+              background: "#ffffff",
+              border: "1px solid #e1e9e2",
+              borderRadius: "14px",
+              textAlign: "left",
+            }}>
+              {[
+                ["Hot tub", hotTub, setHotTub],
+                ["Swimming pool", pool, setPool],
+                ["Sea view", seaView, setSeaView],
+                ["Pet friendly", petFriendly, setPetFriendly],
+                ["Wi-Fi", wifi, setWifi],
+                ["Parking", parking, setParking],
+                ["Family friendly", familyFriendly, setFamilyFriendly],
+              ].map(([label, checked, setter]) => (
+                <label key={String(label)} style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "9px",
+                  color: "#315d43",
+                  cursor: "pointer",
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(checked)}
+                    onChange={(event) => (setter as (value: boolean) => void)(event.target.checked)}
+                  />
+                  {String(label)}
+                </label>
+              ))}
+
+              <button
+                type="button"
+                onClick={clearFilters}
+                style={{
+                  padding: "10px",
+                  border: "1px solid #dce7de",
+                  borderRadius: "8px",
+                  background: "#f8faf8",
+                  color: "#17643b",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
       <section id="property-list" style={{
         maxWidth: "1240px",
         margin: "0 auto",
-        padding: "28px 24px 72px"
+        padding: "32px 24px 72px",
       }}>
         <div style={{
           display: "flex",
@@ -177,7 +422,7 @@ export default function Properties() {
           alignItems: "end",
           flexWrap: "wrap",
           gap: "12px",
-          marginBottom: "24px"
+          marginBottom: "24px",
         }}>
           <div>
             <p style={{
@@ -185,94 +430,74 @@ export default function Properties() {
               fontWeight: 700,
               fontSize: "12px",
               letterSpacing: "1.5px",
-              textTransform: "uppercase"
             }}>
-              HANDPICKED FOR YOUR GETAWAY
+              FIND YOUR SOMEWHERE
             </p>
-            <h2 style={{
-              fontSize: "clamp(24px, 3vw, 32px)",
-              color: "#153e2a",
-              margin: "8px 0"
-            }}>
+            <h2 style={{ fontSize: "30px", color: "#153e2a", margin: "8px 0" }}>
               Explore holiday stays
             </h2>
           </div>
-
           {!loading && (
             <p style={{ color: "#718078" }}>
-              {filteredProperties.length}{" "}
-              {filteredProperties.length === 1 ? "stay" : "stays"} found
+              {filteredProperties.length} {filteredProperties.length === 1 ? "stay" : "stays"} found
             </p>
           )}
         </div>
 
         {loading ? (
-          <p style={{ padding: "40px 0", color: "#607166" }}>
-            Finding holiday stays...
-          </p>
+          <p style={{ padding: "40px 0", color: "#607166" }}>Finding holiday stays...</p>
         ) : filteredProperties.length === 0 ? (
           <div style={{
-            background: "#fff",
+            padding: "40px 24px",
+            textAlign: "center",
+            background: "#ffffff",
             border: "1px solid #e1e9e2",
             borderRadius: "16px",
-            padding: "40px 24px",
-            textAlign: "center"
           }}>
-            <h3 style={{ color: "#153e2a" }}>No stays found</h3>
+            <h3 style={{ color: "#153e2a" }}>No stays match those filters</h3>
             <p style={{ color: "#607166" }}>
-              Try another destination or change your guest selection.
+              Try another destination or clear some filters.
             </p>
-            <button
-              onClick={() => {
-                setSearch("");
-                setGuests("Any");
-              }}
-              style={{
-                padding: "12px 18px",
-                background: "#17643b",
-                color: "#fff",
-                border: 0,
-                borderRadius: "8px",
-                cursor: "pointer"
-              }}
-            >
-              Clear search
+            <button onClick={clearFilters} style={{
+              padding: "12px 18px",
+              background: "#17643b",
+              color: "#ffffff",
+              border: 0,
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}>
+              Clear filters
             </button>
           </div>
         ) : (
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 290px), 1fr))",
-            gap: "24px"
+            gap: "24px",
           }}>
             {filteredProperties.map((property) => {
               const id = String(property.id);
               const imageUrl =
-                property.image_url ||
-                property.image ||
+                property.cover_image_url ||
+                property.images?.split(",")[0]?.trim() ||
                 "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80";
+              const price = property.price_per_night ?? property.nightly_price;
 
               return (
                 <article key={id} style={{
-                  background: "#fff",
+                  background: "#ffffff",
                   border: "1px solid #e6ece7",
                   borderRadius: "18px",
                   overflow: "hidden",
-                  boxShadow: "0 6px 24px rgba(21, 62, 42, 0.06)"
+                  boxShadow: "0 6px 24px rgba(21, 62, 42, 0.06)",
                 }}>
                   <div style={{ position: "relative" }}>
                     <img
                       src={imageUrl}
                       alt={property.title || "Holiday accommodation"}
                       loading="lazy"
-                      style={{
-                        width: "100%",
-                        height: "230px",
-                        objectFit: "cover",
-                        display: "block"
-                      }}
+                      style={{ width: "100%", height: "230px", objectFit: "cover", display: "block" }}
                     />
-
                     {property.featured && (
                       <span style={{
                         position: "absolute",
@@ -280,10 +505,10 @@ export default function Properties() {
                         left: "14px",
                         padding: "7px 11px",
                         borderRadius: "20px",
-                        background: "#fff",
+                        background: "#ffffff",
                         color: "#17643b",
                         fontWeight: 700,
-                        fontSize: "12px"
+                        fontSize: "12px",
                       }}>
                         ★ Featured
                       </span>
@@ -291,51 +516,32 @@ export default function Properties() {
                   </div>
 
                   <div style={{ padding: "22px" }}>
-                    <h3 style={{
-                      color: "#153e2a",
-                      fontSize: "21px",
-                      margin: "0 0 10px"
-                    }}>
+                    <h3 style={{ color: "#153e2a", fontSize: "21px", margin: "0 0 10px" }}>
                       {property.title || "Holiday stay"}
                     </h3>
-
-                    <p style={{
-                      color: "#718078",
-                      margin: "0 0 18px",
-                      minHeight: "22px"
-                    }}>
+                    <p style={{ color: "#718078", margin: "0 0 18px" }}>
                       📍 {property.location || "United Kingdom"}
                     </p>
-
-                    <div style={{
-                      display: "flex",
-                      alignItems: "baseline",
-                      gap: "5px",
-                      marginBottom: "18px"
-                    }}>
+                    <div style={{ marginBottom: "18px" }}>
                       <strong style={{ color: "#17643b", fontSize: "24px" }}>
-                        {property.price_per_night != null
-                          ? `£${property.price_per_night}`
-                          : "Price on request"}
+                        {price != null ? `£${price}` : "Price on request"}
                       </strong>
-                      {property.price_per_night != null && (
-                        <span style={{ color: "#718078", fontSize: "13px" }}>
-                          / night
-                        </span>
-                      )}
+                      {price != null && <span style={{ color: "#718078", fontSize: "13px" }}> / night</span>}
                     </div>
 
                     <button
-                      onClick={() => navigate(`/property/${id}`)}
+                      onClick={() => navigate(`/property/${id}`, {
+                        state: { checkIn, checkOut, guests },
+                      })}
                       style={{
                         width: "100%",
                         padding: "14px",
                         border: 0,
                         borderRadius: "10px",
                         background: "#17643b",
-                        color: "#fff",
+                        color: "#ffffff",
                         fontWeight: 700,
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                     >
                       View property
@@ -350,15 +556,13 @@ export default function Properties() {
                         padding: "12px",
                         border: "1px solid #dce7de",
                         borderRadius: "10px",
-                        background: favorites.includes(id) ? "#fef2f2" : "#fff",
+                        background: favorites.includes(id) ? "#fef2f2" : "#ffffff",
                         color: favorites.includes(id) ? "#b91c1c" : "#315d43",
                         fontWeight: 600,
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                     >
-                      {favorites.includes(id)
-                        ? "♥ Remove favourite"
-                        : "♡ Add to favourites"}
+                      {favorites.includes(id) ? "♥ Remove favourite" : "♡ Add to favourites"}
                     </button>
                   </div>
                 </article>
@@ -370,3 +574,4 @@ export default function Properties() {
     </div>
   );
 }
+
