@@ -4,8 +4,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 
-window.addEventListener("pageshow", (event) => {
-  if (event.persisted) {
+window.addEventListener("pageshow", () => {
+  if (document.visibilityState === "visible") {
     window.location.reload();
   }
 });
