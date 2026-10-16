@@ -117,7 +117,7 @@ export default function App() {
             element={<EditProperty />}
           />
 
-          <Route path="/my-properties" element={<Properties />} />
+   <Route path="/my-properties" element={<MyProperties />} />
 
           <Route
             path="/promote-property"
