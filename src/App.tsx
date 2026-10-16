@@ -23,8 +23,11 @@ import Account from "./pages/Account";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import HostCompliance from "./pages/HostCompliance";
+import MyProperties from "./pages/MyProperties";
 import PropertyCalendar from "./pages/PropertyCalendar";
 import HostDashboard from "./pages/HostDashboard";
+
+
 
 function NotFound() {
   return (
