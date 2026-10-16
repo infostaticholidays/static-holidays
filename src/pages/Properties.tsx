@@ -350,7 +350,7 @@ export default function Properties() {
               cursor: "pointer",
             }}
           >
-            More filters {activeFilterCount > 0 ? (${activeFilterCount}) : ""} {showFilters ? "▲" : "▼"}
+           More filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ""} {showFilters ? "▲" : "▼"}
           </button>
 
           {showFilters && (
