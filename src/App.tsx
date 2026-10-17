@@ -26,6 +26,7 @@ import HostCompliance from "./pages/HostCompliance";
 import MyProperties from "./pages/MyProperties";
 import PropertyCalendar from "./pages/PropertyCalendar";
 import HostDashboard from "./pages/HostDashboard";
+import HostReviews from "./pages/HostReviews";
 
 
 
@@ -160,6 +161,7 @@ export default function App() {
 
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/host-reviews" element={<HostReviews />} />
 
          <Route
   path="/host-dashboard"
