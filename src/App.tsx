@@ -165,6 +165,16 @@ export default function App() {
   path="/host-dashboard"
   element={<HostDashboard />}
 />
+          <Route
+  path="/host-reviews"
+  element={
+    <div style={{ padding: "40px" }}>
+      <h1>Guest Reviews</h1>
+      <p>The reviews page is now connected.</p>
+      <Link to="/host-dashboard">Back to Host Dashboard</Link>
+    </div>
+  }
+/>
 <Route
   path="/dashboard"
   element={<HostDashboard />}
