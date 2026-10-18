@@ -168,7 +168,7 @@ function formatDate(value: string) {
     year: "numeric",
   });
 }
-type PaymentChoice = "deposit" | "full";
+type PaymentChoice = "deposit" | "full" | "custom";
 export default function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
