@@ -413,23 +413,7 @@ useEffect(() => {
   );
 
   const stayPriceInfo = useMemo(() => {
-    
-  const daysToArrival = startDate
-    ? Math.floor(
-        (
-          new Date(`${startDate}T00:00:00Z`).getTime() -
-          Date.UTC(
-            new Date().getUTCFullYear(),
-            new Date().getUTCMonth(),
-            new Date().getUTCDate()
-          )
-        ) / 86400000
-      )
-    : 0;
 
-  const fullPaymentRequired =
-    stayPriceInfo.valid &&
-    (stayPriceInfo.total <= 100 || daysToArrival <= 30);
 
     if (stayDates.length === 0) {
       return {
