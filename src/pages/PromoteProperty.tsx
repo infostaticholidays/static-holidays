@@ -17,7 +17,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     background: PAGE_BG,
     color: TEXT,
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: "Inter, system-ui, sans-serif",
   },
   sidebar: {
     width: 238,
@@ -52,7 +52,10 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     cursor: "pointer",
   },
-  active: { background: "rgba(255,255,255,0.14)", color: "#fff" },
+  active: {
+    background: "rgba(255,255,255,0.14)",
+    color: "#fff",
+  },
   main: {
     minWidth: 0,
     flex: 1,
@@ -65,7 +68,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     margin: 0,
   },
-  muted: { color: MUTED, fontSize: 14, lineHeight: 1.6 },
+  muted: {
+    color: MUTED,
+    fontSize: 14,
+    lineHeight: 1.6,
+  },
   card: {
     background: "#fff",
     border: `1px solid ${BORDER}`,
@@ -113,10 +120,17 @@ type Promotion = {
   created_at: string;
 };
 
-function messageFrom(error: unknown) {
-  return error instanceof Error
-    ? error.message
-    : "Something went wrong. Please try again.";
+function getErrorMessage(error: unknown): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return "Something went wrong. Please try again.";
 }
 
 export default function PromoteProperty() {
@@ -140,41 +154,51 @@ export default function PromoteProperty() {
         error: authError,
       } = await supabase.auth.getUser();
 
-      if (authError) throw authError;
+      if (authError) {
+        throw authError;
+      }
 
       if (!user) {
         navigate("/login");
         return;
       }
 
-      const { data, error } = await supabase
-        .from("properties")
-        .select("id, title, name, location, address")
-        .eq("owner_id", user.id)
-        .order("created_at", { ascending: false });
+      // Load the signed-in host's properties.
+      // Selecting * avoids errors caused by guessed column names.
+      const { data: propertyData, error: propertyError } =
+        await supabase
+          .from("properties")
+          .select("*")
+          .eq("owner_id", user.id);
 
-      if (error) throw error;
+      if (propertyError) {
+        console.error("Failed to load properties:", propertyError);
+        throw propertyError;
+      }
 
-      const ownedProperties = (data ?? []) as Property[];
+      const ownedProperties = (propertyData ?? []) as Property[];
+
       setProperties(ownedProperties);
 
-      if (ownedProperties.length > 0) {
-        const { data: promotionData, error: promotionError } =
-          await supabase
-            .from("property_promotions")
-            .select("id, property_id, status, starts_at, expires_at, created_at")
-            .eq("owner_id", user.id)
-            .order("created_at", { ascending: false });
+      // Load the host's promotion records.
+      const { data: promotionData, error: promotionError } =
+        await supabase
+          .from("property_promotions")
+          .select(
+            "id, property_id, status, starts_at, expires_at, created_at"
+          )
+          .eq("owner_id", user.id)
+          .order("created_at", { ascending: false });
 
-        if (promotionError) throw promotionError;
-
-        setPromotions((promotionData ?? []) as Promotion[]);
-      } else {
-        setPromotions([]);
+      if (promotionError) {
+        console.error("Failed to load promotions:", promotionError);
+        throw promotionError;
       }
+
+      setPromotions((promotionData ?? []) as Promotion[]);
     } catch (error) {
       console.error("Promote property page error:", error);
-      setErrorMessage(messageFrom(error));
+      setErrorMessage(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -183,6 +207,22 @@ export default function PromoteProperty() {
   useEffect(() => {
     void loadPage();
   }, [loadPage]);
+
+  const propertyName = (propertyId: string) => {
+    const property = properties.find(
+      (item) => item.id === propertyId
+    );
+
+    if (!property) {
+      return "Your property";
+    }
+
+    return (
+      property.title ||
+      property.name ||
+      `Property ${property.id}`
+    );
+  };
 
   const handleCheckout = async () => {
     if (!selectedId) {
@@ -195,48 +235,39 @@ export default function PromoteProperty() {
     setNotice("");
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "create-property-promotion-checkout",
-        {
-          body: { property_id: selectedId },
-        }
-      );
+      const { data, error } =
+        await supabase.functions.invoke(
+          "create-property-promotion-checkout",
+          {
+            body: {
+              property_id: selectedId,
+            },
+          }
+        );
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
-      const checkoutUrl = data?.checkout_url ?? data?.url;
+      const checkoutUrl =
+        data?.checkout_url ?? data?.url;
 
       if (
         typeof checkoutUrl !== "string" ||
         !checkoutUrl.startsWith("https://")
       ) {
         throw new Error(
-          "Stripe did not return a valid checkout link. Check your deployed promotion function."
+          "Stripe did not return a valid checkout link. Check that the promotion checkout function is deployed and configured."
         );
       }
 
       window.location.assign(checkoutUrl);
     } catch (error) {
       console.error("Promotion checkout error:", error);
-      setErrorMessage(messageFrom(error));
-    } finally {
+      setErrorMessage(getErrorMessage(error));
       setProcessing(false);
     }
   };
-
-  const propertyName = (id: string) => {
-    const property = properties.find((item) => item.id === id);
-    return property?.title || property?.name || "Your property";
-  };
-
-  const activePromotion = (propertyId: string) =>
-    promotions.find(
-      (promotion) =>
-        promotion.property_id === propertyId &&
-        promotion.status === "active" &&
-        promotion.expires_at &&
-        new Date(promotion.expires_at).getTime() > Date.now()
-    );
 
   if (loading) {
     return (
@@ -257,7 +288,9 @@ export default function PromoteProperty() {
   return (
     <div style={styles.page}>
       <aside style={styles.sidebar}>
-        <div style={styles.brand}>🌿 Static Holidays</div>
+        <div style={styles.brand}>
+          🌿 Static Holidays
+        </div>
 
         <nav aria-label="Host navigation">
           {[
@@ -277,7 +310,9 @@ export default function PromoteProperty() {
               onClick={() => navigate(path)}
               style={{
                 ...styles.nav,
-                ...(path === "/promote-property" ? styles.active : {}),
+                ...(path === "/promote-property"
+                  ? styles.active
+                  : {}),
               }}
             >
               {label}
@@ -287,7 +322,10 @@ export default function PromoteProperty() {
 
         <button
           type="button"
-          style={{ ...styles.nav, marginTop: "auto" }}
+          style={{
+            ...styles.nav,
+            marginTop: "auto",
+          }}
           onClick={() => navigate("/account")}
         >
           ⚙ Account settings
@@ -307,7 +345,11 @@ export default function PromoteProperty() {
           >
             PROPERTY VISIBILITY
           </p>
-          <h1 style={styles.heading}>Promote your property</h1>
+
+          <h1 style={styles.heading}>
+            Promote your property
+          </h1>
+
           <p style={styles.muted}>
             Give your holiday let extra visibility for 30 days.
           </p>
@@ -389,13 +431,25 @@ export default function PromoteProperty() {
                 margin: 0,
               }}
             >
-              Give your listing a promotional boost on Static Holidays.
-              Pay once, with no additional subscription required.
+              Give your listing a promotional boost on Static
+              Holidays. Pay once, with no additional subscription
+              required.
             </p>
 
-            <div style={{ fontSize: 36, fontWeight: 850, marginTop: 20 }}>
+            <div
+              style={{
+                fontSize: 36,
+                fontWeight: 850,
+                marginTop: 20,
+              }}
+            >
               £4.99{" "}
-              <span style={{ fontSize: 14, fontWeight: 500 }}>
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                }}
+              >
                 / 30 days
               </span>
             </div>
@@ -417,12 +471,20 @@ export default function PromoteProperty() {
             <select
               id="promotion-property"
               value={selectedId}
-              onChange={(event) => setSelectedId(event.target.value)}
+              onChange={(event) =>
+                setSelectedId(event.target.value)
+              }
               style={styles.input}
             >
-              <option value="">Select a property…</option>
+              <option value="">
+                Select a property…
+              </option>
+
               {properties.map((property) => (
-                <option key={property.id} value={property.id}>
+                <option
+                  key={property.id}
+                  value={property.id}
+                >
                   {property.title ||
                     property.name ||
                     `Property ${property.id}`}
@@ -440,17 +502,34 @@ export default function PromoteProperty() {
                 }}
               >
                 <strong>{propertyName(selectedId)}</strong>
-                <p style={{ ...styles.muted, margin: "5px 0 0" }}>
-                  {properties.find((item) => item.id === selectedId)
-                    ?.location ||
-                    properties.find((item) => item.id === selectedId)
-                      ?.address ||
-                    "Your selected listing"}
+
+                <p
+                  style={{
+                    ...styles.muted,
+                    margin: "5px 0 0",
+                  }}
+                >
+                  {(() => {
+                    const property = properties.find(
+                      (item) => item.id === selectedId
+                    );
+
+                    return (
+                      property?.location ||
+                      property?.address ||
+                      "Your selected listing"
+                    );
+                  })()}
                 </p>
               </div>
             )}
 
-            <h3 style={{ fontSize: 16, margin: "24px 0 12px" }}>
+            <h3
+              style={{
+                fontSize: 16,
+                margin: "24px 0 12px",
+              }}
+            >
               2. Review your promotion
             </h3>
 
@@ -463,7 +542,9 @@ export default function PromoteProperty() {
                 borderBottom: `1px solid ${BORDER}`,
               }}
             >
-              <span style={styles.muted}>Promotion duration</span>
+              <span style={styles.muted}>
+                Promotion duration
+              </span>
               <strong>30 days</strong>
             </div>
 
@@ -475,29 +556,41 @@ export default function PromoteProperty() {
                 padding: "13px 0",
               }}
             >
-              <span style={styles.muted}>One-off payment</span>
+              <span style={styles.muted}>
+                One-off payment
+              </span>
               <strong>£4.99 GBP</strong>
             </div>
 
             <button
               type="button"
-              disabled={!selectedId || processing || properties.length === 0}
+              disabled={
+                !selectedId ||
+                processing ||
+                properties.length === 0
+              }
               onClick={() => void handleCheckout()}
               style={{
                 ...styles.button,
                 width: "100%",
                 marginTop: 12,
                 opacity:
-                  !selectedId || processing || properties.length === 0
+                  !selectedId ||
+                  processing ||
+                  properties.length === 0
                     ? 0.6
                     : 1,
                 cursor:
-                  !selectedId || processing || properties.length === 0
+                  !selectedId ||
+                  processing ||
+                  properties.length === 0
                     ? "not-allowed"
                     : "pointer",
               }}
             >
-              {processing ? "Opening secure checkout…" : "Promote for £4.99 →"}
+              {processing
+                ? "Opening secure checkout…"
+                : "Promote for £4.99 →"}
             </button>
 
             <p
@@ -508,14 +601,17 @@ export default function PromoteProperty() {
                 marginBottom: 0,
               }}
             >
-              Secure payment through Stripe. Your promotion starts only after
-              successful payment is verified.
+              Secure payment through Stripe. Your promotion
+              starts only after successful payment is verified.
             </p>
 
             {properties.length === 0 && (
               <button
                 type="button"
-                style={{ ...styles.button, marginTop: 16 }}
+                style={{
+                  ...styles.button,
+                  marginTop: 16,
+                }}
                 onClick={() => navigate("/add-property")}
               >
                 + Add a property
@@ -525,64 +621,82 @@ export default function PromoteProperty() {
         </section>
 
         <section style={styles.card}>
-          <h2 style={{ fontSize: 19, margin: "0 0 6px" }}>
+          <h2
+            style={{
+              fontSize: 19,
+              margin: "0 0 6px",
+            }}
+          >
             Your promotions
           </h2>
+
           <p style={styles.muted}>
-            Check the payment status and expiry of your promotions.
+            Check the payment status and expiry of your
+            promotions.
           </p>
 
           {promotions.length === 0 ? (
             <p style={styles.muted}>
-              You don't have any promotions yet. Your purchased promotions
-              will appear here.
+              You don't have any promotions yet. Your purchased
+              promotions will appear here.
             </p>
           ) : (
-            promotions.map((promotion) => (
-              <div
-                key={promotion.id}
-                style={{
-                  padding: "14px 0",
-                  borderTop: `1px solid ${BORDER}`,
-                }}
-              >
+            promotions.map((promotion) => {
+              const isActive =
+                promotion.status === "active" &&
+                promotion.expires_at !== null &&
+                new Date(promotion.expires_at).getTime() >
+                  Date.now();
+
+              return (
                 <div
+                  key={promotion.id}
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    flexWrap: "wrap",
+                    padding: "14px 0",
+                    borderTop: `1px solid ${BORDER}`,
                   }}
                 >
-                  <strong>{propertyName(promotion.property_id)}</strong>
-                  <span
+                  <div
                     style={{
-                      color:
-                        promotion.status === "active" &&
-                        promotion.expires_at &&
-                        new Date(promotion.expires_at).getTime() > Date.now()
-                          ? GREEN
-                          : MUTED,
-                      fontWeight: 800,
-                      fontSize: 13,
-                      textTransform: "capitalize",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      flexWrap: "wrap",
                     }}
                   >
-                    {promotion.status}
-                  </span>
-                </div>
+                    <strong>
+                      {propertyName(promotion.property_id)}
+                    </strong>
 
-                <p style={{ ...styles.muted, margin: "6px 0 0" }}>
-                  {promotion.expires_at
-                    ? `Expires ${new Date(
-                        promotion.expires_at
-                      ).toLocaleDateString("en-GB")}`
-                    : promotion.status === "pending"
-                      ? "Awaiting verified payment"
-                      : "Expiry date not set"}
-                </p>
-              </div>
-            ))
+                    <span
+                      style={{
+                        color: isActive ? GREEN : MUTED,
+                        fontWeight: 800,
+                        fontSize: 13,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {promotion.status}
+                    </span>
+                  </div>
+
+                  <p
+                    style={{
+                      ...styles.muted,
+                      margin: "6px 0 0",
+                    }}
+                  >
+                    {promotion.expires_at
+                      ? `Expires ${new Date(
+                          promotion.expires_at
+                        ).toLocaleDateString("en-GB")}`
+                      : promotion.status === "pending"
+                        ? "Awaiting verified payment"
+                        : "Expiry date not set"}
+                  </p>
+                </div>
+              );
+            })
           )}
 
           <button
