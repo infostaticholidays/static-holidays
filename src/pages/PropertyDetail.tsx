@@ -767,15 +767,18 @@ const bookingMode = String(ownerBookingMode ?? "")
         );
       }
 
+ 
       // Start the existing Stripe Checkout flow.
       const { data: checkout, error: checkoutError } =
         await supabase.functions.invoke("create-checkout-session", {
           body: {
-  booking_id: newBooking.id,
-  payment_choice: fullPaymentRequired
-    ? "full"
-    : paymentChoice,
-},
+            booking_id: newBooking.id,
+            payment_choice: fullPaymentRequired
+              ? "full"
+              : paymentChoice,
+          },
+        });
+
 
       if (checkoutError) {
         console.error("Could not start Stripe Checkout:", checkoutError);
