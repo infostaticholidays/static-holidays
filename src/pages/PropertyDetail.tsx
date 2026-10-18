@@ -807,6 +807,7 @@ const bookingMode = String(ownerBookingMode ?? "")
       }
 
  
+      
       // Start the existing Stripe Checkout flow.
       const { data: checkout, error: checkoutError } =
         await supabase.functions.invoke("create-checkout-session", {
@@ -817,6 +818,7 @@ const bookingMode = String(ownerBookingMode ?? "")
               : paymentChoice,
           },
         });
+
 
 
       if (checkoutError) {
