@@ -601,18 +601,22 @@ useEffect(() => {
         return;
       }
 
-      // Read the owner's booking preference once.
-      const { data: ownerProfile, error: profileError } = await supabase
-        .from("profiles")
-        .select("booking_mode")
-        .eq("id", property.owner_id)
-        .maybeSingle();
+     // Read the owner's booking preference without exposing their profile.
+const { data: ownerBookingMode, error: profileError } =
+  await supabase.rpc("get_owner_booking_mode", {
+    p_owner_id: property.owner_id,
+  });
 
-      if (profileError) throw profileError;
+if (profileError) {
+  console.error("Could not read the host's booking preference:", profileError);
+  throw new Error(
+    "We couldn't check the host's booking preference. Please try again."
+  );
+}
 
-      const bookingMode = String(ownerProfile?.booking_mode ?? "")
-        .trim()
-        .toLowerCase();
+const bookingMode = String(ownerBookingMode ?? "")
+  .trim()
+  .toLowerCase();
 
       const isManualBooking = [
         "manual",
