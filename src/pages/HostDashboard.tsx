@@ -1610,5 +1610,3 @@ window.location.assign(checkoutUrl);
         </footer>
       </main>
     </div>
-  );
-}
