@@ -1910,202 +1910,152 @@ const bookingMode = String(ownerBookingMode ?? "")
                 </div>
               )}
 
-              {bookingMessage && (
+{endDate && stayPriceInfo.valid && (
+  <section
+    style={{
+      marginTop: 20,
+      padding: 15,
+      border: "1px solid #e1ebe0",
+      borderRadius: 12,
+      background: "#fff",
+    }}
+  >
+    <h3
+      style={{
+        margin: "0 0 12px",
+        fontSize: 15,
+        color: "#203128",
+      }}
+    >
+      Choose your payment
+    </h3>
+
+    {fullPaymentRequired ? (
+      <div
+        style={{
+          padding: 12,
+          borderRadius: 9,
+          background: "#f3f7f2",
+          color: "#315640",
+          fontSize: 13,
+          lineHeight: 1.6,
+        }}
+      >
+        <strong>Full payment required</strong>
+        <p style={{ margin: "5px 0 0" }}>
+          Because your stay costs £100 or less, or check-in is
+          within 30 days, the full amount must be paid.
+        </p>
+        <strong>{formatPrice(stayPriceInfo.total)}</strong>
+      </div>
+    ) : (
+      <div
+        style={{
+          display: "grid",
+          gap: 12,
+          fontSize: 13,
+          color: "#405448",
+        }}
+      >
+        <label style={{ display: "flex", gap: 10, cursor: "pointer" }}>
+          <input
+            type="radio"
+            name="paymentChoice"
+            value="deposit"
+            checked={paymentChoice === "deposit"}
+            onChange={() => setPaymentChoice("deposit")}
+          />
+          <span>
+            <strong>Pay £100 deposit</strong>
+            <span style={{ display: "block", marginTop: 3, color: "#758078" }}>
+              Pay £100 now.
+            </span>
+          </span>
+        </label>
+
+        <label style={{ display: "flex", gap: 10, cursor: "pointer" }}>
+          <input
+            type="radio"
+            name="paymentChoice"
+            value="custom"
+            checked={paymentChoice === "custom"}
+            onChange={() => setPaymentChoice("custom")}
+          />
+          <span>
+            <strong>Choose another amount</strong>
+            <span style={{ display: "block", marginTop: 3, color: "#758078" }}>
+              Minimum £100, up to the full booking total.
+            </span>
+          </span>
+        </label>
+
+        {paymentChoice === "custom" && (
+          <label style={{ display: "block", fontWeight: 700 }}>
+            Amount to pay (£)
+            <input
+              type="number"
+              min="100"
+              max={stayPriceInfo.total}
+              step="0.01"
+              inputMode="decimal"
+              value={customAmount}
+              onChange={(event) => setCustomAmount(event.target.value)}
+              placeholder="Enter amount, e.g. 250"
+              style={{
+                display: "block",
+                boxSizing: "border-box",
+                width: "100%",
+                marginTop: 7,
+                padding: 12,
+                border: "1px solid #dce4dc",
+                borderRadius: 9,
+                fontSize: 14,
+                background: "#fff",
+                color: "#203128",
+              }}
+            />
+          </label>
+        )}
+
+        <label style={{ display: "flex", gap: 10, cursor: "pointer" }}>
+          <input
+            type="radio"
+            name="paymentChoice"
+            value="full"
+            checked={paymentChoice === "full"}
+            onChange={() => setPaymentChoice("full")}
+          />
+          <span>
+            <strong>Pay in full</strong>
+            <span style={{ display: "block", marginTop: 3, color: "#758078" }}>
+              Pay {formatPrice(stayPriceInfo.total)} now.
+            </span>
+          </span>
+        </label>
+      </div>
+    )}
+  </section>
+)}
+
+{bookingMessage && (
+  <p
+    role="status"
+    style={{
+      background: bookingMessageType === "success" ? "#dcfce7" : "#fee2e2",
+      color: bookingMessageType === "success" ? "#166534" : "#991b1b",
+      borderRadius: 9,
+      padding: 12,
+      fontSize: 12,
+      lineHeight: 1.6,
+      overflowWrap: "anywhere",
+      marginTop: 16,
+    }}
+  >
+    {bookingMessage}
+  </p>
+)}
+
               
-              {endDate && stayPriceInfo.valid && (
-                <section
-                  style={{
-                    marginTop: 20,
-                    padding: 15,
-                    border: "1px solid #e1ebe0",
-                    borderRadius: 12,
-                    background: "#fff",
-                  }}
-                >
-                  <h3
-                    style={{
-                      margin: "0 0 12px",
-                      fontSize: 15,
-                      color: "#203128",
-                    }}
-                  >
-                    Choose your payment
-                  </h3>
-
-                  {fullPaymentRequired ? (
-                    <div
-                      style={{
-                        padding: 12,
-                        borderRadius: 9,
-                        background: "#f3f7f2",
-                        color: "#315640",
-                        fontSize: 13,
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      <strong>Full payment required</strong>
-                      <p style={{ margin: "5px 0 0" }}>
-                        Because your stay costs £100 or less, or check-in
-                        is within 30 days, the full amount must be paid.
-                      </p>
-                      <strong>
-                        {formatPrice(stayPriceInfo.total)}
-                      </strong>
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: "grid",
-                        gap: 12,
-                        fontSize: 13,
-                        color: "#405448",
-                      }}
-                    >
-                      <label
-                        style={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: 10,
-                          cursor: "pointer",
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentChoice"
-                          value="deposit"
-                          checked={paymentChoice === "deposit"}
-                          onChange={() => setPaymentChoice("deposit")}
-                        />
-                        <span>
-                          <strong>Pay £100 deposit</strong>
-                          <span
-                            style={{
-                              display: "block",
-                              marginTop: 3,
-                              color: "#758078",
-                            }}
-                          >
-                            Pay £100 now.
-                          </span>
-                        </span>
-                      </label>
-
-                      <label
-                        style={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: 10,
-                          cursor: "pointer",
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentChoice"
-                          value="custom"
-                          checked={paymentChoice === "custom"}
-                          onChange={() => setPaymentChoice("custom")}
-                        />
-                        <span>
-                          <strong>Choose another amount</strong>
-                          <span
-                            style={{
-                              display: "block",
-                              marginTop: 3,
-                              color: "#758078",
-                            }}
-                          >
-                            Minimum £100, up to the full booking total.
-                          </span>
-                        </span>
-                      </label>
-
-                      {paymentChoice === "custom" && (
-                        <label
-                          style={{
-                            display: "block",
-                            fontWeight: 700,
-                          }}
-                        >
-                          Amount to pay (£)
-                          <input
-                            type="number"
-                            min="100"
-                            max={stayPriceInfo.total}
-                            step="0.01"
-                            inputMode="decimal"
-                            value={customAmount}
-                            onChange={(event) =>
-                              setCustomAmount(event.target.value)
-                            }
-                            placeholder="Enter amount, e.g. 250"
-                            style={{
-                              display: "block",
-                              boxSizing: "border-box",
-                              width: "100%",
-                              marginTop: 7,
-                              padding: 12,
-                              border: "1px solid #dce4dc",
-                              borderRadius: 9,
-                              fontSize: 14,
-                              background: "#fff",
-                              color: "#203128",
-                            }}
-                          />
-                        </label>
-                      )}
-
-                      <label
-                        style={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: 10,
-                          cursor: "pointer",
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentChoice"
-                          value="full"
-                          checked={paymentChoice === "full"}
-                          onChange={() => setPaymentChoice("full")}
-                        />
-                        <span>
-                          <strong>Pay in full</strong>
-                          <span
-                            style={{
-                              display: "block",
-                              marginTop: 3,
-                              color: "#758078",
-                            }}
-                          >
-                            Pay {formatPrice(stayPriceInfo.total)} now.
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-                  )}
-                </section>
-              )}
-
-                <p
-                  role="status"
-                  style={{
-                    background:
-                      bookingMessageType === "success" ? "#dcfce7" : "#fee2e2",
-                    color:
-                      bookingMessageType === "success" ? "#166534" : "#991b1b",
-                    borderRadius: 9,
-                    padding: 12,
-                    fontSize: 12,
-                    lineHeight: 1.6,
-                    overflowWrap: "anywhere",
-                    marginTop: 16,
-                  }}
-                >
-                  {bookingMessage}
-                </p>
-              )}
-
               <button
                 type="button"
                 onClick={() => void createBooking()}
