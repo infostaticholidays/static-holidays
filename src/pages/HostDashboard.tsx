@@ -456,6 +456,7 @@ const handleSaveBookingMode = async () => {
   
   
  
+  
   const handlePlanUpgrade = async (planId: PlanId) => {
     if (planId === "host") {
       setNotice("Host Free is the free plan.");
@@ -479,7 +480,7 @@ const handleSaveBookingMode = async () => {
 
       if (error) throw error;
 
-      if (!data?.url || typeof data.url !== "string") {
+      if (typeof data?.url !== "string" || !data.url) {
         throw new Error(
           "The checkout link was not returned. Check that create-plan-checkout is deployed and configured."
         );
@@ -497,6 +498,56 @@ const handleSaveBookingMode = async () => {
       );
     } finally {
       setProcessingPlan(null);
+    }
+  };
+
+  const handlePromotionCheckout = async () => {
+    const selectedProperty = properties.find(
+      (property) => String(property.id) === selectedPropertyId
+    );
+
+    if (!selectedProperty) {
+      setPageError("Please choose a property to promote first.");
+      return;
+    }
+
+    setProcessingPromotion(true);
+    setPageError("");
+    setNotice("");
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "create-property-promotion-checkout",
+        {
+          body: {
+            property_id: selectedProperty.id,
+            promotion_type: "homepage_search",
+          },
+        }
+      );
+
+      if (error) throw error;
+
+      const checkoutUrl = data?.checkout_url ?? data?.url;
+
+      if (typeof checkoutUrl !== "string" || !checkoutUrl) {
+        throw new Error(
+          "The checkout link was not returned. Check that create-property-promotion-checkout is deployed and configured."
+        );
+      }
+
+      if (!checkoutUrl.startsWith("https://")) {
+        throw new Error("The checkout link is not a valid secure URL.");
+      }
+
+      window.location.assign(checkoutUrl);
+    } catch (error) {
+      console.error("Property promotion checkout error:", error);
+      setPageError(
+        `Unable to start promotion checkout: ${getErrorMessage(error)}. Make sure the create-property-promotion-checkout Supabase Edge Function and Stripe settings are configured.`
+      );
+    } finally {
+      setProcessingPromotion(false);
     }
   };
 
