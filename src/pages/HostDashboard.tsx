@@ -747,13 +747,7 @@ export default function HostDashboard() {
           >
             ☆ &nbsp; Reviews
           </button>
-          <button
-            type="button"
-            style={styles.navItem}
-            onClick={() => goTo("/host-subscriptions")}
-          >
-            ◈ &nbsp; Plans & Membership
-          </button>
+         
         </nav>
 
         <div style={{ marginTop: "auto", padding: "24px 12px 0" }}>
