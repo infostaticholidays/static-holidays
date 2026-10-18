@@ -606,7 +606,22 @@ useEffect(() => {
       showError("A valid price is not available for this stay.");
       return;
     }
+if (!fullPaymentRequired && paymentChoice === "custom") {
+  const amount = Number(customAmount);
 
+  if (
+    customAmount.trim() === "" ||
+    !Number.isFinite(amount) ||
+    !Number.isInteger(amount * 100) ||
+    amount < 100 ||
+    amount > stayPriceInfo.total
+  ) {
+    showError(
+      `Enter an amount between £100 and ${formatPrice(stayPriceInfo.total)}, using no more than two decimal places.`
+    );
+    return;
+  }
+}
     setBookingLoading(true);
 
     try {
