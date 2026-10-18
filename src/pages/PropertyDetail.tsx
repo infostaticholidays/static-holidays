@@ -606,7 +606,24 @@ const { data: ownerBookingMode, error: profileError } =
   await supabase.rpc("get_owner_booking_mode", {
     p_owner_id: property.owner_id,
   });
+if (profileError) {
+  console.error("Booking mode RPC failed:", {
+    code: profileError.code,
+    message: profileError.message,
+    details: profileError.details,
+    hint: profileError.hint,
+    ownerId: property.owner_id,
+  });
 
+  throw new Error(
+    `Booking preference lookup failed: ${profileError.message}`
+  );
+}
+
+console.log("Booking mode RPC result:", {
+  ownerBookingMode,
+  ownerId: property.owner_id,
+});
 if (profileError) {
   console.error("Could not read the host's booking preference:", profileError);
   throw new Error(
