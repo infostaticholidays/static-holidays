@@ -484,20 +484,20 @@ const handleSaveBookingMode = async () => {
         );
       }
 
-      if (!data.url.startsWith("https://")) {
-        throw new Error("The checkout link is not a valid secure URL.");
-      }
+      
+const checkoutUrl = data?.checkout_url ?? data?.url;
 
-      window.location.assign(data.url);
-    } catch (error) {
-      console.error("Plan checkout error:", error);
-      setPageError(
-        `Unable to start checkout: ${getErrorMessage(error)}. Make sure the create-plan-checkout Supabase Edge Function and Stripe settings are configured.`
-      );
-    } finally {
-      setProcessingPlan(null);
-    }
-  };
+if (typeof checkoutUrl !== "string" || !checkoutUrl) {
+  throw new Error(
+    "The checkout link was not returned. Check that create-property-promotion-checkout is deployed and configured."
+  );
+}
+
+if (!checkoutUrl.startsWith("https://")) {
+  throw new Error("The checkout link is not a valid secure URL.");
+}
+
+window.location.assign(checkoutUrl);
 
   const handlePromotionCheckout = async () => {
     const selectedProperty = properties.find(
