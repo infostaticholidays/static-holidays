@@ -16,6 +16,17 @@ type Plan = {
   popular?: boolean;
 };
 
+type Promotion = {
+  id: string;
+  property_id: string;
+  owner_id: string;
+  status: "pending" | "active" | "expired" | "failed";
+  starts_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  amount_pence: number;
+};
+
 const GREEN = "#176b50";
 const GREEN_DARK = "#104b39";
 const GREEN_LIGHT = "#eaf5ef";
@@ -30,8 +41,45 @@ const money = (value: number) =>
     currency: "GBP",
   }).format(Number.isFinite(value) ? value : 0);
 
-// Keep this helper at module scope so every component can access it.
 const formatPrice = (price: number) => money(price);
+
+const formatDate = (value: string | null | undefined) => {
+  if (!value) return "Not set";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not set";
+
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getPromotionStatus = (promotion: Promotion) => {
+  if (promotion.status === "failed") return "Failed";
+  if (promotion.status === "pending") return "Payment pending";
+  if (promotion.status === "expired") return "Expired";
+
+  if (
+    promotion.expires_at &&
+    new Date(promotion.expires_at).getTime() <= Date.now()
+  ) {
+    return "Expired";
+  }
+
+  return "Active";
+};
+
+const getDaysRemaining = (expiresAt: string | null) => {
+  if (!expiresAt) return null;
+
+  const difference = new Date(expiresAt).getTime() - Date.now();
+
+  if (!Number.isFinite(difference) || difference <= 0) return 0;
+
+  return Math.ceil(difference / (1000 * 60 * 60 * 24));
+};
 
 const plans: Plan[] = [
   {
@@ -210,6 +258,7 @@ function getPlanId(value: unknown): PlanId {
 
   if (plan.includes("elite")) return "elite";
   if (plan.includes("super")) return "super";
+
   return "host";
 }
 
@@ -232,15 +281,17 @@ export default function HostDashboard() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState<any>(null);
-  
-const [profile, setProfile] = useState<any>(null);
-const [bookingMode, setBookingMode] = useState<"manual" | "automatic">("manual");
-const [savingBookingMode, setSavingBookingMode] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
+
+  const [bookingMode, setBookingMode] =
+    useState<"manual" | "automatic">("manual");
+  const [savingBookingMode, setSavingBookingMode] = useState(false);
 
   const [properties, setProperties] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [conversations, setConversations] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
@@ -275,7 +326,6 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
 
         setUser(currentUser);
 
-        // Profile is essential to determine whether this account is a host.
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("*")
@@ -295,16 +345,14 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
 
         setProfile(profileData);
         setBookingMode(
-  profileData.booking_mode === "automatic" ? "automatic" : "manual"
-);
+          profileData.booking_mode === "automatic" ? "automatic" : "manual"
+        );
 
         if (profileData.role && profileData.role !== "host") {
           navigate("/account");
           return;
         }
 
-        // Load each dashboard section independently so one optional section
-        // cannot prevent the rest of the dashboard from appearing.
         const propertyResult = await supabase
           .from("properties")
           .select("*")
@@ -313,36 +361,65 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
 
         if (!mountedCheck()) return;
 
+        let propertyData: any[] = [];
+
         if (propertyResult.error) {
-          console.error("Properties could not be loaded:", propertyResult.error);
+          console.error(
+            "Properties could not be loaded:",
+            propertyResult.error
+          );
           setProperties([]);
           setNotice("Some property information could not be loaded.");
         } else {
-          const propertyData = propertyResult.data ?? [];
+          propertyData = propertyResult.data ?? [];
           setProperties(propertyData);
+        }
 
-          const propertyIds = propertyData
-            .map((property: any) => property.id)
-            .filter(Boolean);
+        // Load the owner's promotion history independently of bookings.
+        const promotionResult = await supabase
+          .from("property_promotions")
+          .select(
+            "id, property_id, owner_id, status, starts_at, expires_at, created_at, amount_pence"
+          )
+          .eq("owner_id", currentUser.id)
+          .order("created_at", { ascending: false });
 
-          if (propertyIds.length > 0) {
-            const bookingResult = await supabase
-              .from("bookings")
-              .select("*")
-              .in("property_id", propertyIds)
-              .order("created_at", { ascending: false });
+        if (!mountedCheck()) return;
 
-            if (!mountedCheck()) return;
+        if (promotionResult.error) {
+          console.error(
+            "Property promotions could not be loaded:",
+            promotionResult.error
+          );
+          setPromotions([]);
+        } else {
+          setPromotions((promotionResult.data ?? []) as Promotion[]);
+        }
 
-            if (bookingResult.error) {
-              console.error("Bookings could not be loaded:", bookingResult.error);
-              setBookings([]);
-            } else {
-              setBookings(bookingResult.data ?? []);
-            }
-          } else {
+        const propertyIds = propertyData
+          .map((property: any) => property.id)
+          .filter(Boolean);
+
+        if (propertyIds.length > 0) {
+          const bookingResult = await supabase
+            .from("bookings")
+            .select("*")
+            .in("property_id", propertyIds)
+            .order("created_at", { ascending: false });
+
+          if (!mountedCheck()) return;
+
+          if (bookingResult.error) {
+            console.error(
+              "Bookings could not be loaded:",
+              bookingResult.error
+            );
             setBookings([]);
+          } else {
+            setBookings(bookingResult.data ?? []);
           }
+        } else {
+          setBookings([]);
         }
 
         const conversationResult = await supabase
@@ -363,8 +440,6 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
           setConversations(conversationResult.data ?? []);
         }
 
-        // Reviews are optional. A missing host_id column or another reviews
-        // query error should not crash the whole dashboard.
         const reviewResult = await supabase
           .from("reviews")
           .select("*")
@@ -402,6 +477,7 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
   }, [loadDashboard]);
 
   const currentPlan = getPlanId(profile?.plan);
+
   const isVerified = Boolean(
     profile?.id_verified && profile?.insurance_verified
   );
@@ -409,8 +485,9 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
   const grossEarnings = bookings.reduce((total, booking) => {
     const status = String(booking.status ?? "").toLowerCase();
 
-    // Avoid counting cancelled or rejected bookings as earnings.
-    if (["cancelled", "canceled", "rejected"].includes(status)) return total;
+    if (["cancelled", "canceled", "rejected"].includes(status)) {
+      return total;
+    }
 
     const amount = Number(
       booking.total_price ?? booking.total_amount ?? booking.amount ?? 0
@@ -419,42 +496,41 @@ const [savingBookingMode, setSavingBookingMode] = useState(false);
     return total + (Number.isFinite(amount) ? amount : 0);
   }, 0);
 
+  // Preserve existing membership commission rates.
   const commissionRate =
     currentPlan === "elite" ? 0.01 : currentPlan === "super" ? 0.05 : 0.12;
 
   const estimatedCommission = grossEarnings * commissionRate;
   const estimatedNet = grossEarnings - estimatedCommission;
-const handleSaveBookingMode = async () => {
-  if (!user?.id) {
-    setPageError("Please sign in again.");
-    return;
-  }
 
-  setSavingBookingMode(true);
-  setPageError("");
-  setNotice("");
+  const handleSaveBookingMode = async () => {
+    if (!user?.id) {
+      setPageError("Please sign in again.");
+      return;
+    }
 
-  try {
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        booking_mode: bookingMode,
-      })
-      .eq("id", user.id);
+    setSavingBookingMode(true);
+    setPageError("");
+    setNotice("");
 
-    if (error) throw error;
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ booking_mode: bookingMode })
+        .eq("id", user.id);
 
-    setNotice("Booking preference saved successfully.");
-  } catch (error) {
-    console.error(error);
-    setPageError("Could not save booking preference.");
-  } finally {
-    setSavingBookingMode(false);
-  }
-};
-  
-  
-  
+      if (error) throw error;
+
+      setNotice("Booking preference saved successfully.");
+    } catch (error) {
+      console.error(error);
+      setPageError("Could not save booking preference.");
+    } finally {
+      setSavingBookingMode(false);
+    }
+  };
+
+  // Existing membership checkout: keep using create-plan-checkout.
   const handlePlanUpgrade = async (planId: PlanId) => {
     if (planId === "host") {
       setNotice("Host Free is the free plan.");
@@ -478,27 +554,28 @@ const handleSaveBookingMode = async () => {
 
       if (error) throw error;
 
-      if (!data?.url || typeof data.url !== "string") {
+      if (typeof data?.url !== "string" || !data.url) {
         throw new Error(
           "The checkout link was not returned. Check that create-plan-checkout is deployed and configured."
         );
       }
 
-      
-const checkoutUrl = data?.checkout_url ?? data?.url;
+      if (!data.url.startsWith("https://")) {
+        throw new Error("The checkout link is not a valid secure URL.");
+      }
 
-if (typeof checkoutUrl !== "string" || !checkoutUrl) {
-  throw new Error(
-    "The checkout link was not returned. Check that create-property-promotion-checkout is deployed and configured."
-  );
-}
+      window.location.assign(data.url);
+    } catch (error) {
+      console.error("Plan checkout error:", error);
+      setPageError(
+        `Unable to start membership checkout: ${getErrorMessage(error)}`
+      );
+    } finally {
+      setProcessingPlan(null);
+    }
+  };
 
-if (!checkoutUrl.startsWith("https://")) {
-  throw new Error("The checkout link is not a valid secure URL.");
-}
-
-window.location.assign(checkoutUrl);
-
+  // Separate checkout handler for the one-off property promotion.
   const handlePromotionCheckout = async () => {
     const selectedProperty = properties.find(
       (property) => String(property.id) === selectedPropertyId
@@ -526,17 +603,19 @@ window.location.assign(checkoutUrl);
 
       if (error) throw error;
 
-      if (!data?.url || typeof data.url !== "string") {
+      const checkoutUrl = data?.checkout_url ?? data?.url;
+
+      if (typeof checkoutUrl !== "string" || !checkoutUrl) {
         throw new Error(
-          "The checkout link was not returned. Check that create-property-promotion-checkout is deployed and configured."
+          "The promotion checkout link was not returned. Check that create-property-promotion-checkout is deployed and configured."
         );
       }
 
-      if (!data.url.startsWith("https://")) {
+      if (!checkoutUrl.startsWith("https://")) {
         throw new Error("The checkout link is not a valid secure URL.");
       }
 
-      window.location.assign(data.url);
+      window.location.assign(checkoutUrl);
     } catch (error) {
       console.error("Property promotion checkout error:", error);
       setPageError(
@@ -789,43 +868,42 @@ window.location.assign(checkoutUrl);
         )}
 
         <section style={{ ...styles.card, marginBottom: 20 }}>
-  <h2 style={styles.sectionTitle}>Booking preferences</h2>
+          <h2 style={styles.sectionTitle}>Booking preferences</h2>
+          <p style={styles.muted}>
+            Choose how you want to handle booking requests.
+          </p>
 
-  <p style={styles.muted}>
-    Choose how you want to handle booking requests.
-  </p>
+          <label style={{ display: "block", marginBottom: 12 }}>
+            <input
+              type="radio"
+              name="bookingMode"
+              checked={bookingMode === "manual"}
+              onChange={() => setBookingMode("manual")}
+              disabled={savingBookingMode}
+            />
+            {" "}Manual approval — I approve each booking myself.
+          </label>
 
-  <label style={{ display: "block", marginBottom: 12 }}>
-    <input
-      type="radio"
-      name="bookingMode"
-      checked={bookingMode === "manual"}
-      onChange={() => setBookingMode("manual")}
-      disabled={savingBookingMode}
-    />
-    {" "}Manual approval — I approve each booking myself.
-  </label>
+          <label style={{ display: "block", marginBottom: 16 }}>
+            <input
+              type="radio"
+              name="bookingMode"
+              checked={bookingMode === "automatic"}
+              onChange={() => setBookingMode("automatic")}
+              disabled={savingBookingMode}
+            />
+            {" "}Automatic booking — eligible bookings are confirmed automatically.
+          </label>
 
-  <label style={{ display: "block", marginBottom: 16 }}>
-    <input
-      type="radio"
-      name="bookingMode"
-      checked={bookingMode === "automatic"}
-      onChange={() => setBookingMode("automatic")}
-      disabled={savingBookingMode}
-    />
-    {" "}Automatic booking — eligible bookings are confirmed automatically.
-  </label>
-
-  <button
-    type="button"
-    style={styles.primaryButton}
-    onClick={() => void handleSaveBookingMode()}
-    disabled={savingBookingMode}
-  >
-    {savingBookingMode ? "Saving..." : "Save booking preference"}
-  </button>
-</section>
+          <button
+            type="button"
+            style={styles.primaryButton}
+            onClick={() => void handleSaveBookingMode()}
+            disabled={savingBookingMode}
+          >
+            {savingBookingMode ? "Saving..." : "Save booking preference"}
+          </button>
+        </section>
 
         {!isVerified && (
           <section
@@ -1003,23 +1081,13 @@ window.location.assign(checkoutUrl);
                   )}
 
                   <h3 style={{ fontSize: 17, margin: "0 0 6px" }}>
-                    {property.title ||
-                      property.name ||
-                      "Untitled property"}
+                    {property.title || property.name || "Untitled property"}
                   </h3>
                   <p style={{ ...styles.muted, margin: "0 0 14px" }}>
-                    {property.location ||
-                      property.address ||
-                      "Location not added"}
+                    {property.location || property.address || "Location not added"}
                   </p>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 8,
-                    }}
-                  >
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     <button
                       type="button"
                       style={styles.secondaryButton}
@@ -1030,9 +1098,7 @@ window.location.assign(checkoutUrl);
                     <button
                       type="button"
                       style={styles.secondaryButton}
-                      onClick={() =>
-                        goTo(`/property-calendar/${property.id}`)
-                      }
+                      onClick={() => goTo(`/property-calendar/${property.id}`)}
                     >
                       Calendar
                     </button>
@@ -1168,9 +1234,7 @@ window.location.assign(checkoutUrl);
           <div style={styles.grid}>
             {plans.map((plan) => {
               const price =
-                planBilling === "monthly"
-                  ? plan.monthlyPrice
-                  : plan.yearlyPrice;
+                planBilling === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
               const isCurrent = currentPlan === plan.id;
 
               return (
@@ -1269,8 +1333,7 @@ window.location.assign(checkoutUrl);
                     style={{
                       ...styles.primaryButton,
                       width: "100%",
-                      opacity:
-                        isCurrent || processingPlan !== null ? 0.65 : 1,
+                      opacity: isCurrent || processingPlan !== null ? 0.65 : 1,
                       cursor:
                         isCurrent || processingPlan !== null
                           ? "not-allowed"
@@ -1343,13 +1406,7 @@ window.location.assign(checkoutUrl);
                   Promote a property on the homepage and improve its search
                   visibility for 30 days — without changing your subscription.
                 </p>
-                <div
-                  style={{
-                    fontSize: 31,
-                    fontWeight: 850,
-                    marginTop: 18,
-                  }}
-                >
+                <div style={{ fontSize: 31, fontWeight: 850, marginTop: 18 }}>
                   £4.99{" "}
                   <span style={{ fontSize: 14, fontWeight: 500 }}>
                     / 30 days
@@ -1381,9 +1438,7 @@ window.location.assign(checkoutUrl);
                 <select
                   id="promotion-property"
                   value={selectedPropertyId}
-                  onChange={(event) =>
-                    setSelectedPropertyId(event.target.value)
-                  }
+                  onChange={(event) => setSelectedPropertyId(event.target.value)}
                   style={styles.input}
                 >
                   <option value="">Select your property…</option>
@@ -1433,6 +1488,116 @@ window.location.assign(checkoutUrl);
                 )}
               </div>
             </div>
+          </div>
+        </section>
+
+        <section style={{ marginBottom: 30 }}>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={styles.sectionTitle}>My property promotions</h2>
+            <p style={{ ...styles.muted, margin: 0 }}>
+              Check payment status and the remaining time for each promotion.
+            </p>
+          </div>
+
+          <div style={styles.card}>
+            {promotions.length === 0 ? (
+              <p style={{ ...styles.muted, margin: 0 }}>
+                You haven't purchased a property promotion yet. Completed
+                purchases will appear here once recorded in your account.
+              </p>
+            ) : (
+              promotions.map((promotion) => {
+                const property = properties.find(
+                  (item: any) => String(item.id) === String(promotion.property_id)
+                );
+
+                const status = getPromotionStatus(promotion);
+                const daysRemaining = getDaysRemaining(promotion.expires_at);
+                const statusColour =
+                  status === "Active"
+                    ? GREEN
+                    : status === "Expired" || status === "Failed"
+                      ? "#8c3025"
+                      : "#8a651b";
+
+                return (
+                  <article
+                    key={promotion.id}
+                    style={{
+                      padding: "16px 0",
+                      borderBottom: `1px solid ${BORDER}`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "start",
+                        gap: 12,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <h3 style={{ fontSize: 16, margin: "0 0 6px" }}>
+                          {property?.title ||
+                            property?.name ||
+                            "Property promotion"}
+                        </h3>
+                        <span
+                          style={{
+                            ...styles.pill,
+                            background:
+                              status === "Active"
+                                ? GREEN_LIGHT
+                                : status === "Expired" || status === "Failed"
+                                  ? "#fff0ee"
+                                  : "#fff6df",
+                            color: statusColour,
+                          }}
+                        >
+                          {status}
+                        </span>
+                      </div>
+
+                      <strong>{money((promotion.amount_pence ?? 499) / 100)}</strong>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fit, minmax(min(100%, 145px), 1fr))",
+                        gap: 12,
+                        marginTop: 14,
+                      }}
+                    >
+                      <div>
+                        <div style={styles.muted}>Start date</div>
+                        <strong>{formatDate(promotion.starts_at)}</strong>
+                      </div>
+                      <div>
+                        <div style={styles.muted}>Expiry date</div>
+                        <strong>{formatDate(promotion.expires_at)}</strong>
+                      </div>
+                      <div>
+                        <div style={styles.muted}>Time remaining</div>
+                        <strong>
+                          {status === "Active" && daysRemaining !== null
+                            ? `${daysRemaining} day${daysRemaining === 1 ? "" : "s"}`
+                            : status === "Pending"
+                              ? "Awaiting payment confirmation"
+                              : status === "Expired"
+                                ? "Promotion ended"
+                                : status === "Failed"
+                                  ? "Payment failed"
+                                  : "Not available"}
+                        </strong>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })
+            )}
           </div>
         </section>
 
@@ -1610,3 +1775,5 @@ window.location.assign(checkoutUrl);
         </footer>
       </main>
     </div>
+  );
+}
