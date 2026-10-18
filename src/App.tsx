@@ -27,6 +27,7 @@ import MyProperties from "./pages/MyProperties";
 import PropertyCalendar from "./pages/PropertyCalendar";
 import HostDashboard from "./pages/HostDashboard";
 import HostReviews from "./pages/HostReviews";
+import PromoteProperty from "./pages/PromoteProperty";
 
 
 
@@ -196,6 +197,10 @@ export default function App() {
             path="/property-calendar/:propertyId"
             element={<PropertyCalendar />}
           />
+          <Route
+  path="/promote-property"
+  element={<PromoteProperty />}
+/>
 
           <Route path="*" element={<NotFound />} />
         </Routes>
