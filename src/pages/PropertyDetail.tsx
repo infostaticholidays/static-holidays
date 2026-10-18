@@ -476,9 +476,30 @@ useEffect(() => {
       unpriced,
       nightlyPrices,
     };
+ 
   }, [stayDates, calendarDates, basePrice]);
 
+  // Full payment is required for stays costing £100 or less,
+  // or when check-in is within 30 days.
+  const daysToArrival = startDate
+    ? Math.floor(
+        (
+          new Date(`${startDate}T00:00:00Z`).getTime() -
+          Date.UTC(
+            new Date().getUTCFullYear(),
+            new Date().getUTCMonth(),
+            new Date().getUTCDate()
+          )
+        ) / 86400000
+      )
+    : 0;
+
+  const fullPaymentRequired =
+    stayPriceInfo.valid &&
+    (stayPriceInfo.total <= 100 || daysToArrival <= 30);
+
   const displayPrice = useMemo(() => {
+
     if (basePrice !== null) return basePrice;
 
     const availablePrices = Object.values(calendarDates)
