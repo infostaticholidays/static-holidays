@@ -1,0 +1,32 @@
+```css
+/* Make the website text bigger overall */
+html {
+  font-size: 18px;
+}
+
+body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Make headings bigger and easier to read */
+h1 {
+  font-size: 2.2rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+}
+
+h3 {
+  font-size: 1.4rem;
+}
+
+/* Make buttons and form fields easier to read */
+button,
+input,
+select,
+textarea {
+  font-size: 1rem;
+}
+```
