@@ -325,6 +325,9 @@ export default function Account() {
               Welcome back, {firstName}!
             </h1>
 
+<p>Let's find your somewhere special.</p>
+<p>Your next getaway starts here.</p>
+
             <p
               style={{
                 margin: "0 0 24px",
