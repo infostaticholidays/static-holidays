@@ -543,8 +543,7 @@ export default function Account() {
                   ⏳ {timeLeft}
                 </p>
               </div>
-
-              <div style={{ fontSize: 56 }}>✈️</div>
+<div style={{ fontSize: 56 }}>🏡</div>
             </div>
           )}
         </section>
