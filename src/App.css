@@ -1,5 +1,4 @@
-```css
-/* Make the website text bigger overall */
+/* Increase the default text size across the website */
 html {
   font-size: 18px;
 }
@@ -9,24 +8,34 @@ body {
   line-height: 1.6;
 }
 
-/* Make headings bigger and easier to read */
+/* Enlarge headings throughout the website */
 h1 {
   font-size: 2.2rem;
+  line-height: 1.2;
 }
 
 h2 {
   font-size: 1.8rem;
+  line-height: 1.3;
 }
 
 h3 {
   font-size: 1.4rem;
+  line-height: 1.4;
 }
 
-/* Make buttons and form fields easier to read */
+/* Enlarge text in buttons and form fields */
 button,
 input,
 select,
 textarea {
   font-size: 1rem;
 }
-```
+
+/* Improve readability of paragraphs and links */
+p,
+li,
+label,
+a {
+  line-height: 1.6;
+}
