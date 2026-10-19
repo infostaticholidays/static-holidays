@@ -262,11 +262,15 @@ export default function Account() {
     );
   }
 
+
 const firstName =
+  profile?.first_name?.trim() ||
   profile?.full_name?.trim()?.split(/\s+/)[0] ||
+  user?.user_metadata?.first_name?.trim() ||
   user?.user_metadata?.full_name?.trim()?.split(/\s+/)[0] ||
   user?.user_metadata?.name?.trim()?.split(/\s+/)[0] ||
   "holidaymaker";
+
 
 
   return (
