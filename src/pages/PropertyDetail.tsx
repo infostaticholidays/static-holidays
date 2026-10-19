@@ -812,8 +812,16 @@ const bookingMode = String(ownerBookingMode ?? "")
         })
         .select("id")
         .single();
+      if (insertError) {
+        if (insertError.code === "42501") {
+          showError(
+            "You must submit your ID and have it approved before you can make a booking."
+          );
+          return;
+        }
 
-      if (insertError) throw insertError;
+        throw insertError;
+      }
 
       if (!newBooking?.id) {
         throw new Error(
