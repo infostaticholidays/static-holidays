@@ -40,6 +40,13 @@ export default function Account() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [newsletterSaving, setNewsletterSaving] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+
+const [profileForm, setProfileForm] = useState({
+  full_name: "",
+  phone: "",
+  address: "",
+});
 
   const navigate = useNavigate();
 
