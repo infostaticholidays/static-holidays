@@ -507,8 +507,23 @@ useEffect(() => {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) {
+            if (!user) {
         navigate("/login");
+        return;
+      }
+            // Guests must have an approved ID before booking.
+      const { data: guestProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id_verified")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+
+      if (guestProfile?.id_verified !== true) {
+        showError(
+          "You must submit your ID and have it approved before you can make a booking."
+        );
         return;
       }
 
