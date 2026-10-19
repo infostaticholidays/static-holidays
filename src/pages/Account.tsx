@@ -262,8 +262,12 @@ export default function Account() {
     );
   }
 
-  const firstName =
-    profile?.full_name?.trim()?.split(/\s+/)[0] 
+const firstName =
+  profile?.full_name?.trim()?.split(/\s+/)[0] ||
+  user?.user_metadata?.full_name?.trim()?.split(/\s+/)[0] ||
+  user?.user_metadata?.name?.trim()?.split(/\s+/)[0] ||
+  "holidaymaker";
+
 
   return (
     <div
