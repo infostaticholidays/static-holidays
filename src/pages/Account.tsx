@@ -263,7 +263,7 @@ export default function Account() {
   }
 
   const firstName =
-    profile?.full_name?.trim()?.split(/\s+/)[0] || "traveller";
+    profile?.full_name?.trim()?.split(/\s+/)[0] 
 
   return (
     <div
