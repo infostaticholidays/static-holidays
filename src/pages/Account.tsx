@@ -230,6 +230,48 @@ const [profileForm, setProfileForm] = useState({
 
     setNewsletterSaving(false);
   }
+  
+async function saveProfile() {
+  if (!user || profileSaving) return;
+
+  const fullName = profileForm.full_name.trim();
+  const nameParts = fullName.split(/\s+/).filter(Boolean);
+
+  setProfileSaving(true);
+
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: fullName || null,
+        first_name: nameParts[0] || null,
+        last_name: nameParts.slice(1).join(" ") || null,
+        phone: profileForm.phone.trim() || null,
+        address: profileForm.address.trim() || null,
+      })
+      .eq("id", user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    setProfile(data);
+
+    setProfileForm({
+      full_name: data.full_name || "",
+      phone: data.phone || "",
+      address: data.address || "",
+    });
+
+    alert("Your account details have been saved.");
+  } catch (error) {
+    console.error("Could not save account details:", error);
+    alert("Sorry, we couldn't save your details. Please try again.");
+  } finally {
+    setProfileSaving(false);
+  }
+}
+
 
   async function removeFavourite(id: string) {
     const { error } = await supabase
