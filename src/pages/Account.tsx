@@ -823,139 +823,167 @@ const firstName =
             </h2>
 
            
-<div style={{ display: "grid", gap: 16 }}>
-  <div>
-    <label
-      htmlFor="profile-full-name"
-      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
+
+{!isEditingProfile ? (
+  <div style={{ display: "grid", gap: 16 }}>
+    {[
+      ["Full name", profile?.full_name],
+      ["Email address", user?.email],
+      ["Phone", profile?.phone],
+      ["Address", profile?.address],
+    ].map(([label, value]) => (
+      <div
+        key={label}
+        style={{
+          paddingBottom: 12,
+          borderBottom: `1px solid ${border}`,
+        }}
+      >
+        <p style={{ color: muted, fontSize: 12, margin: "0 0 5px" }}>
+          {label}
+        </p>
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>
+          {value || "Not set"}
+        </p>
+      </div>
+    ))}
+
+    <button
+      type="button"
+      onClick={() => setIsEditingProfile(true)}
+      style={buttonStyle}
     >
-      Full name
-    </label>
-    <input
-      id="profile-full-name"
-      type="text"
-      autoComplete="name"
-      value={profileForm.full_name}
-      onChange={(e) =>
-        setProfileForm((prev) => ({
-          ...prev,
-          full_name: e.target.value,
-        }))
-      }
-      placeholder="Enter your full name"
-      style={{
-        boxSizing: "border-box",
-        width: "100%",
-        padding: 12,
-        border: `1px solid ${border}`,
-        borderRadius: 10,
-        fontSize: 14,
-      }}
-    />
+      Edit
+    </button>
   </div>
+) : (
+  <div style={{ display: "grid", gap: 16 }}>
+    <div>
+      <label htmlFor="profile-full-name">Full name</label>
+      <input
+        id="profile-full-name"
+        value={profileForm.full_name}
+        onChange={(e) =>
+          setProfileForm((prev) => ({
+            ...prev,
+            full_name: e.target.value,
+          }))
+        }
+        placeholder="Enter your full name"
+        style={{
+          boxSizing: "border-box",
+          width: "100%",
+          padding: 12,
+          marginTop: 6,
+          border: `1px solid ${border}`,
+          borderRadius: 10,
+        }}
+      />
+    </div>
 
-  <div>
-    <label
-      htmlFor="profile-email"
-      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
-    >
-      Email address
-    </label>
-    <input
-      id="profile-email"
-      type="email"
-      value={user?.email || ""}
-      readOnly
-      style={{
-        boxSizing: "border-box",
-        width: "100%",
-        padding: 12,
-        border: `1px solid ${border}`,
-        borderRadius: 10,
-        background: sage,
-        fontSize: 14,
-      }}
-    />
-    <p style={{ color: muted, fontSize: 12, margin: "5px 0 0" }}>
-      Your sign-in email address.
-    </p>
+    <div>
+      <label htmlFor="profile-email">Email address</label>
+      <input
+        id="profile-email"
+        type="email"
+        value={user?.email || ""}
+        readOnly
+        style={{
+          boxSizing: "border-box",
+          width: "100%",
+          padding: 12,
+          marginTop: 6,
+          background: sage,
+          border: `1px solid ${border}`,
+          borderRadius: 10,
+        }}
+      />
+    </div>
+
+    <div>
+      <label htmlFor="profile-phone">Phone</label>
+      <input
+        id="profile-phone"
+        type="tel"
+        value={profileForm.phone}
+        onChange={(e) =>
+          setProfileForm((prev) => ({
+            ...prev,
+            phone: e.target.value,
+          }))
+        }
+        placeholder="Enter your phone number"
+        style={{
+          boxSizing: "border-box",
+          width: "100%",
+          padding: 12,
+          marginTop: 6,
+          border: `1px solid ${border}`,
+          borderRadius: 10,
+        }}
+      />
+    </div>
+
+    <div>
+      <label htmlFor="profile-address">Address</label>
+      <textarea
+        id="profile-address"
+        value={profileForm.address}
+        onChange={(e) =>
+          setProfileForm((prev) => ({
+            ...prev,
+            address: e.target.value,
+          }))
+        }
+        placeholder="Enter your address"
+        rows={3}
+        style={{
+          boxSizing: "border-box",
+          width: "100%",
+          padding: 12,
+          marginTop: 6,
+          border: `1px solid ${border}`,
+          borderRadius: 10,
+        }}
+      />
+    </div>
+
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+      <button
+        type="button"
+        onClick={saveProfile}
+        disabled={profileSaving}
+        style={{
+          ...buttonStyle,
+          opacity: profileSaving ? 0.7 : 1,
+        }}
+      >
+        {profileSaving ? "Saving..." : "Save changes"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setProfileForm({
+            full_name: profile?.full_name || "",
+            phone: profile?.phone || "",
+            address: profile?.address || "",
+          });
+          setIsEditingProfile(false);
+        }}
+        style={{
+          ...buttonStyle,
+          background: "#ffffff",
+          color: darkGreen,
+          border: `1px solid ${border}`,
+        }}
+      >
+        Cancel
+      </button>
+    </div>
   </div>
+)}
 
-  <div>
-    <label
-      htmlFor="profile-phone"
-      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
-    >
-      Phone
-    </label>
-    <input
-      id="profile-phone"
-      type="tel"
-      autoComplete="tel"
-      value={profileForm.phone}
-      onChange={(e) =>
-        setProfileForm((prev) => ({
-          ...prev,
-          phone: e.target.value,
-        }))
-      }
-      placeholder="Enter your phone number"
-      style={{
-        boxSizing: "border-box",
-        width: "100%",
-        padding: 12,
-        border: `1px solid ${border}`,
-        borderRadius: 10,
-        fontSize: 14,
-      }}
-    />
-  </div>
-
-  <div>
-    <label
-      htmlFor="profile-address"
-      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
-    >
-      Address
-    </label>
-    <textarea
-      id="profile-address"
-      autoComplete="street-address"
-      value={profileForm.address}
-      onChange={(e) =>
-        setProfileForm((prev) => ({
-          ...prev,
-          address: e.target.value,
-        }))
-      }
-      placeholder="Enter your address"
-      rows={3}
-      style={{
-        boxSizing: "border-box",
-        width: "100%",
-        padding: 12,
-        border: `1px solid ${border}`,
-        borderRadius: 10,
-        fontSize: 14,
-        resize: "vertical",
-      }}
-    />
-  </div>
-
-  <button
-    type="button"
-    onClick={saveProfile}
-    disabled={profileSaving}
-    style={{
-      ...buttonStyle,
-      opacity: profileSaving ? 0.7 : 1,
-    }}
-  >
-    {profileSaving ? "Saving details..." : "Save changes"}
-  </button>
-</div>
-
-             
        
           </div>
 
