@@ -41,6 +41,7 @@ export default function Account() {
   const [loading, setLoading] = useState(true);
   const [newsletterSaving, setNewsletterSaving] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
 const [profileForm, setProfileForm] = useState({
   full_name: "",
