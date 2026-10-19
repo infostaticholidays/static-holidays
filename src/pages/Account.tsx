@@ -954,51 +954,7 @@ const firstName =
   </button>
 </div>
 
-              <div
-                key={label}
-                style={{
-                  padding: "13px 0",
-                  borderBottom: `1px solid ${border}`,
-                }}
-              >
-                <p
-                  style={{
-                    color: muted,
-                    fontSize: 12,
-                    margin: "0 0 5px",
-                  }}
-                >
-                  {label}
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    overflowWrap: "anywhere",
-                  }}
-                >
-                  {value || "Not set"}
-                </p>
-
-                {label === "Address" && value && (
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      String(value)
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      display: "inline-block",
-                      marginTop: 7,
-                      color: green,
-                      fontSize: 13,
-                    }}
-                  >
-                    View on map →
-                  </a>
-                )}
-              </div>
+             
        
           </div>
 
