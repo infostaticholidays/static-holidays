@@ -325,22 +325,30 @@ export default function Account() {
               Welcome back, {firstName}!
             </h1>
 
-<p>Let's find your somewhere special.</p>
-<p>Your next getaway starts here.</p>
 
-            <p
-              style={{
-                margin: "0 0 24px",
-                maxWidth: 540,
-                lineHeight: 1.7,
-                color: "#e0eee4",
-                fontSize: 15,
-              }}
-            >
-              Your next escape starts here. Keep track of your trips,
-              save your favourite stays and get ready for your next adventure.
-            </p>
+<p
+  style={{
+    margin: "0 0 8px",
+    fontSize: 17,
+    lineHeight: 1.6,
+  }}
+>
+  Let's find your somewhere special.
+</p>
 
+<p
+  style={{
+    margin: "0 0 24px",
+    maxWidth: 540,
+    lineHeight: 1.7,
+    color: "#e0eee4",
+    fontSize: 15,
+  }}
+>
+  Your next getaway starts here.
+</p>
+
+            
             <div
               style={{
                 display: "flex",
