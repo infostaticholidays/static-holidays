@@ -386,7 +386,7 @@ export default function Account() {
               value: favourites.length,
             },
             {
-              icon: "✈",
+              icon: "🏡",
               label: "Upcoming trip",
               value: trip ? "Planned" : "Not yet",
             },
