@@ -821,12 +821,139 @@ const firstName =
               Account details
             </h2>
 
-            {[
-              ["Full name", profile?.full_name],
-              ["Email address", user?.email],
-              ["Phone", profile?.phone],
-              ["Address", profile?.address],
-            ].map(([label, value]) => (
+           
+<div style={{ display: "grid", gap: 16 }}>
+  <div>
+    <label
+      htmlFor="profile-full-name"
+      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
+    >
+      Full name
+    </label>
+    <input
+      id="profile-full-name"
+      type="text"
+      autoComplete="name"
+      value={profileForm.full_name}
+      onChange={(e) =>
+        setProfileForm((prev) => ({
+          ...prev,
+          full_name: e.target.value,
+        }))
+      }
+      placeholder="Enter your full name"
+      style={{
+        boxSizing: "border-box",
+        width: "100%",
+        padding: 12,
+        border: `1px solid ${border}`,
+        borderRadius: 10,
+        fontSize: 14,
+      }}
+    />
+  </div>
+
+  <div>
+    <label
+      htmlFor="profile-email"
+      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
+    >
+      Email address
+    </label>
+    <input
+      id="profile-email"
+      type="email"
+      value={user?.email || ""}
+      readOnly
+      style={{
+        boxSizing: "border-box",
+        width: "100%",
+        padding: 12,
+        border: `1px solid ${border}`,
+        borderRadius: 10,
+        background: sage,
+        fontSize: 14,
+      }}
+    />
+    <p style={{ color: muted, fontSize: 12, margin: "5px 0 0" }}>
+      Your sign-in email address.
+    </p>
+  </div>
+
+  <div>
+    <label
+      htmlFor="profile-phone"
+      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
+    >
+      Phone
+    </label>
+    <input
+      id="profile-phone"
+      type="tel"
+      autoComplete="tel"
+      value={profileForm.phone}
+      onChange={(e) =>
+        setProfileForm((prev) => ({
+          ...prev,
+          phone: e.target.value,
+        }))
+      }
+      placeholder="Enter your phone number"
+      style={{
+        boxSizing: "border-box",
+        width: "100%",
+        padding: 12,
+        border: `1px solid ${border}`,
+        borderRadius: 10,
+        fontSize: 14,
+      }}
+    />
+  </div>
+
+  <div>
+    <label
+      htmlFor="profile-address"
+      style={{ display: "block", color: muted, fontSize: 13, marginBottom: 6 }}
+    >
+      Address
+    </label>
+    <textarea
+      id="profile-address"
+      autoComplete="street-address"
+      value={profileForm.address}
+      onChange={(e) =>
+        setProfileForm((prev) => ({
+          ...prev,
+          address: e.target.value,
+        }))
+      }
+      placeholder="Enter your address"
+      rows={3}
+      style={{
+        boxSizing: "border-box",
+        width: "100%",
+        padding: 12,
+        border: `1px solid ${border}`,
+        borderRadius: 10,
+        fontSize: 14,
+        resize: "vertical",
+      }}
+    />
+  </div>
+
+  <button
+    type="button"
+    onClick={saveProfile}
+    disabled={profileSaving}
+    style={{
+      ...buttonStyle,
+      opacity: profileSaving ? 0.7 : 1,
+    }}
+  >
+    {profileSaving ? "Saving details..." : "Save changes"}
+  </button>
+</div>
+
               <div
                 key={label}
                 style={{
