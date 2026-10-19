@@ -999,7 +999,7 @@ const firstName =
                   </a>
                 )}
               </div>
-            ))}
+       
           </div>
 
           <div style={cardStyle}>
