@@ -16,6 +16,7 @@ import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 import Bookings from "./pages/Bookings";
 import BookingDetail from "./pages/BookingDetail";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import Businesses from "./pages/Businesses";
 import Services from "./pages/Services";
 import Profile from "./pages/Profile";
@@ -104,7 +105,10 @@ export default function App() {
             path="/booking/:id"
             element={<BookingDetail />}
           />
-
+<Route
+  path="/payment-success"
+  element={<PaymentSuccess />}
+/>
           <Route path="/businesses" element={<Businesses />} />
           <Route path="/services" element={<Services />} />
 
