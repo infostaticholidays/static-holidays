@@ -77,6 +77,11 @@ const [profileForm, setProfileForm] = useState({
       }
 
       setProfile(profileData);
+      setProfileForm({
+  full_name: profileData.full_name || "",
+  phone: profileData.phone || "",
+  address: profileData.address || "",
+});
 
       const { data: favData, error: favError } = await supabase
         .from("favourites")
