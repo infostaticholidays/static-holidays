@@ -811,11 +811,13 @@ export default function Home() {
         .sh-plan-card > a { display: inline-block; margin-top: 8px; color: var(--sh-green); font-size: 13px; font-weight: 750; }
         .sh-plan-card > a span { margin-left: 6px; }
         .sh-plan-note { margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--sh-border); font-size: 11px !important; }
-      <WritingBlock id="48216" variant="standard">        .sh-footer {
-margin-top: 45px;
-padding: 28px clamp(20px, 5vw, 76px) 20px;
-background: #ffffff;
-border-top: 5px solid #284a34;
+      <WritingBlock id="48216" variant="standard">        .s .sh-footer {
+  margin-top: 55px;
+  padding: 42px clamp(22px, 5vw, 76px) 20px;
+  background: #183d2a;
+  border-top: 5px solid #d6e7d3;
+  color: #ffffff;
+}
 }</WritingBlock>
         .sh-footer-inner { max-width: 1288px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
         .sh-footer-copy { color: var(--sh-muted); font-size: 12px; line-height: 1.8; }
