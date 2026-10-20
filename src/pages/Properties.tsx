@@ -162,15 +162,7 @@ function clearFilters() {
 }
 
 
-  const activeFilterCount = [
-    hotTub,
-    pool,
-    seaView,
-    petFriendly,
-    wifi,
-    parking,
-    familyFriendly,
-  ].filter(Boolean).length;
+  const activeFilterCount = selectedFeatures.length;
 
   return (
     <div style={{
