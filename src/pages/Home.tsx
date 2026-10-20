@@ -723,20 +723,218 @@ export default function Home() {
         .sh-eyebrow { display: inline-block; margin-bottom: 18px; color: #e2eee2; font-size: 11px; font-weight: 750; letter-spacing: 2.8px; }
         .sh-hero h1 { margin: 0; color: white; font-size: clamp(44px,6vw,76px); line-height: 1.02; font-weight: 680; letter-spacing: -3.5px; }
         .sh-hero-subtitle { max-width: 470px; margin: 22px 0 32px; color: #f0f5ef; font-size: 17px; line-height: 1.7; }
+        
         .sh-search {
-          display: grid; grid-template-columns: 1.5fr 1fr 1fr .8fr auto; align-items: end;
-          gap: 8px; max-width: 1160px; padding: 13px; border: 1px solid rgba(255,255,255,.7);
-          border-radius: 17px; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.19);
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+          width: 100%;
+          max-width: 660px;
+          margin-top: 28px;
+          padding: 24px;
+          border: 1px solid rgba(255,255,255,.8);
+          border-radius: 20px;
+          background: #fff;
+          box-shadow: 0 22px 60px rgba(0,0,0,.22);
         }
-        .sh-search label { display: flex; min-width: 0; flex-direction: column; gap: 8px; padding: 7px 10px; }
-        .sh-search label span { color: #355b43; font-size: 11px; font-weight: 750; }
-        .sh-search input, .sh-search select { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; color: #263b2e; font: inherit; font-size: 12px; }
-        .sh-search button, .sh-primary-button {
-          min-height: 48px; padding: 0 20px; border: 0; border-radius: 11px;
-          background: var(--sh-green); color: white; font-size: 13px; font-weight: 700;
-          cursor: pointer; white-space: nowrap;
+
+        .sh-search-title {
+          max-width: 660px;
+          margin: 0;
+          color: #fff;
+          font-size: 16px;
+          font-weight: 700;
+          letter-spacing: .1px;
         }
-        .sh-search button:hover, .sh-primary-button:hover { background: var(--sh-dark-green); }
+
+        .sh-search label {
+          display: flex;
+          flex-direction: column;
+          gap: 9px;
+          min-width: 0;
+          padding: 13px 14px;
+          border: 1px solid #e2eae2;
+          border-radius: 12px;
+          background: #fff;
+          transition: border-color .2s, box-shadow .2s;
+        }
+
+        .sh-search label:focus-within {
+          border-color: #286442;
+          box-shadow: 0 0 0 3px rgba(40,100,66,.09);
+        }
+
+        .sh-search label > span:first-child {
+          color: #355b43;
+          font-size: 12px;
+          font-weight: 750;
+        }
+
+        .sh-search input,
+        .sh-search select {
+          width: 100%;
+          min-width: 0;
+          padding: 0;
+          border: 0;
+          outline: 0;
+          background: transparent;
+          color: #263b2e;
+          font: inherit;
+          font-size: 13px;
+        }
+
+        .sh-search input::placeholder {
+          color: #89958c;
+          opacity: 1;
+        }
+
+        .sh-search .sh-search-destination,
+        .sh-search .sh-search-guests,
+        .sh-search > button {
+          grid-column: 1 / -1;
+        }
+
+        .sh-search .sh-search-field-row {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+          min-width: 0;
+        }
+
+        .sh-search .sh-search-date-label {
+          min-width: 0;
+        }
+
+        .sh-search .sh-date-control {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          min-width: 0;
+        }
+
+        .sh-search .sh-date-control svg {
+          flex-shrink: 0;
+          color: #286442;
+        }
+
+        .sh-search .sh-date-control input[type="date"] {
+          min-width: 0;
+          width: 100%;
+          cursor: pointer;
+        }
+
+        .sh-search .sh-date-control input[type="date"].is-empty {
+          color: transparent;
+        }
+
+        .sh-search .sh-date-control input[type="date"].is-empty::-webkit-datetime-edit {
+          color: transparent;
+        }
+
+        .sh-search .sh-date-placeholder {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #89958c;
+          font-size: 13px;
+          pointer-events: none;
+        }
+
+        .sh-search .sh-date-control:focus-within .sh-date-placeholder {
+          display: none;
+        }
+
+        .sh-search .sh-search-icon {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          min-width: 0;
+        }
+
+        .sh-search .sh-search-icon svg {
+          flex-shrink: 0;
+          color: #286442;
+        }
+
+        .sh-search button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          width: 100%;
+          min-height: 52px;
+          padding: 0 22px;
+          border: 0;
+          border-radius: 12px;
+          background: #286442;
+          color: #fff;
+          font-size: 14px;
+          font-weight: 750;
+          cursor: pointer;
+          transition: background .2s, transform .2s;
+        }
+
+        .sh-search button:hover {
+          background: #1d472f;
+          transform: translateY(-1px);
+        }
+
+        .sh-search button:focus-visible {
+          outline: 3px solid #9bc9a3;
+          outline-offset: 3px;
+        }
+
+        @media (max-width: 1050px) {
+          .sh-search {
+            max-width: 660px;
+          }
+        }
+
+        @media (max-width: 650px) {
+          .sh-search {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 12px;
+            padding: 16px;
+            margin-top: 22px;
+            border-radius: 16px;
+          }
+
+          .sh-search .sh-search-destination,
+          .sh-search .sh-search-guests,
+          .sh-search > button {
+            grid-column: auto;
+          }
+
+          .sh-search .sh-search-field-row {
+            gap: 9px;
+          }
+
+          .sh-search label {
+            padding: 12px 11px;
+          }
+
+          .sh-search .sh-date-control {
+            gap: 6px;
+          }
+
+          .sh-search .sh-date-control svg {
+            width: 17px;
+            height: 17px;
+          }
+
+          .sh-search input,
+          .sh-search select,
+          .sh-search .sh-date-placeholder {
+            font-size: 12px;
+          }
+
+          .sh-search button {
+            min-height: 50px;
+          }
+        }
+
         .sh-trust-row { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 22px; color: white; font-size: 12px; font-weight: 550; }
         .sh-trust-row span::before { content: "✓"; margin-right: 7px; color: #cde5c8; font-weight: 800; }
         .sh-section { max-width: 1440px; margin: 0 auto; padding: 65px clamp(20px,5vw,76px) 0; }
