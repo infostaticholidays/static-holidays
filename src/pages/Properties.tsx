@@ -405,7 +405,6 @@ function clearFilters() {
       <option value="4+">4+ guests</option>
     </select>
   </label>
-</div>
 
        
 
