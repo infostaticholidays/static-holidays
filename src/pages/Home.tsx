@@ -1283,21 +1283,7 @@ export default function Home() {
               <div className="sh-search-field-row">
                 <label className="sh-search-date-label">
                   <span>Check-in</span>
-                  <span className="sh-date-control">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="3" y="5" width="18" height="16" rx="2" />
-                      <path d="M16 3v4M8 3v4M3 10h18" />
-                    </svg>
+                
                     {!checkIn && (
                       <span className="sh-date-placeholder">Add date</span>
                     )}
