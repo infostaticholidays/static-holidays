@@ -877,11 +877,11 @@ export default function Home() {
           text-decoration: none;
         }
 
-        .sh-footer-column a:hover,
-        .sh-footer-bottom a:hover {
-          color: #d6e7d3 !important;
-          text-decoration: underline;
-        }
+      .sh-footer-column a:hover,
+.sh-footer-bottom a:hover {
+  color: #8fb99a !important;
+  text-decoration: underline;
+}
 
         .sh-footer-bottom {
           max-width: 1288px;
