@@ -785,7 +785,7 @@ export default function Home() {
   box-sizing: border-box;
 }
 
-```css
+
 .sh-search input[type="date"] {
   display: block;
   width: 100%;
