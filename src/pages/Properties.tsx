@@ -26,10 +26,7 @@ type Property = {
   status?: string;
 };
 
-type Property = {
-  // Keep all your existing property fields here
-  status?: string;
-};
+
 
 const featureOptions = [
   "dogs welcome",
