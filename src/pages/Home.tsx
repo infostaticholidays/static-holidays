@@ -796,7 +796,7 @@ export default function Home() {
   cursor: pointer;
   font-size: 14px;
 }
-```
+
 
 .sh-search input::placeholder {
   color: #89958c;
