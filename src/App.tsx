@@ -30,6 +30,7 @@ import PropertyCalendar from "./pages/PropertyCalendar";
 import HostDashboard from "./pages/HostDashboard";
 import HostReviews from "./pages/HostReviews";
 import PromoteProperty from "./pages/PromoteProperty";
+import Contact from "./pages/Contact";
 
 function NotFound() {
   return (
@@ -118,6 +119,7 @@ export default function App() {
 
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/contact" element={<Contact />} />
 
           <Route
             path="/host-reviews"
