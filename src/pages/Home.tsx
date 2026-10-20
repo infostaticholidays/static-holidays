@@ -821,13 +821,24 @@ export default function Home() {
           min-width: 0;
         }
 
-        .sh-search .sh-date-control {
-          position: relative;
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          min-width: 0;
-        }
+      .sh-search .sh-date-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.sh-search .sh-date-control input[type="date"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding: 8px 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 13px;
+}
 
         .sh-search .sh-date-control svg {
           flex-shrink: 0;
