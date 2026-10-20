@@ -298,106 +298,116 @@ function clearFilters() {
           lodges for your next UK getaway.
         </p>
 
-        <div style={{
-          maxWidth: "1000px",
-          margin: "30px auto 0",
-          padding: "14px",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "12px",
-          background: "#ffffff",
-          border: "1px solid #e1e9e2",
-          borderRadius: "18px",
-          boxShadow: "0 12px 36px rgba(21, 62, 42, 0.08)",
-          textAlign: "left",
-        }}>fontSize: "13px",
-fontWeight: 600,
-textTransform: "lowercase",
-            DESTINATION
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Where would you like to go?"
-              style={{
-                display: "block",
-                boxSizing: "border-box",
-                width: "100%",
-                marginTop: "7px",
-                padding: "13px",
-                border: "1px solid #e1e9e2",
-                borderRadius: "9px",
-                fontSize: "14px",
-              }}
-            />
-          </label>
+<div style={{
+  maxWidth: "1000px",
+  margin: "30px auto 0",
+  padding: "14px",
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "12px",
+  background: "#ffffff",
+  border: "1px solid #e1e9e2",
+  borderRadius: "18px",
+  boxShadow: "0 12px 36px rgba(21, 62, 42, 0.08)",
+  textAlign: "left",
+}}>
+  <label style={{ flex: "2 1 200px", color: "#315d43", fontSize: "13px", fontWeight: 600 }}>
+    destination
+    <input
+      value={search}
+      onChange={(event) => setSearch(event.target.value)}
+      placeholder="Where would you like to go?"
+      style={{
+        display: "block",
+        boxSizing: "border-box",
+        width: "100%",
+        marginTop: "7px",
+        padding: "13px",
+        border: "1px solid #d5e5d8",
+        borderRadius: "12px",
+        fontFamily: "inherit",
+        fontSize: "14px",
+        color: "#243b2d",
+      }}
+    />
+  </label>
 
-          <label style={{ flex: "1 1 140px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
-            CHECK-IN
-            <input
-              type="date"
-              min={today}
-              value={checkIn}
-              onChange={(event) => {
-                setCheckIn(event.target.value);
-                if (checkOut && event.target.value >= checkOut) setCheckOut("");
-              }}
-              style={{
-                display: "block",
-                boxSizing: "border-box",
-                width: "100%",
-                marginTop: "7px",
-                padding: "13px",
-                border: "1px solid #e1e9e2",
-                borderRadius: "9px",
-                fontSize: "14px",
-              }}
-            />
-          </label>
+  <label style={{ flex: "1 1 140px", color: "#315d43", fontSize: "13px", fontWeight: 600 }}>
+    check-in
+    <input
+      type="date"
+      min={today}
+      value={checkIn}
+      onChange={(event) => {
+        setCheckIn(event.target.value);
+        if (checkOut && event.target.value >= checkOut) setCheckOut("");
+      }}
+      style={{
+        display: "block",
+        boxSizing: "border-box",
+        width: "100%",
+        marginTop: "7px",
+        padding: "13px",
+        border: "1px solid #d5e5d8",
+        borderRadius: "12px",
+        fontFamily: "inherit",
+        fontSize: "14px",
+        color: "#243b2d",
+      }}
+    />
+  </label>
 
-          <label style={{ flex: "1 1 140px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
-            CHECK-OUT
-            <input
-              type="date"
-              min={checkIn || today}
-              value={checkOut}
-              onChange={(event) => setCheckOut(event.target.value)}
-              style={{
-                display: "block",
-                boxSizing: "border-box",
-                width: "100%",
-                marginTop: "7px",
-                padding: "13px",
-                border: "1px solid #e1e9e2",
-                borderRadius: "9px",
-                fontSize: "14px",
-              }}
-            />
-          </label>
+  <label style={{ flex: "1 1 140px", color: "#315d43", fontSize: "13px", fontWeight: 600 }}>
+    check-out
+    <input
+      type="date"
+      min={checkIn || today}
+      value={checkOut}
+      onChange={(event) => setCheckOut(event.target.value)}
+      style={{
+        display: "block",
+        boxSizing: "border-box",
+        width: "100%",
+        marginTop: "7px",
+        padding: "13px",
+        border: "1px solid #d5e5d8",
+        borderRadius: "12px",
+        fontFamily: "inherit",
+        fontSize: "14px",
+        color: "#243b2d",
+      }}
+    />
+  </label>
 
-          <label style={{ flex: "1 1 125px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
-            GUESTS
-            <select
-              value={guests}
-              onChange={(event) => setGuests(event.target.value)}
-              style={{
-                display: "block",
-                boxSizing: "border-box",
-                width: "100%",
-                marginTop: "7px",
-                padding: "13px",
-                border: "1px solid #e1e9e2",
-                borderRadius: "9px",
-                background: "#ffffff",
-                fontSize: "14px",
-              }}
-            >
-              <option value="Any">Any guests</option>
-              <option value="1">1+ guest</option>
-              <option value="2">2+ guests</option>
-              <option value="3">3+ guests</option>
-              <option value="4+">4+ guests</option>
-            </select>
-          </label>
+  <label style={{ flex: "1 1 125px", color: "#315d43", fontSize: "13px", fontWeight: 600 }}>
+    guests
+    <select
+      value={guests}
+      onChange={(event) => setGuests(event.target.value)}
+      style={{
+        display: "block",
+        boxSizing: "border-box",
+        width: "100%",
+        marginTop: "7px",
+        padding: "13px",
+        border: "1px solid #d5e5d8",
+        borderRadius: "12px",
+        background: "#ffffff",
+        fontFamily: "inherit",
+        fontSize: "14px",
+        color: "#243b2d",
+      }}
+    >
+      <option value="Any">Any guests</option>
+      <option value="1">1+ guest</option>
+      <option value="2">2+ guests</option>
+      <option value="3">3+ guests</option>
+      <option value="4+">4+ guests</option>
+    </select>
+  </label>
+</div>
+
+       
 
           <button
             onClick={() => {
