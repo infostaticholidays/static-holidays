@@ -1074,7 +1074,7 @@ export default function Home() {
         </div>
       </section>
 
-        <```
+      
   <footer className="sh-footer">
     <div className="sh-footer-grid">
       <div className="sh-footer-brand">
