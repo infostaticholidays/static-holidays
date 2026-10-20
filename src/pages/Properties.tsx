@@ -462,30 +462,34 @@ function clearFilters() {
               borderRadius: "14px",
               textAlign: "left",
             }}>
-              {[
-                ["Hot tub", hotTub, setHotTub],
-                ["Swimming pool", pool, setPool],
-                ["Sea view", seaView, setSeaView],
-                ["Pet friendly", petFriendly, setPetFriendly],
-                ["Wi-Fi", wifi, setWifi],
-                ["Parking", parking, setParking],
-                ["Family friendly", familyFriendly, setFamilyFriendly],
-              ].map(([label, checked, setter]) => (
-                <label key={String(label)} style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "9px",
-                  color: "#315d43",
-                  cursor: "pointer",
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={Boolean(checked)}
-                    onChange={(event) => (setter as (value: boolean) => void)(event.target.checked)}
-                  />
-                  {String(label)}
-                </label>
-              ))}
+            
+{featureOptions.map((feature) => (
+  <label
+    key={feature}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "9px",
+      color: "#315d43",
+      cursor: "pointer",
+      textTransform: "capitalize",
+    }}
+  >
+    <input
+      type="checkbox"
+      checked={selectedFeatures.includes(feature)}
+      onChange={(event) => {
+        setSelectedFeatures((current) =>
+          event.target.checked
+            ? [...current, feature]
+            : current.filter((item) => item !== feature)
+        );
+      }}
+    />
+    {feature}
+  </label>
+))}
+
 
               <button
                 type="button"
