@@ -785,11 +785,18 @@ export default function Home() {
   box-sizing: border-box;
 }
 
+```css
 .sh-search input[type="date"] {
-  min-height: 38px;
-  padding: 8px 10px 8px 0;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 10px 16px 10px 0;
+  box-sizing: border-box;
   cursor: pointer;
+  font-size: 14px;
 }
+```
 
 .sh-search input::placeholder {
   color: #89958c;
