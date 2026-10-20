@@ -35,6 +35,7 @@ import BookingTerms from "./pages/BookingTerms";
 import CancellationPolicy from "./pages/CancellationPolicy";
 import TravelInsurance from "./pages/TravelInsurance";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CookiePolicy from "./pages/CookiePolicy";
 
 function NotFound() {
   return (
@@ -125,6 +126,7 @@ export default function App() {
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/booking-terms" element={<BookingTerms />} />
+          <Route path="/cookie-policy" element={<CookiePolicy />} />
 
           <Route
             path="/host-reviews"
@@ -167,6 +169,7 @@ export default function App() {
   path="/privacy-policy"
   element={<PrivacyPolicy />}
 />
+          
 
           <Route path="*" element={<NotFound />} />
         </Routes>
