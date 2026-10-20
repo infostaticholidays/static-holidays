@@ -795,7 +795,7 @@ export default function Home() {
   color: #89958c;
   opacity: 1;
 }
-```
+
 
         .sh-search .sh-search-destination,
         .sh-search .sh-search-guests,
