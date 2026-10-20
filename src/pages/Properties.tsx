@@ -410,8 +410,8 @@ function clearFilters() {
 
           <button
             onClick={() => {
-              if (checkIn && checkOut && checkOut <= checkIn) {
-                alert("Check-out must be after check-in.");
+              if (CheckIn && CheckOut && CheckOut <= CheckIn) {
+                alert("Check-out must be after Check-in.");
                 return;
               }
               document.getElementById("property-list")?.scrollIntoView({ behavior: "smooth" });
