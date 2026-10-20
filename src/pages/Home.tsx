@@ -1027,11 +1027,14 @@ export default function Home() {
       <section className="sh-hero">
         <div className="sh-hero-inner">
           <div className="sh-hero-copy">
-            <span className="sh-eyebrow">YOUR NEXT ESCAPE</span>
-            <h1>Find your somewhere.</h1>
-            <p className="sh-hero-subtitle">
-              Lovely places to stay. Memorable moments to make.
-            </p>
+           
+<span className="sh-eyebrow">YOUR NEXT UK GETAWAY</span>
+<h1>Find your perfect holiday stay</h1>
+<p className="sh-hero-subtitle">
+  Discover welcoming holiday homes, coastal escapes, caravans and lodges
+  for your next UK getaway.
+</p>
+
 
             <form className="sh-search" onSubmit={handleSearch}>
               <label>
