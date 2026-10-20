@@ -51,7 +51,56 @@ const featureOptions = [
   "equine facilities",
 ];
 
-// Paste the complete matchesPropertyFeature function here.
+function matchesPropertyFeature(
+  property: Property,
+  feature: string
+): boolean {
+  const flags: Record<string, boolean | undefined> = {
+    "dogs welcome": property.pet_friendly,
+    "hot tub": property.has_hot_tub,
+    "swimming pool": property.has_pool,
+    "sea view": property.sea_view,
+    parking: property.parking,
+    "wi-fi": property.wifi,
+  };
+
+  if (flags[feature] === true) return true;
+
+  const aliases: Record<string, string[]> = {
+    "dogs welcome": ["dogs welcome", "dog friendly", "pet friendly"],
+    "log burner": ["log burner", "wood burner"],
+    "hot tub": ["hot tub", "jacuzzi"],
+    "swimming pool": ["swimming pool", "pool"],
+    garden: ["garden"],
+    parking: ["parking"],
+    "wi-fi": ["wi-fi", "wifi", "wi fi"],
+    "sea view": ["sea view", "ocean view"],
+    "wheelchair accessible": ["wheelchair accessible", "wheelchair access"],
+    bbq: ["bbq", "barbecue"],
+    "fire pit": ["fire pit"],
+    dishwasher: ["dishwasher"],
+    "washing machine": ["washing machine"],
+    "cot and highchair": ["cot and highchair", "cot", "highchair"],
+    "enclosed garden": ["enclosed garden"],
+    "private outdoor space": ["private outdoor space", "private patio"],
+    "games room": ["games room", "game room"],
+    "ev charging": ["ev charging", "electric vehicle charging"],
+    "rural location": ["rural location", "countryside"],
+    "equine facilities": ["equine facilities", "equestrian", "stables"],
+  };
+
+  const storedFeatures = [
+    ...(property.features ?? []),
+    ...(property.holiday_types ?? []),
+  ].map((item) => item.toLowerCase().replace(/[_-]+/g, " ").trim());
+
+  return (aliases[feature] ?? [feature]).some((alias) =>
+    storedFeatures.includes(
+      alias.toLowerCase().replace(/[_-]+/g, " ").trim()
+    )
+  );
+}
+
 
 
 export default function Properties() {
