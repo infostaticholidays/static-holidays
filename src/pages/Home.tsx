@@ -770,7 +770,6 @@ export default function Home() {
           font-weight: 750;
         }
 
-        ```css
 .sh-search input,
 .sh-search select {
   width: 100%;
