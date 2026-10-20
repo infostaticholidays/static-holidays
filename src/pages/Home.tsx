@@ -1115,5 +1115,7 @@ export default function Home() {
       <Link to="/properties">Explore all stays →</Link>
     </div>
   </footer>
-
+    </main>
+  );
+}
    
