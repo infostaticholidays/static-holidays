@@ -1072,44 +1072,46 @@ border-top: 5px solid #284a34;
         </div>
       </section>
 
-        <footer className="sh-footer">
-        <div className="sh-footer-grid">
-          <div className="sh-footer-brand">
-            <Link to="/" className="sh-footer-logo">
-              Static Holidays
-            </Link>
-            <p>Lovely places to stay. Memorable moments to make.</p>
-            <p className="sh-footer-copyright">
-              © {new Date().getFullYear()} Static Holidays. All rights reserved.
-            </p>
-          </div>
+        <```
+  <footer className="sh-footer">
+    <div className="sh-footer-grid">
+      <div className="sh-footer-brand">
+        <Link to="/" className="sh-footer-logo">
+          Static Holidays
+        </Link>
+        <p>Lovely places to stay. Memorable moments to make.</p>
+      </div>
 
-          <div className="sh-footer-column">
-            <h3>Explore</h3>
-            <Link to="/properties">Explore stays</Link>
-            <Link to="/dashboard">List your property</Link>
-            <Link to="/contact">Contact us</Link>
-          </div>
+      <div className="sh-footer-column">
+        <h3>Explore</h3>
+        <Link to="/properties">Explore stays</Link>
+        <Link to="/dashboard">List your property</Link>
+        <Link to="/contact">Contact us</Link>
+      </div>
 
-          <div className="sh-footer-column">
-            <h3>Legal &amp; privacy</h3>
-            <Link to="/privacy-policy">GDPR &amp; Privacy Policy</Link>
-            <Link to="/cookie-policy">Cookie Policy</Link>
-          </div>
+      <div className="sh-footer-column">
+        <h3>Guest information</h3>
+        <Link to="/booking-terms">Booking Terms &amp; Conditions</Link>
+        <Link to="/cancellation-policy">Cancellation Policy</Link>
+        <Link to="/travel-insurance">Travel Insurance Information</Link>
+      </div>
 
-          <div className="sh-footer-column">
-            <h3>Bookings &amp; travel</h3>
-            <Link to="/booking-terms">Booking Terms &amp; Conditions</Link>
-            <Link to="/cancellation-policy">Cancellation Policy</Link>
-            <Link to="/travel-insurance">Travel Insurance Information</Link>
-          </div>
+      <div className="sh-footer-column">
+        <h3>Privacy &amp; legal</h3>
+        <Link to="/privacy-policy">GDPR &amp; Privacy Policy</Link>
+        <Link to="/cookie-policy">Cookie Policy</Link>
+      </div>
 
-          <div className="sh-footer-column">
-            <h3>For property owners</h3>
-            <Link to="/owner-terms">Owner Terms &amp; Conditions</Link>
-          </div>
-        </div>
-      </footer>
-    </main>
-  );
-}
+      <div className="sh-footer-column">
+        <h3>Property owners</h3>
+        <Link to="/owner-terms">Owner Terms &amp; Conditions</Link>
+      </div>
+    </div>
+
+    <div className="sh-footer-bottom">
+      <p>© {new Date().getFullYear()} Static Holidays. All rights reserved.</p>
+      <Link to="/properties">Explore all stays →</Link>
+    </div>
+  </footer>
+
+   
