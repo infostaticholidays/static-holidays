@@ -1243,9 +1243,10 @@ export default function Home() {
 
 
         <nav className="sh-nav-links" aria-label="Main navigation">
-          <a className="sh-hide-mobile" href="/properties">Explore stays</a>
-          <a className="sh-nav-dashboard" href="/dashboard">Dashboard</a>
-          <a className="sh-sign-in" href="/login">Sign in</a>
+         <a className="sh-hide-mobile" href="/properties">Explore stays</a>
+<a className="sh-hide-mobile" href="/blog">Blog</a>
+<a className="sh-nav-dashboard" href="/dashboard">Dashboard</a>
+<a className="sh-sign-in" href="/login">Sign in</a>
         </nav>
       </header>
 
