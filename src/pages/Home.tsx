@@ -1234,52 +1234,158 @@ export default function Home() {
 </p>
 
 
+         
+            <p className="sh-search-title">Find your perfect stay</p>
+
             <form className="sh-search" onSubmit={handleSearch}>
-              <label>
-                <span>DESTINATION</span>
-                <input
-                  value={destination}
-                  onChange={(event) => setDestination(event.target.value)}
-                  placeholder="Where would you like to go?"
-                />
+              <label className="sh-search-destination">
+                <span>Destination</span>
+                <span className="sh-search-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+                    <circle cx="12" cy="10" r="2.5" />
+                  </svg>
+                  <input
+                    value={destination}
+                    onChange={(event) => setDestination(event.target.value)}
+                    placeholder="Where would you like to go?"
+                    aria-label="Destination"
+                  />
+                </span>
               </label>
 
-              <label>
-                <span>CHECK-IN</span>
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(event) => setCheckIn(event.target.value)}
-                  min={new Date().toISOString().slice(0, 10)}
-                />
+              <div className="sh-search-field-row">
+                <label className="sh-search-date-label">
+                  <span>Check-in</span>
+                  <span className="sh-date-control">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="16" rx="2" />
+                      <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
+                    {!checkIn && (
+                      <span className="sh-date-placeholder">Add date</span>
+                    )}
+                    <input
+                      className={!checkIn ? "is-empty" : ""}
+                      type="date"
+                      value={checkIn}
+                      onChange={(event) => {
+                        const nextDate = event.target.value;
+                        setCheckIn(nextDate);
+
+                        if (checkOut && nextDate && checkOut < nextDate) {
+                          setCheckOut("");
+                        }
+                      }}
+                      min={new Date().toLocaleDateString("en-CA")}
+                      aria-label="Check-in date"
+                      required
+                    />
+                  </span>
+                </label>
+
+                <label className="sh-search-date-label">
+                  <span>Check-out</span>
+                  <span className="sh-date-control">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="16" rx="2" />
+                      <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
+                    {!checkOut && (
+                      <span className="sh-date-placeholder">Add date</span>
+                    )}
+                    <input
+                      className={!checkOut ? "is-empty" : ""}
+                      type="date"
+                      value={checkOut}
+                      onChange={(event) => setCheckOut(event.target.value)}
+                      min={checkIn || new Date().toLocaleDateString("en-CA")}
+                      aria-label="Check-out date"
+                      required
+                    />
+                  </span>
+                </label>
+              </div>
+
+              <label className="sh-search-guests">
+                <span>Guests</span>
+                <span className="sh-search-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="10" cy="7" r="4" />
+                    <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  <select
+                    value={guests}
+                    onChange={(event) => setGuests(event.target.value)}
+                    aria-label="Number of guests"
+                  >
+                    <option value="1">1 guest</option>
+                    <option value="2">2 guests</option>
+                    <option value="3">3 guests</option>
+                    <option value="4">4 guests</option>
+                    <option value="5">5 guests</option>
+                    <option value="6">6+ guests</option>
+                  </select>
+                </span>
               </label>
 
-              <label>
-                <span>CHECK-OUT</span>
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(event) => setCheckOut(event.target.value)}
-                  min={checkIn || new Date().toISOString().slice(0, 10)}
-                />
-              </label>
-
-              <label>
-                <span>GUESTS</span>
-                <select
-                  value={guests}
-                  onChange={(event) => setGuests(event.target.value)}
+              <button type="submit">
+                <svg
+                  width="19"
+                  height="19"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  aria-hidden="true"
                 >
-                  <option value="1">1 guest</option>
-                  <option value="2">2 guests</option>
-                  <option value="3">3 guests</option>
-                  <option value="4">4 guests</option>
-                  <option value="5">5 guests</option>
-                  <option value="6">6+ guests</option>
-                </select>
-              </label>
-
-              <button type="submit">Find a stay →</button>
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-4-4" />
+                </svg>
+                Search stays
+              </button>
             </form>
 
             <div className="sh-trust-row">
