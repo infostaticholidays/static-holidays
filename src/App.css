@@ -1,4 +1,4 @@
-/* Make text larger across all pages, including fixed-size text */
+/* Increase text size across the whole website */
 body,
 body p,
 body span,
@@ -9,18 +9,19 @@ body button,
 body input,
 body select,
 body textarea {
-  font-size: 18px !important;
+  font-size: 20px !important;
   line-height: 1.6;
 }
 
+/* Larger headings */
 body h1 {
-  font-size: 42px !important;
+  font-size: 48px !important;
 }
 
 body h2 {
-  font-size: 34px !important;
+  font-size: 38px !important;
 }
 
 body h3 {
-  font-size: 26px !important;
+  font-size: 30px !important;
 }
