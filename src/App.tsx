@@ -33,6 +33,7 @@ import PromoteProperty from "./pages/PromoteProperty";
 import Contact from "./pages/Contact";
 import BookingTerms from "./pages/BookingTerms";
 import CancellationPolicy from "./pages/CancellationPolicy";
+import TravelInsurance from "./pages/TravelInsurance";
 
 function NotFound() {
   return (
@@ -156,6 +157,10 @@ export default function App() {
           <Route
   path="/cancellation-policy"
   element={<CancellationPolicy />}
+/>
+          <Route
+  path="/travel-insurance"
+  element={<TravelInsurance />}
 />
 
           <Route path="*" element={<NotFound />} />
