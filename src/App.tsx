@@ -32,6 +32,7 @@ import HostReviews from "./pages/HostReviews";
 import PromoteProperty from "./pages/PromoteProperty";
 import Contact from "./pages/Contact";
 import BookingTerms from "./pages/BookingTerms";
+import CancellationPolicy from "./pages/CancellationPolicy";
 
 function NotFound() {
   return (
@@ -152,6 +153,10 @@ export default function App() {
             path="/property-calendar/:propertyId"
             element={<PropertyCalendar />}
           />
+          <Route
+  path="/cancellation-policy"
+  element={<CancellationPolicy />}
+/>
 
           <Route path="*" element={<NotFound />} />
         </Routes>
