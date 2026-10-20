@@ -310,8 +310,9 @@ function clearFilters() {
           borderRadius: "18px",
           boxShadow: "0 12px 36px rgba(21, 62, 42, 0.08)",
           textAlign: "left",
-        }}>
-          <label style={{ flex: "2 1 200px", color: "#315d43", fontSize: "12px", fontWeight: 700 }}>
+        }}>fontSize: "13px",
+fontWeight: 600,
+textTransform: "lowercase",
             DESTINATION
             <input
               value={search}
