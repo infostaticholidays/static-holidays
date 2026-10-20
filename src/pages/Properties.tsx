@@ -552,7 +552,7 @@ function clearFilters() {
           }}>
             <h3 style={{ color: "#153e2a" }}>No stays match those filters</h3>
             <p style={{ color: "#607166" }}>
-              Try another destination or clear some filters.
+              Try another Destination or clear some filters.
             </p>
             <button onClick={clearFilters} style={{
               padding: "12px 18px",
