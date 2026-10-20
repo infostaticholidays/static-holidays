@@ -811,15 +811,142 @@ export default function Home() {
         .sh-plan-card > a { display: inline-block; margin-top: 8px; color: var(--sh-green); font-size: 13px; font-weight: 750; }
         .sh-plan-card > a span { margin-left: 6px; }
         .sh-plan-note { margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--sh-border); font-size: 11px !important; }
-      <WritingBlock id="48216" variant="standard">        .s .sh-footer {
-  margin-top: 55px;
-  padding: 42px clamp(22px, 5vw, 76px) 20px;
-  background: #183d2a;
-  border-top: 5px solid #d6e7d3;
-  color: #ffffff;
-}
-}</WritingBlock>
-        .sh-footer-inner { max-width: 1288px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+      <WritingBlock id="48216" variant="standard">      
+      
+        .sh-footer {
+          margin-top: 55px;
+          padding: 42px clamp(22px, 5vw, 76px) 20px;
+          background: #183d2a;
+          border-top: 5px solid #d6e7d3;
+          color: #ffffff;
+        }
+
+        .sh-footer-grid {
+          max-width: 1288px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1.5fr 1fr 1.35fr 1fr 1.3fr;
+          gap: 30px;
+          align-items: start;
+        }
+
+        .sh-footer-brand {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .sh-footer-logo {
+          color: #ffffff !important;
+          font-size: 25px !important;
+          font-weight: 800;
+          line-height: 1.25;
+          text-decoration: none;
+        }
+
+        .sh-footer-brand p {
+          margin: 0;
+          color: #d4e2d3 !important;
+          font-size: 13px !important;
+          line-height: 1.8;
+        }
+
+        .sh-footer-column {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .sh-footer-column h3 {
+          margin: 0 0 5px;
+          color: #d6e7d3 !important;
+          font-size: 12px !important;
+          font-weight: 800;
+          line-height: 1.5;
+          letter-spacing: 0.7px;
+          text-transform: uppercase;
+        }
+
+        .sh-footer-column a {
+          color: #ffffff !important;
+          font-size: 13px !important;
+          font-weight: 400;
+          line-height: 1.6;
+          text-decoration: none;
+        }
+
+        .sh-footer-column a:hover,
+        .sh-footer-bottom a:hover {
+          color: #d6e7d3 !important;
+          text-decoration: underline;
+        }
+
+        .sh-footer-bottom {
+          max-width: 1288px;
+          margin: 34px auto 0;
+          padding-top: 18px;
+          border-top: 1px solid #496552;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .sh-footer-bottom p {
+          margin: 0;
+          color: #d4e2d3 !important;
+          font-size: 11px !important;
+          line-height: 1.7;
+        }
+
+        .sh-footer-bottom a {
+          color: #ffffff !important;
+          font-size: 12px !important;
+          font-weight: 600;
+          text-decoration: none;
+        }
+
+        @media (max-width: 1000px) {
+          .sh-footer-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 30px 24px;
+          }
+        }
+
+        @media (max-width: 650px) {
+          .sh-footer {
+            padding: 32px 22px 18px;
+          }
+
+          .sh-footer-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 28px 18px;
+          }
+
+          .sh-footer-brand {
+            grid-column: 1 / -1;
+          }
+
+          .sh-footer-bottom {
+            margin-top: 28px;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 10px;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .sh-footer-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .sh-footer-brand {
+            grid-column: auto;
+          }
+        }
+
         .sh-footer-copy { color: var(--sh-muted); font-size: 12px; line-height: 1.8; }
         .sh-footer-links { display: flex; flex-wrap: wrap; gap: 22px; color: #52675a; font-size: 12px; font-weight: 600; }
         @media (max-width: 1050px) {
