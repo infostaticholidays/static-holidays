@@ -878,9 +878,12 @@ export default function Home() {
         }
 
       .sh-footer-column a:hover,
-.sh-footer-bottom a:hover {
-  color: #8fb99a !important;
-  text-decoration: underline;
+.sh-footer-column a:focus,
+.sh-footer-bottom a:hover,
+.sh-footer-bottom a:focus {
+  color: #ffffff !important;
+  text-decoration: none;
+  opacity: 1;
 }
 
         .sh-footer-bottom {
