@@ -770,23 +770,33 @@ export default function Home() {
           font-weight: 750;
         }
 
-        .sh-search input,
-        .sh-search select {
-          width: 100%;
-          min-width: 0;
-          padding: 0;
-          border: 0;
-          outline: 0;
-          background: transparent;
-          color: #263b2e;
-          font: inherit;
-          font-size: 13px;
-        }
+        ```css
+.sh-search input,
+.sh-search select {
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+  padding: 6px 8px 6px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #263b2e;
+  font: inherit;
+  font-size: 13px;
+  box-sizing: border-box;
+}
 
-        .sh-search input::placeholder {
-          color: #89958c;
-          opacity: 1;
-        }
+.sh-search input[type="date"] {
+  min-height: 38px;
+  padding: 8px 10px 8px 0;
+  cursor: pointer;
+}
+
+.sh-search input::placeholder {
+  color: #89958c;
+  opacity: 1;
+}
+```
 
         .sh-search .sh-search-destination,
         .sh-search .sh-search-guests,
