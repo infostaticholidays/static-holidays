@@ -1292,63 +1292,49 @@ export default function Home() {
               </label>
 
               <div className="sh-search-field-row">
-                <label className="sh-search-date-label">
-                  <span>Check-in</span>
-                
-                    {!checkIn && (
-                      <span className="sh-date-placeholder">Add date</span>
-                    )}
-                    <input
-                      className={!checkIn ? "is-empty" : ""}
-                      type="date"
-                      value={checkIn}
-                      onChange={(event) => {
-                        const nextDate = event.target.value;
-                        setCheckIn(nextDate);
+  <label className="sh-search-date-label">
+    <span>Check-in</span>
+    <span className="sh-date-control">
+      {!checkIn && (
+        <span className="sh-date-placeholder">Add date</span>
+      )}
+      <input
+        className={!checkIn ? "is-empty" : ""}
+        type="date"
+        value={checkIn}
+        onChange={(event) => {
+          const nextDate = event.target.value;
+          setCheckIn(nextDate);
 
-                        if (checkOut && nextDate && checkOut < nextDate) {
-                          setCheckOut("");
-                        }
-                      }}
-                      min={new Date().toLocaleDateString("en-CA")}
-                      aria-label="Check-in date"
-                      required
-                    />
-                  </span>
-                </label>
+          if (checkOut && nextDate && checkOut < nextDate) {
+            setCheckOut("");
+          }
+        }}
+        min={new Date().toLocaleDateString("en-CA")}
+        aria-label="Check-in date"
+        required
+      />
+    </span>
+  </label>
 
-                <label className="sh-search-date-label">
-                  <span>Check-out</span>
-                  <span className="sh-date-control">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="3" y="5" width="18" height="16" rx="2" />
-                      <path d="M16 3v4M8 3v4M3 10h18" />
-                    </svg>
-                    {!checkOut && (
-                      <span className="sh-date-placeholder">Add date</span>
-                    )}
-                    <input
-                      className={!checkOut ? "is-empty" : ""}
-                      type="date"
-                      value={checkOut}
-                      onChange={(event) => setCheckOut(event.target.value)}
-                      min={checkIn || new Date().toLocaleDateString("en-CA")}
-                      aria-label="Check-out date"
-                      required
-                    />
-                  </span>
-                </label>
-              </div>
+  <label className="sh-search-date-label">
+    <span>Check-out</span>
+    <span className="sh-date-control">
+      {!checkOut && (
+        <span className="sh-date-placeholder">Add date</span>
+      )}
+      <input
+        className={!checkOut ? "is-empty" : ""}
+        type="date"
+        value={checkOut}
+        onChange={(event) => setCheckOut(event.target.value)}
+        min={checkIn || new Date().toLocaleDateString("en-CA")}
+        aria-label="Check-out date"
+        required
+      />
+    </span>
+  </label>
+</div>
 
               <label className="sh-search-guests">
                 <span>Guests</span>
