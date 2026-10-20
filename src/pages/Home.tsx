@@ -1029,7 +1029,7 @@ export default function Home() {
           <div className="sh-hero-copy">
            
 <span className="sh-eyebrow">YOUR NEXT UK GETAWAY</span>
-<h1>Find your perfect holiday stay</h1>
+  <h1>Find your somewhere.</h1>
 <p className="sh-hero-subtitle">
   Discover welcoming holiday homes, coastal escapes, caravans and lodges
   for your next UK getaway.
