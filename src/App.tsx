@@ -130,7 +130,10 @@ export default function App() {
           <Route path="/booking-terms" element={<BookingTerms />} />
           <Route path="/cookie-policy" element={<CookiePolicy />} />
           <Route path="/owner-terms" element={<OwnerTerms />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+  path="/reset-password"
+  element={<ResetPassword />}
+/>
 
           <Route
             path="/host-reviews"
