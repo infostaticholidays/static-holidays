@@ -142,18 +142,14 @@ export default function Properties() {
 
     const capacity = Number(property.sleeps || 0);
 
-    return (
-      matchesSearch &&
-      (guests === "Any" ||
-        (guests === "4+" ? capacity >= 4 : capacity >= Number(guests))) &&
-      (!hotTub || property.has_hot_tub === true) &&
-      (!pool || property.has_pool === true || property.pool_type !== "none") &&
-      (!seaView || property.sea_view === true) &&
-      (!petFriendly || property.pet_friendly === true) &&
-      (!wifi || property.wifi === true) &&
-      (!parking || property.parking === true) &&
-      (!familyFriendly || property.family_friendly === true)
-    );
+   return (
+  matchesSearch &&
+  (guests === "Any" ||
+    (guests === "4+" ? capacity >= 4 : capacity >= Number(guests))) &&
+  selectedFeatures.every((feature) =>
+    matchesPropertyFeature(property, feature)
+  )
+);
   });
 
   function clearFilters() {
