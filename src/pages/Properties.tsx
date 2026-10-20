@@ -152,19 +152,15 @@ export default function Properties() {
 );
   });
 
-  function clearFilters() {
-    setSearch("");
-    setGuests("Any");
-    setCheckIn("");
-    setCheckOut("");
-    setHotTub(false);
-    setPool(false);
-    setSeaView(false);
-    setPetFriendly(false);
-    setWifi(false);
-    setParking(false);
-    setFamilyFriendly(false);
-  }
+  
+function clearFilters() {
+  setSearch("");
+  setGuests("Any");
+  setCheckIn("");
+  setCheckOut("");
+  setSelectedFeatures([]);
+}
+
 
   const activeFilterCount = [
     hotTub,
