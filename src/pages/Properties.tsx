@@ -380,7 +380,7 @@ function clearFilters() {
   </label>
 
   <label style={{ flex: "1 1 125px", color: "#315d43", fontSize: "13px", fontWeight: 600 }}>
-    guests
+    Guests
     <select
       value={guests}
       onChange={(event) => setGuests(event.target.value)}
