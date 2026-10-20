@@ -1099,9 +1099,12 @@ export default function Home() {
         <Link to="/travel-insurance">Travel Insurance Information</Link>
       </div>
 
-      <div className="sh-footer-column">
+         <div className="sh-footer-column">
         <h3>For property owners</h3>
         <Link to="/owner-terms">Owner Terms &amp; Conditions</Link>
       </div>
     </div>
   </footer>
+</main>
+);
+}
