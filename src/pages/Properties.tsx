@@ -312,7 +312,7 @@ function clearFilters() {
   textAlign: "left",
 }}>
   <label style={{ flex: "2 1 200px", color: "#315d43", fontSize: "13px", fontWeight: 600 }}>
-    destination
+    Destination
     <input
       value={search}
       onChange={(event) => setSearch(event.target.value)}
