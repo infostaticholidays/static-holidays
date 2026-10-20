@@ -811,7 +811,7 @@ export default function Home() {
         .sh-plan-card > a { display: inline-block; margin-top: 8px; color: var(--sh-green); font-size: 13px; font-weight: 750; }
         .sh-plan-card > a span { margin-left: 6px; }
         .sh-plan-note { margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--sh-border); font-size: 11px !important; }
-      <WritingBlock id="48216" variant="standard">      
+       
       
         .sh-footer {
           margin-top: 55px;
