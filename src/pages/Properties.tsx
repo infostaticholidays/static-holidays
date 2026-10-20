@@ -333,7 +333,7 @@ function clearFilters() {
   </label>
 
   <label style={{ flex: "1 1 140px", color: "#315d43", fontSize: "13px", fontWeight: 600 }}>
-    check-in
+    Check-in
     <input
       type="date"
       min={today}
