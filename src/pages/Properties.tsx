@@ -26,6 +26,37 @@ type Property = {
   status?: string;
 };
 
+type Property = {
+  // Keep all your existing property fields here
+  status?: string;
+};
+
+const featureOptions = [
+  "dogs welcome",
+  "log burner",
+  "hot tub",
+  "swimming pool",
+  "garden",
+  "parking",
+  "wi-fi",
+  "sea view",
+  "wheelchair accessible",
+  "bbq",
+  "fire pit",
+  "dishwasher",
+  "washing machine",
+  "cot and highchair",
+  "enclosed garden",
+  "private outdoor space",
+  "games room",
+  "ev charging",
+  "rural location",
+  "equine facilities",
+];
+
+// Paste the complete matchesPropertyFeature function here.
+
+
 export default function Properties() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
