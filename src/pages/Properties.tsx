@@ -64,6 +64,7 @@ export default function Properties() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
 
   const [hotTub, setHotTub] = useState(false);
   const [pool, setPool] = useState(false);
