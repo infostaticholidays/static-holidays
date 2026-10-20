@@ -31,6 +31,7 @@ import HostDashboard from "./pages/HostDashboard";
 import HostReviews from "./pages/HostReviews";
 import PromoteProperty from "./pages/PromoteProperty";
 import Contact from "./pages/Contact";
+import BookingTerms from "./pages/BookingTerms";
 
 function NotFound() {
   return (
@@ -120,6 +121,7 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/booking-terms" element={<BookingTerms />} />
 
           <Route
             path="/host-reviews"
