@@ -811,7 +811,12 @@ export default function Home() {
         .sh-plan-card > a { display: inline-block; margin-top: 8px; color: var(--sh-green); font-size: 13px; font-weight: 750; }
         .sh-plan-card > a span { margin-left: 6px; }
         .sh-plan-note { margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--sh-border); font-size: 11px !important; }
-        .sh-footer { margin-top: 75px; padding: 38px clamp(20px,5vw,76px); border-top: 1px solid var(--sh-border); }
+      <WritingBlock id="48216" variant="standard">        .sh-footer {
+margin-top: 45px;
+padding: 28px clamp(20px, 5vw, 76px) 20px;
+background: #ffffff;
+border-top: 5px solid #284a34;
+}</WritingBlock>
         .sh-footer-inner { max-width: 1288px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
         .sh-footer-copy { color: var(--sh-muted); font-size: 12px; line-height: 1.8; }
         .sh-footer-links { display: flex; flex-wrap: wrap; gap: 22px; color: #52675a; font-size: 12px; font-weight: 600; }
