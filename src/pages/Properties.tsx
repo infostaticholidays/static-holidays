@@ -627,7 +627,7 @@ function clearFilters() {
 
                     <button
                     onClick={() => navigate(`/property/${id}`, {
-                        state: { checkIn, checkOut, guests },
+                        state: { checkIn, checkOut, Guests },
                       })}
                       style={{
                         width: "100%",
