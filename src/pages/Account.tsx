@@ -181,9 +181,9 @@ if (error) {
       console.log("ACCOUNT: loading finished");
       setLoading(false);
     }
+  }
 
-
-useEffect(() => {
+  useEffect(() => {
   if (!trip?.start_date) {
     setTimeLeft("");
     return;
