@@ -355,6 +355,14 @@ const [detailsForm, setDetailsForm] = useState({
         }
 
         setProfile(profileData);
+        
+setDetailsForm({
+  full_name: profileData.full_name ?? "",
+  email: currentUser.email ?? "",
+  phone: profileData.phone ?? "",
+  address: profileData.address ?? "",
+});
+
         setBookingMode(
           profileData.booking_mode === "automatic" ? "automatic" : "manual"
         );
