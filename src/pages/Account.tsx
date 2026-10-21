@@ -282,7 +282,7 @@ setTrip(upcoming[0] || null);
     const timer = window.setInterval(updateCountdowns, 60000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [upcomingTrips.length]);
 
 
   
