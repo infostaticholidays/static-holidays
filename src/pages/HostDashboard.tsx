@@ -944,7 +944,130 @@ const handleSaveDetails = async () => {
         )}
 
         <section style={{ ...styles.card, marginBottom: 20 }}>
-          <h2 style={styles.sectionTitle}>Booking preferences</h2>
+          <h2 style={styles.sectionTitle}>My personal details</h2>
+
+          {!editingDetails ? (
+            <>
+              <p>
+                <strong>Name:</strong>{" "}
+                {profile?.full_name || "Not provided"}
+              </p>
+              <p>
+                <strong>Email:</strong>{" "}
+                {user?.email || "Not provided"}
+              </p>
+              <p>
+                <strong>Telephone:</strong>{" "}
+                {profile?.phone || "Not provided"}
+              </p>
+              <p>
+                <strong>Address:</strong>{" "}
+                {profile?.address || "Not provided"}
+              </p>
+
+              <button
+                type="button"
+                style={styles.primaryButton}
+                onClick={() => setEditingDetails(true)}
+              >
+                Edit My Details
+              </button>
+            </>
+          ) : (
+            <>
+              <label style={{ display: "block", marginBottom: 12 }}>
+                Full name
+                <input
+                  type="text"
+                  style={styles.input}
+                  value={detailsForm.full_name}
+                  onChange={(e) =>
+                    setDetailsForm({
+                      ...detailsForm,
+                      full_name: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label style={{ display: "block", marginBottom: 12 }}>
+                Email address
+                <input
+                  type="email"
+                  style={styles.input}
+                  value={detailsForm.email}
+                  onChange={(e) =>
+                    setDetailsForm({
+                      ...detailsForm,
+                      email: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label style={{ display: "block", marginBottom: 12 }}>
+                Telephone
+                <input
+                  type="tel"
+                  style={styles.input}
+                  value={detailsForm.phone}
+                  onChange={(e) =>
+                    setDetailsForm({
+                      ...detailsForm,
+                      phone: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label style={{ display: "block", marginBottom: 16 }}>
+                Address
+                <textarea
+                  style={styles.input}
+                  value={detailsForm.address}
+                  onChange={(e) =>
+                    setDetailsForm({
+                      ...detailsForm,
+                      address: e.target.value,
+                    })
+                  }
+                  rows={3}
+                />
+              </label>
+
+              <button
+                type="button"
+                style={styles.primaryButton}
+                onClick={handleSaveDetails}
+                disabled={savingDetails}
+              >
+                {savingDetails ? "Saving..." : "Save Changes"}
+              </button>
+
+              <button
+                type="button"
+                style={{
+                  ...styles.secondaryButton,
+                  marginLeft: 8,
+                }}
+                disabled={savingDetails}
+                onClick={() => {
+                  setDetailsForm({
+                    full_name: profile?.full_name ?? "",
+                    email: user?.email ?? "",
+                    phone: profile?.phone ?? "",
+                    address: profile?.address ?? "",
+                  });
+                  setEditingDetails(false);
+                  setPageError("");
+                }}
+              >
+                Cancel
+              </button>
+            </>
+          )}
+        </section>
+
           <p style={styles.muted}>
             Choose how you want to handle booking requests.
           </p>
