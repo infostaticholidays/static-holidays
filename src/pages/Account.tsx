@@ -190,9 +190,64 @@ console.log("Bookings returned from Supabase:", bookingsData);
               new Date(b.start_date).getTime()
           );
 
-       setPreviousTrips(previous);
-setUpcomingTrips(upcoming);
-setTrip(upcoming[0] || null);
+       const todayForCountdown = new Date();
+todayForCountdown.setHours(0, 0, 0, 0);
+
+const tripsWithMessages = upcoming.map((holiday: any) => {
+  const parseDate = (value: string) => {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  const checkIn = parseDate(holiday.start_date);
+  const checkOut = parseDate(holiday.end_date);
+
+  const daysToCheckIn = Math.round(
+    (checkIn.getTime() - todayForCountdown.getTime()) / 86400000
+  );
+
+  const daysToCheckOut = Math.round(
+    (checkOut.getTime() - todayForCountdown.getTime()) / 86400000
+  );
+
+  let holidayMessage = "";
+
+  if (daysToCheckOut <= 0) {
+    holidayMessage =
+      "🏡 Your holiday ends today — we hope you had a wonderful stay!";
+  } else if (daysToCheckIn > 0) {
+    const months = Math.floor(daysToCheckIn / 30);
+    const weeks = Math.floor((daysToCheckIn % 30) / 7);
+    const days = daysToCheckIn % 7;
+
+    const parts: string[] = [];
+
+    if (months > 0) {
+      parts.push(`${months} ${months === 1 ? "month" : "months"}`);
+    }
+    if (weeks > 0) {
+      parts.push(`${weeks} ${weeks === 1 ? "week" : "weeks"}`);
+    }
+    if (days > 0 || parts.length === 0) {
+      parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+    }
+
+    holidayMessage = `✈️ Your holiday starts in ${parts.join(", ")}!`;
+  } else if (daysToCheckIn === 0) {
+    holidayMessage = "🌿 Your holiday has started! Enjoy every moment.";
+  } else if (daysToCheckOut === 1) {
+    holidayMessage = "💚 Enjoy your last day — checkout is tomorrow!";
+  } else {
+    holidayMessage =
+      `🏖️ Holiday mode is on! ${daysToCheckOut} days left until checkout.`;
+  }
+
+  return { ...holiday, holidayMessage };
+});
+
+setPreviousTrips(previous);
+setUpcomingTrips(tripsWithMessages);
+setTrip(tripsWithMessages[0] || null);
         console.log("Upcoming trips after filtering:", upcoming);
       }
 
