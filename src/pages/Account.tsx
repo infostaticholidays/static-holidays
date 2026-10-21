@@ -180,36 +180,48 @@ const [profileForm, setProfileForm] = useState({
   }
 
   useEffect(() => {
-    loadAccount();
-  }, []);
-
-  useEffect(() => {
-    if (!trip?.start_date) {
+    if (!trip?.start_date || !trip?.end_date) {
       setTimeLeft("");
       return;
     }
 
+    const start = new Date(trip.start_date).getTime();
+    const checkout = new Date(trip.end_date).getTime();
+
     function updateCountdown() {
-      const start = new Date(trip.start_date).getTime();
-      const diff = start - Date.now();
+      const now = Date.now();
 
-      if (diff <= 0) {
-        setTimeLeft("Your holiday has started!");
-        return;
+      if (now < start) {
+        setTimeLeft(
+          `Your holiday starts in ${formatTime(start - now)}`
+        );
+      } else if (now < checkout) {
+        setTimeLeft(
+          `Time left on your holiday: ${formatTime(checkout - now)}`
+        );
+      } else {
+        setTimeLeft(
+          "Thank you for staying with Static Holidays! 🌿"
+        );
       }
+    }
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    function formatTime(diff: number) {
+      const totalSeconds = Math.max(0, Math.floor(diff / 1000));
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
 
-      setTimeLeft(`${days} days, ${hours} hours, ${minutes} minutes`);
+      return `${days} days, ${hours} hours, ${minutes} mins, ${seconds} secs`;
     }
 
     updateCountdown();
-    const timer = setInterval(updateCountdown, 60000);
+    const timer = window.setInterval(updateCountdown, 1000);
 
-    return () => clearInterval(timer);
+    return () => window.clearInterval(timer);
   }, [trip]);
+
 
   async function toggleNewsletter(value: boolean) {
     if (!user || newsletterSaving) return;
