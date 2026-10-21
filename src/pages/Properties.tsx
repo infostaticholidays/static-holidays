@@ -627,10 +627,13 @@ function clearFilters() {
                       {price != null && <span style={{ color: "#718078", fontSize: "13px" }}> / night</span>}
                     </div>
 
-                    <button
-                    onClick={() => navigate(`/property/${id}`, {
-                        state: { checkIn, checkOut, Guests },
-                      })}
+               
+onClick={() =>
+  navigate(`/property/${id}`, {
+    state: { checkIn, checkOut, guests },
+  })
+}
+
                       style={{
                         width: "100%",
                         padding: "14px",
