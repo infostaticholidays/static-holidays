@@ -76,6 +76,7 @@ const [profileForm, setProfileForm] = useState({
       }
 
       setUser(user);
+      console.log("Signed-in guest ID:", user.id);
 
     
 const { data: profileData, error } = await supabase
