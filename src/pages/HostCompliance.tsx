@@ -277,7 +277,28 @@ export default function HostCompliance() {
 
   return (
     <main style={styles.page}>
-      <header style={styles.header}>
+          <header style={styles.header}>
+        <button
+          type="button"
+          onClick={() => navigate("/dashboard")}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 15px",
+            marginBottom: 22,
+            border: "1px solid rgba(255,255,255,0.45)",
+            borderRadius: 9,
+            background: "rgba(255,255,255,0.10)",
+            color: "#FFFFFF",
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          ← Back to Host Dashboard
+        </button>
+
         <div style={styles.brandRow}>
           <div style={styles.brandMark}>SH</div>
           <div>
