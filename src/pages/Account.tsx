@@ -767,8 +767,6 @@ const firstName =
 >
   {holiday.holidayMessage}
 </p>
-
-                    )}
                   </div>
                   <div style={{ fontSize: 56 }}>🏡</div>
                 </div>
