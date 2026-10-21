@@ -928,12 +928,16 @@ const firstName =
     Identity verification
   </h2>
 
-  <p style={{ color: muted, lineHeight: 1.7, fontSize: 14 }}>
-   Submit a valid passport or driving licence for identity verification. Your document will be reviewed before you can book a property.
+<p style={{ color: muted, lineHeight: 1.7, fontSize: 14 }}>
+  Submit a valid passport or driving licence for identity verification.
+  Your document will be reviewed before you can book a property.
+</p>
 
-Accepted file formats: JPG, PNG or PDF. Maximum file size: 10 MB. Your document is stored securely in private storage and is only available to authorised reviewers.
-  </p>
-
+<p style={{ color: muted, lineHeight: 1.7, fontSize: 14 }}>
+  Accepted documents: passport or driving licence. Accepted file
+  formats: JPG, PNG or PDF. Maximum file size: 10 MB. Please ensure
+  your document is clear and all details are readable.
+</p>
   {idSubmission?.status === "pending" ? (
     <div
       style={{
