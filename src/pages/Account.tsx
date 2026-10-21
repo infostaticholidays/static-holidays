@@ -310,6 +310,85 @@ async function saveProfile() {
 }
 
 
+async function submitIdentityDocument() {
+  if (!user || !idFile || idUploading) return;
+
+  if (!["image/jpeg", "image/png", "application/pdf"].includes(idFile.type)) {
+    alert("Please choose a JPG, PNG, or PDF document.");
+    return;
+  }
+
+  if (idFile.size > 10 * 1024 * 1024) {
+    alert("Your document must be smaller than 10 MB.");
+    return;
+  }
+
+  if (
+    idSubmission?.status === "pending" ||
+    idSubmission?.status === "approved"
+  ) {
+    alert(
+      "You already have a pending or approved ID submission."
+    );
+    return;
+  }
+
+  setIdUploading(true);
+
+  let uploadedPath: string | null = null;
+
+  try {
+    const safeName = idFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filePath = `${user.id}/${crypto.randomUUID()}-${safeName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("identity-documents")
+      .upload(filePath, idFile, {
+        upsert: false,
+        contentType: idFile.type,
+      });
+
+    if (uploadError) throw uploadError;
+
+    uploadedPath = filePath;
+
+    const { data, error: insertError } = await supabase
+      .from("identity_verifications")
+      .insert({
+        user_id: user.id,
+        document_path: filePath,
+        status: "pending",
+      })
+      .select("id, document_path, status, submitted_at")
+      .single();
+
+    if (insertError) throw insertError;
+
+    setIdSubmission(data);
+    setIdFile(null);
+
+    alert("Your ID has been submitted for review.");
+  } catch (error) {
+    console.error("ID submission failed:", error);
+
+    if (uploadedPath) {
+      const { error: cleanupError } = await supabase.storage
+        .from("identity-documents")
+        .remove([uploadedPath]);
+
+      if (cleanupError) {
+        console.error("Could not clean up uploaded ID:", cleanupError);
+      }
+    }
+
+    alert(
+      "We couldn't submit your ID. Please try again. If the problem continues, check the browser console."
+    );
+  } finally {
+    setIdUploading(false);
+  }
+}
+
   async function removeFavourite(id: string) {
     const { error } = await supabase
       .from("favourites")
