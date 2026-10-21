@@ -177,10 +177,10 @@ if (error) {
       }
 
       setReviews(reviewData || []);
-    } finally {
+     } finally {
+      console.log("ACCOUNT: loading finished");
       setLoading(false);
     }
-  }
 
   useEffect(() => {
     if (!trip?.start_date || !trip?.end_date) {
