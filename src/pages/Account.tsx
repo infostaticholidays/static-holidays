@@ -929,8 +929,9 @@ const firstName =
   </h2>
 
   <p style={{ color: muted, lineHeight: 1.7, fontSize: 14 }}>
-    Submit an identity document for review so we can verify your
-    account before booking.
+   Submit a valid passport or driving licence for identity verification. Your document will be reviewed before you can book a property.
+
+Accepted file formats: JPG, PNG or PDF. Maximum file size: 10 MB. Your document is stored securely in private storage and is only available to authorised reviewers.
   </p>
 
   {idSubmission?.status === "pending" ? (
