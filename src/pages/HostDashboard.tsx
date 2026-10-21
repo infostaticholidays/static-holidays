@@ -282,6 +282,17 @@ export default function HostDashboard() {
 
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  
+const [editingDetails, setEditingDetails] = useState(false);
+const [savingDetails, setSavingDetails] = useState(false);
+
+const [detailsForm, setDetailsForm] = useState({
+  full_name: "",
+  email: "",
+  phone: "",
+  address: "",
+});
+
 
   const [bookingMode, setBookingMode] =
     useState<"manual" | "automatic">("manual");
