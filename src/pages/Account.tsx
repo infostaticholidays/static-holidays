@@ -658,14 +658,13 @@ const firstName =
                 YOUR NEXT ADVENTURE
               </p>
               <h2 style={{ margin: 0, fontSize: 23 }}>
-                My next trip
+                {upcomingTrips.length > 1 ? "My upcoming trips" : "My next trip"}
               </h2>
             </div>
-
             <span style={{ fontSize: 30 }}>🏖️</span>
           </div>
 
-          {!trip ? (
+          {upcomingTrips.length === 0 ? (
             <div
               style={{
                 background: sage,
@@ -678,14 +677,7 @@ const firstName =
               <h3 style={{ margin: "0 0 8px" }}>
                 Your next escape awaits
               </h3>
-              <p
-                style={{
-                  color: muted,
-                  lineHeight: 1.6,
-                  margin: "0 auto 18px",
-                  maxWidth: 430,
-                }}
-              >
+              <p style={{ color: muted, lineHeight: 1.6 }}>
                 You don't have an upcoming trip listed yet. Find somewhere
                 special for your next break.
               </p>
@@ -694,52 +686,60 @@ const firstName =
               </Link>
             </div>
           ) : (
-            <div
-              style={{
-                background: sage,
-                borderRadius: 16,
-                padding: 24,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 20,
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <h3 style={{ fontSize: 23, margin: "0 0 12px" }}>
-                  {trip.destination || "Your upcoming holiday"}
-                </h3>
-
-                <p style={{ margin: "0 0 8px", color: muted }}>
-                  <strong>Check-in:</strong>{" "}
-                  {trip.start_date
-                    ? new Date(trip.start_date).toLocaleDateString("en-GB")
-                    : "Not set"}
-                </p>
-
-                <p style={{ margin: "0 0 8px", color: muted }}>
-                  <strong>Check-out:</strong>{" "}
-                  {trip.end_date
-                    ? new Date(trip.end_date).toLocaleDateString("en-GB")
-                    : "Not set"}
-                </p>
-
-                <p
+            <div style={{ display: "grid", gap: 16 }}>
+              {upcomingTrips.map((holiday: any, index: number) => (
+                <div
+                  key={holiday.id}
                   style={{
-                    margin: "16px 0 0",
-                    color: green,
-                    fontWeight: 700,
+                    background: sage,
+                    borderRadius: 16,
+                    padding: 24,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 20,
+                    flexWrap: "wrap",
                   }}
                 >
-                  ⏳ {timeLeft}
-                </p>
-              </div>
-<div style={{ fontSize: 56 }}>🏡</div>
+                  <div>
+                    <h3 style={{ fontSize: 23, margin: "0 0 12px" }}>
+                      {holiday.destination || "Your upcoming holiday"}
+                    </h3>
+
+                    <p style={{ margin: "0 0 8px", color: muted }}>
+                      <strong>Check-in:</strong>{" "}
+                      {holiday.start_date
+                        ? new Date(holiday.start_date).toLocaleDateString("en-GB")
+                        : "Not set"}
+                    </p>
+
+                    <p style={{ margin: "0 0 8px", color: muted }}>
+                      <strong>Check-out:</strong>{" "}
+                      {holiday.end_date
+                        ? new Date(holiday.end_date).toLocaleDateString("en-GB")
+                        : "Not set"}
+                    </p>
+
+                    {index === 0 && (
+                      <p
+                        style={{
+                          margin: "16px 0 0",
+                          color: green,
+                          fontWeight: 700,
+                        }}
+                      >
+                        ⏳ {timeLeft}
+                      </p>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 56 }}>🏡</div>
+                </div>
+              ))}
             </div>
           )}
         </section>
 
+     
         {/* FAVOURITE PROPERTIES */}
         <section style={{ marginBottom: 28 }}>
           <div
