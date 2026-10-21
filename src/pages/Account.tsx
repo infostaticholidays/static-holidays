@@ -232,7 +232,7 @@ const tripsWithMessages = upcoming.map((holiday: any) => {
       parts.push(`${days} ${days === 1 ? "day" : "days"}`);
     }
 
-    holidayMessage = `✈️ Your holiday starts in ${parts.join(", ")}!`;
+    holidayMessage = `🏡 Your holiday starts in ${parts.join(", ")}!`;
   } else if (daysToCheckIn === 0) {
     holidayMessage = "🌿 Your holiday has started! Enjoy every moment.";
   } else if (daysToCheckOut === 1) {
@@ -318,7 +318,7 @@ setTrip(tripsWithMessages[0] || null);
               parts.push(`${days} ${days === 1 ? "day" : "days"}`);
             }
 
-            holidayMessage = `✈️ Your holiday starts in ${parts.join(", ")}!`;
+            holidayMessage = `🏡 Your holiday starts in ${parts.join(", ")}!`;
           } else if (daysToCheckIn === 0) {
             holidayMessage = "🌿 Your holiday has started! Enjoy every moment.";
           } else if (daysToCheckOut === 1) {
