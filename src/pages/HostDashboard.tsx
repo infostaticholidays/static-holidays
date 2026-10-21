@@ -549,6 +549,69 @@ setDetailsForm({
     }
   };
 
+const handleSaveDetails = async () => {
+  if (!user?.id) {
+    setPageError("Please sign in again.");
+    return;
+  }
+
+  if (!detailsForm.full_name.trim()) {
+    setPageError("Please enter your full name.");
+    return;
+  }
+
+  setSavingDetails(true);
+  setPageError("");
+  setNotice("");
+
+  try {
+    const newEmail = detailsForm.email.trim();
+
+    if (!newEmail) {
+      throw new Error("Please enter your email address.");
+    }
+
+    if (newEmail !== user.email) {
+      const { error: emailError } = await supabase.auth.updateUser({
+        email: newEmail,
+      });
+
+      if (emailError) throw emailError;
+    }
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: detailsForm.full_name.trim(),
+        phone: detailsForm.phone.trim(),
+        address: detailsForm.address.trim(),
+      })
+      .eq("id", user.id)
+      .select("full_name, phone, address")
+      .single();
+
+    if (error) throw error;
+
+    setProfile((previous: any) => ({
+      ...previous,
+      ...data,
+    }));
+
+    setEditingDetails(false);
+
+    setNotice(
+      newEmail !== user.email
+        ? "Your details have been saved. Please check your new email inbox for a confirmation link."
+        : "Your personal details have been saved successfully."
+    );
+  } catch (error) {
+    console.error("Saving host details failed:", error);
+    setPageError(getErrorMessage(error));
+  } finally {
+    setSavingDetails(false);
+  }
+};
+
   // Existing membership checkout: keep using create-plan-checkout.
   const handlePlanUpgrade = async (planId: PlanId) => {
     if (planId === "host") {
