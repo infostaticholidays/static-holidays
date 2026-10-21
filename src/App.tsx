@@ -38,6 +38,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import OwnerTerms from "./pages/OwnerTerms";
 import ResetPassword from "./pages/ResetPassword";
+import AdminDocumentReview from "./pages/AdminDocumentReview";
 
 function NotFound() {
   return (
@@ -175,6 +176,10 @@ export default function App() {
           <Route
   path="/privacy-policy"
   element={<PrivacyPolicy />}
+/>
+          <Route
+  path="/admin/document-review"
+  element={<AdminDocumentReview />}
 />
           
 
