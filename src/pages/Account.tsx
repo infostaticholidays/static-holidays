@@ -227,11 +227,15 @@ if (error) {
       return `${days} days, ${hours} hours, ${minutes} mins, ${seconds} secs`;
     }
 
-      updateCountdown();
+     
+    updateCountdown();
     const timer = window.setInterval(updateCountdown, 1000);
 
     return () => window.clearInterval(timer);
   }, [trip]);
+
+  async function toggleNewsletter(value: boolean) {
+
 
   async function toggleNewsletter(value: boolean) {
     if (!user || newsletterSaving) return;
