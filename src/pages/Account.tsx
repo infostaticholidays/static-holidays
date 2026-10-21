@@ -50,7 +50,12 @@ const [profileForm, setProfileForm] = useState({
 });
 
   const navigate = useNavigate();
-
+  useEffect(() => {
+    loadAccount().catch((error) => {
+      console.error("Failed to load account:", error);
+      setLoading(false);
+    });
+  }, []);
   async function loadAccount() {
     setLoading(true);
 
