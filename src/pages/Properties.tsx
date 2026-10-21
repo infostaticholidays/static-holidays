@@ -404,30 +404,36 @@ function clearFilters() {
     </select>
   </label>
 
+<button
+  type="button"
+  onClick={() => {
+    if (checkIn && checkOut && checkOut <= checkIn) {
+      alert("Check-out must be after Check-in.");
+      return;
+    }
+
+    document
+      .getElementById("property-list")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }}
+  style={{
+    alignSelf: "end",
+    flex: "1 1 130px",
+    padding: "14px 20px",
+    border: 0,
+    borderRadius: "10px",
+    background: "#17643b",
+    color: "#ffffff",
+    fontWeight: 700,
+    cursor: "pointer",
+  }}
+>
+  Search stays
+</button>
+
        
 
-          <button
-            onClick={() => {
-              if (CheckIn && CheckOut && CheckOut <= CheckIn) {
-                alert("Check-out must be after Check-in.");
-                return;
-              }
-              document.getElementById("property-list")?.scrollIntoView({ behavior: "smooth" });
-            }}
-            style={{
-              alignSelf: "end",
-              flex: "1 1 130px",
-              padding: "14px 20px",
-              border: 0,
-              borderRadius: "10px",
-              background: "#17643b",
-              color: "#ffffff",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Search stays
-          </button>
+         
         </div>
 
         <div style={{ maxWidth: "1000px", margin: "12px auto 0", textAlign: "left" }}>
