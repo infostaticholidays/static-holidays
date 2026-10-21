@@ -193,6 +193,7 @@ console.log("Bookings returned from Supabase:", bookingsData);
        setPreviousTrips(previous);
 setUpcomingTrips(upcoming);
 setTrip(upcoming[0] || null);
+        console.log("Upcoming trips after filtering:", upcoming);
       }
 
 
