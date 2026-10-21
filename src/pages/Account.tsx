@@ -66,16 +66,19 @@ const [profileForm, setProfileForm] = useState({
 
       setUser(user);
 
-      const { data: profileData, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+    
+const { data: profileData, error } = await supabase
+  .from("profiles")
+  .select("*")
+  .eq("id", user.id)
+  .single();
 
-      if (error) {
-        console.error("Could not load profile:", error);
-        return;
-      }
+if (error) {
+  console.error("Could not load profile:", error);
+  alert("We couldn't load your account profile. Please check the browser console.");
+  return;
+}
+
 
       setProfile(profileData);
       setProfileForm({
