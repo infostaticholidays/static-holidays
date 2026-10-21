@@ -160,7 +160,7 @@ if (verificationError) {
       if (!bookingsError) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
+console.log("Bookings returned from Supabase:", bookingsData);
         const confirmedTrips = (bookingsData || []).map((booking: any) => {
           const property = Array.isArray(booking.properties)
             ? booking.properties[0]
