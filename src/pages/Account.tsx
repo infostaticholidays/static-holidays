@@ -91,6 +91,22 @@ if (error) {
 
 
       setProfile(profileData);
+      
+const { data: verificationData, error: verificationError } =
+  await supabase
+    .from("identity_verifications")
+    .select("id, document_path, status, submitted_at")
+    .eq("user_id", user.id)
+    .order("submitted_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+if (verificationError) {
+  console.error("Could not load ID submission:", verificationError);
+} else {
+  setIdSubmission(verificationData);
+}
+
       setProfileForm({
   full_name: profileData.full_name || "",
   phone: profileData.phone || "",
