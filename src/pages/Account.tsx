@@ -757,18 +757,16 @@ const firstName =
                         : "Not set"}
                     </p>
 
-                    {index === 0 && (
-                   
-  <p
-    style={{
-      margin: "16px 0 0",
-      color: green,
-      fontWeight: 700,
-      lineHeight: 1.6,
-    }}
-  >
-    {holiday.holidayMessage}
-  </p>
+                   <p
+  style={{
+    margin: "16px 0 0",
+    color: green,
+    fontWeight: 700,
+    lineHeight: 1.6,
+  }}
+>
+  {holiday.holidayMessage}
+</p>
 
                     )}
                   </div>
