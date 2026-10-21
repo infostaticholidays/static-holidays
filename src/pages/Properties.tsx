@@ -639,21 +639,29 @@ onClick={() =>
     state: { checkIn, checkOut, guests },
   })
 }
-         <button           
+   
+                    
+<button
+  type="button"
+  onClick={() =>
+    navigate(`/property/${id}`, {
+      state: { checkIn, checkOut, guests },
+    })
+  }
+  style={{
+    width: "100%",
+    padding: "14px",
+    border: 0,
+    borderRadius: "10px",
+    background: "#17643b",
+    color: "#ffffff",
+    fontWeight: 700,
+    cursor: "pointer",
+  }}
+>
+  View property
+</button>
 
-                      style={{
-                        width: "100%",
-                        padding: "14px",
-                        border: 0,
-                        borderRadius: "10px",
-                        background: "#17643b",
-                        color: "#ffffff",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      View property
-                    </button>
 
                     <button
                       onClick={() => toggleFavorite(id)}
