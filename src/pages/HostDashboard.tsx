@@ -921,14 +921,7 @@ export default function HostDashboard() {
                 Complete your identity and insurance checks to help keep
                 Static Holidays safe and trustworthy.
               </div>
-              <div style={{ marginTop: 12, fontSize: 13 }}>
-                <span style={{ marginRight: 14 }}>
-                  {profile?.id_verified ? "✓" : "○"} Identity verified
-                </span>
-                <span>
-                  {profile?.insurance_verified ? "✓" : "○"} Insurance verified
-                </span>
-              </div>
+             
             </div>
             <button
               type="button"
