@@ -219,7 +219,6 @@ if (error) {
   }, [trip]);
 
 
-  async function toggleNewsletter(value: boolean) {
 
 
   async function toggleNewsletter(value: boolean) {
