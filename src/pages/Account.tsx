@@ -182,32 +182,40 @@ if (error) {
       setLoading(false);
     }
 
-  useEffect(() => {
-    if (!trip?.start_date || !trip?.end_date) {
-      setTimeLeft("");
+
+useEffect(() => {
+  if (!trip?.start_date) {
+    setTimeLeft("");
+    return;
+  }
+
+  const start = new Date(trip.start_date).getTime();
+
+  function updateCountdown() {
+    const diff = start - Date.now();
+
+    if (diff <= 0) {
+      setTimeLeft("Your holiday has started! 🌿");
       return;
     }
 
-    const start = new Date(trip.start_date).getTime();
-    const checkout = new Date(trip.end_date).getTime();
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
-    function updateCountdown() {
-      const now = Date.now();
+    setTimeLeft(
+      `Your holiday starts in ${days} days, ${hours} hours, ${minutes} mins, ${seconds} secs`
+    );
+  }
 
-      if (now < start) {
-        setTimeLeft(
-          `Your holiday starts in ${formatTime(start - now)}`
-        );
-      } else if (now < checkout) {
-        setTimeLeft(
-          `Time left on your holiday: ${formatTime(checkout - now)}`
-        );
-      } else {
-        setTimeLeft(
-          "Thank you for staying with Static Holidays! 🌿"
-        );
-      }
-    }
+  updateCountdown();
+  const timer = window.setInterval(updateCountdown, 1000);
+
+  return () => window.clearInterval(timer);
+}, [trip]);
+
 
     function formatTime(diff: number) {
       const totalSeconds = Math.max(0, Math.floor(diff / 1000));
