@@ -213,62 +213,64 @@ setTrip(upcoming[0] || null);
     }
   }
 
+ 
   useEffect(() => {
     const updateCountdowns = () => {
       const now = new Date();
-
       const today = new Date(
         now.getFullYear(),
         now.getMonth(),
         now.getDate()
       );
 
-      const formatDate = (dateString: string) => {
-        const [year, month, day] = dateString.split("-").map(Number);
-        return new Date(year, month - 1, day);
-      };
+      setUpcomingTrips((trips) =>
+        trips.map((holiday) => {
+          const parseDate = (value: string) => {
+            const [year, month, day] = value.split("-").map(Number);
+            return new Date(year, month - 1, day);
+          };
 
-      const formatRemaining = (totalDays: number) => {
-        const years = Math.floor(totalDays / 365);
-        const months = Math.floor((totalDays % 365) / 30);
-        const weeks = Math.floor((totalDays % 30) / 7);
-        const days = totalDays % 7;
+          const checkIn = parseDate(holiday.start_date);
+          const checkOut = parseDate(holiday.end_date);
 
-        const parts: string[] = [];
-
-        if (years > 0) parts.push(`${years} ${years === 1 ? "year" : "years"}`);
-        if (months > 0) parts.push(`${months} ${months === 1 ? "month" : "months"}`);
-        if (weeks > 0) parts.push(`${weeks} ${weeks === 1 ? "week" : "weeks"}`);
-        if (days > 0 || parts.length === 0) {
-          parts.push(`${days} ${days === 1 ? "day" : "days"}`);
-        }
-
-        return parts.join(", ");
-      };
-
-      setUpcomingTrips((currentTrips) =>
-        currentTrips.map((holiday) => {
-          const checkIn = formatDate(holiday.start_date);
-          const checkOut = formatDate(holiday.end_date);
-          const daysUntilCheckIn = Math.round(
+          const daysToCheckIn = Math.round(
             (checkIn.getTime() - today.getTime()) / 86400000
           );
-          const daysUntilCheckOut = Math.round(
+
+          const daysToCheckOut = Math.round(
             (checkOut.getTime() - today.getTime()) / 86400000
           );
 
-          let holidayMessage = "";
+          let holidayMessage: string;
 
-          if (daysUntilCheckOut <= 0) {
-            holidayMessage = "🏡 Your holiday ends today — we hope you had a wonderful stay!";
-          } else if (daysUntilCheckIn > 0) {
-            holidayMessage = `✈️ Your holiday starts in ${formatRemaining(daysUntilCheckIn)}!`;
-          } else if (daysUntilCheckIn === 0) {
+          if (daysToCheckOut <= 0) {
+            holidayMessage =
+              "🏡 Your holiday ends today — we hope you had a wonderful stay!";
+          } else if (daysToCheckIn > 0) {
+            const months = Math.floor(daysToCheckIn / 30);
+            const weeks = Math.floor((daysToCheckIn % 30) / 7);
+            const days = daysToCheckIn % 7;
+
+            const parts: string[] = [];
+
+            if (months > 0) {
+              parts.push(`${months} ${months === 1 ? "month" : "months"}`);
+            }
+            if (weeks > 0) {
+              parts.push(`${weeks} ${weeks === 1 ? "week" : "weeks"}`);
+            }
+            if (days > 0 || parts.length === 0) {
+              parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+            }
+
+            holidayMessage = `✈️ Your holiday starts in ${parts.join(", ")}!`;
+          } else if (daysToCheckIn === 0) {
             holidayMessage = "🌿 Your holiday has started! Enjoy every moment.";
-          } else if (daysUntilCheckOut === 1) {
+          } else if (daysToCheckOut === 1) {
             holidayMessage = "💚 Enjoy your last day — checkout is tomorrow!";
           } else {
-            holidayMessage = `🏖️ Holiday mode is on! ${daysUntilCheckOut} days left until checkout.`;
+            holidayMessage =
+              `🏖️ Holiday mode is on! ${daysToCheckOut} days left until checkout.`;
           }
 
           return { ...holiday, holidayMessage };
@@ -281,6 +283,7 @@ setTrip(upcoming[0] || null);
 
     return () => window.clearInterval(timer);
   }, []);
+
 
   
 
