@@ -35,6 +35,7 @@ export default function Account() {
   const [profile, setProfile] = useState<any>(null);
   const [favourites, setFavourites] = useState<any[]>([]);
   const [trip, setTrip] = useState<any>(null);
+  const [upcomingTrips, setUpcomingTrips] = useState<any[]>([]);
   const [previousTrips, setPreviousTrips] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
