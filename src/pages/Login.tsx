@@ -59,13 +59,18 @@ export default function Login() {
         return;
       }
 
-     if (profile?.role === "admin") {
-  navigate("/admin/document-review");
-if (profile?.role === "host" || profile?.role === "owner") {
-  navigate("/host-dashboard");
-} else {
-  navigate("/account");
-}
+     
+      if (profile?.role === "admin") {
+        navigate("/admin/document-review");
+      } else if (
+        profile?.role === "host" ||
+        profile?.role === "owner"
+      ) {
+        navigate("/host-dashboard");
+      } else {
+        navigate("/account");
+      }
+
 
     } catch (error) {
       console.error(error);
