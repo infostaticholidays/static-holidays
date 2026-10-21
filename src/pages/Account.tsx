@@ -183,56 +183,41 @@ if (error) {
     }
   }
 
+  
   useEffect(() => {
-  if (!trip?.start_date) {
-    setTimeLeft("");
-    return;
-  }
-
-  const start = new Date(trip.start_date).getTime();
-
-  function updateCountdown() {
-    const diff = start - Date.now();
-
-    if (diff <= 0) {
-      setTimeLeft("Your holiday has started! 🌿");
+    if (!trip?.start_date) {
+      setTimeLeft("");
       return;
     }
 
-    const totalSeconds = Math.floor(diff / 1000);
-    const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor((totalSeconds % 86400) / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    const start = new Date(trip.start_date).getTime();
 
-    setTimeLeft(
-      `Your holiday starts in ${days} days, ${hours} hours, ${minutes} mins, ${seconds} secs`
-    );
-  }
+    const updateCountdown = () => {
+      const diff = start - Date.now();
 
-  updateCountdown();
-  const timer = window.setInterval(updateCountdown, 1000);
+      if (diff <= 0) {
+        setTimeLeft("Your holiday has started! 🌿");
+        return;
+      }
 
-  return () => window.clearInterval(timer);
-}, [trip]);
-
-
-    function formatTime(diff: number) {
-      const totalSeconds = Math.max(0, Math.floor(diff / 1000));
+      const totalSeconds = Math.floor(diff / 1000);
       const days = Math.floor(totalSeconds / 86400);
       const hours = Math.floor((totalSeconds % 86400) / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
 
-      return `${days} days, ${hours} hours, ${minutes} mins, ${seconds} secs`;
-    }
+      setTimeLeft(
+        `Your holiday starts in ${days} days, ${hours} hours, ${minutes} mins, ${seconds} secs`
+      );
+    };
 
-     
     updateCountdown();
+
     const timer = window.setInterval(updateCountdown, 1000);
 
     return () => window.clearInterval(timer);
   }, [trip]);
+
 
   async function toggleNewsletter(value: boolean) {
 
