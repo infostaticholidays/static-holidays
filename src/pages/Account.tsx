@@ -188,8 +188,9 @@ if (verificationError) {
               new Date(b.start_date).getTime()
           );
 
-        setPreviousTrips(previous);
-        setTrip(upcoming[0] || null);
+       setPreviousTrips(previous);
+setUpcomingTrips(upcoming);
+setTrip(upcoming[0] || null);
       }
 
 
