@@ -42,6 +42,11 @@ export default function Account() {
   const [newsletterSaving, setNewsletterSaving] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  
+const [idSubmission, setIdSubmission] = useState<any>(null);
+const [idFile, setIdFile] = useState<File | null>(null);
+const [idUploading, setIdUploading] = useState(false);
+
 
 const [profileForm, setProfileForm] = useState({
   full_name: "",
