@@ -919,6 +919,93 @@ const firstName =
             </div>
           )}
         </section>
+        
+{/* IDENTITY VERIFICATION */}
+<section style={{ ...cardStyle, marginBottom: 28 }}>
+  <div style={{ fontSize: 28, marginBottom: 12 }}>🪪</div>
+
+  <h2 style={{ margin: "0 0 12px", fontSize: 22 }}>
+    Identity verification
+  </h2>
+
+  <p style={{ color: muted, lineHeight: 1.7, fontSize: 14 }}>
+    Submit an identity document for review so we can verify your
+    account before booking.
+  </p>
+
+  {idSubmission?.status === "pending" ? (
+    <div
+      style={{
+        background: "#fff6df",
+        borderRadius: 12,
+        padding: 16,
+        color: "#795a16",
+      }}
+    >
+      <strong>⏳ ID awaiting review</strong>
+      <p style={{ marginBottom: 0, fontSize: 14 }}>
+        Your document has been submitted and is waiting for review.
+      </p>
+    </div>
+  ) : idSubmission?.status === "approved" ? (
+    <div
+      style={{
+        background: "#e8f2e9",
+        borderRadius: 12,
+        padding: 16,
+        color: darkGreen,
+      }}
+    >
+      <strong>✓ ID submission approved</strong>
+      <p style={{ marginBottom: 0, fontSize: 14 }}>
+        Your submitted document has been approved.
+      </p>
+    </div>
+  ) : (
+    <>
+      {idSubmission?.status === "rejected" && (
+        <p style={{ color: "#934444", fontSize: 14 }}>
+          Your previous submission was rejected. You can submit a
+          new document below.
+        </p>
+      )}
+
+      <label
+        htmlFor="identity-document"
+        style={{ display: "block", fontWeight: 600, margin: "18px 0 8px" }}
+      >
+        Choose your ID document
+      </label>
+
+      <input
+        id="identity-document"
+        type="file"
+        accept=".jpg,.jpeg,.png,.pdf"
+        disabled={idUploading}
+        onChange={(e) => setIdFile(e.target.files?.[0] || null)}
+        style={{ display: "block", marginBottom: 16, maxWidth: "100%" }}
+      />
+
+      <p style={{ color: muted, fontSize: 12, lineHeight: 1.6 }}>
+        Accepted formats: JPG, PNG, or PDF. Maximum file size: 10 MB.
+        Your document is stored in private storage.
+      </p>
+
+      <button
+        type="button"
+        onClick={submitIdentityDocument}
+        disabled={!idFile || idUploading}
+        style={{
+          ...buttonStyle,
+          opacity: !idFile || idUploading ? 0.6 : 1,
+        }}
+      >
+        {idUploading ? "Submitting..." : "Submit ID for review"}
+      </button>
+    </>
+  )}
+</section>
+
 
         {/* ACCOUNT DETAILS AND NEWSLETTER */}
         <section
