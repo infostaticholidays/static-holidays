@@ -279,8 +279,7 @@ export default function EditProperty() {
           title: data.title ?? "",
           location: data.location ?? "",
           description: data.description ?? "",
-                    house_rules: data.house_rules ?? "",
-          hot_tub_instructions: data.hot_tub_instructions ?? "",
+                  
           nearby_information: data.nearby_information ?? "",
           check_in_time: data.check_in_time
   ? String(data.check_in_time).slice(0, 5)
