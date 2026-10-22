@@ -824,7 +824,29 @@ const firstName =
   {holiday.holidayMessage}
 </p>
                   </div>
-                  <div style={{ fontSize: 56 }}>🏡</div>
+                 
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
+                    <div style={{ fontSize: 56 }}>🏡</div>
+
+                    <Link
+                      to={`/my-booking/${holiday.id}`}
+                      style={{
+                        ...buttonStyle,
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      View booking details →
+                    </Link>
+                  </div>
+
                 </div>
               ))}
             </div>
