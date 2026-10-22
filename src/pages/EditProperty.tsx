@@ -319,12 +319,50 @@ check_in_timezone: data.check_in_timezone ?? "Europe/London",
             ? data.equine_facilities
             : [],
         });
-        const { data: arrivalData, error: arrivalError } = await supabase
-          .from("property_arrival_details")
-          .select(
-          
-  "house_rules, hot_tub_instructions, check_in_instructions, key_safe_location, key_safe_code, owner_contact_details, arrival_notes"
-)
+        
+const { data: arrivalData, error: arrivalError } = await supabase
+  .from("property_arrival_details")
+  .select(
+    "check_in_instructions, key_safe_location, key_safe_code, owner_contact_details, arrival_notes"
+  )
+  .eq("property_id", id)
+  .maybeSingle();
+
+if (arrivalError) {
+  console.error("Could not load private arrival details:", arrivalError);
+  setErrorMessage(
+    "Your property loaded, but private arrival details could not be loaded. Please check the arrival-information permissions in Supabase."
+  );
+} else if (!cancelled) {
+  setArrivalDetails((current) => ({
+    ...current,
+    check_in_instructions: arrivalData?.check_in_instructions ?? "",
+    key_safe_location: arrivalData?.key_safe_location ?? "",
+    key_safe_code: arrivalData?.key_safe_code ?? "",
+    owner_contact_details: arrivalData?.owner_contact_details ?? "",
+    arrival_notes: arrivalData?.arrival_notes ?? "",
+  }));
+}
+
+const { data: guestInfoData, error: guestInfoError } = await supabase
+  .from("property_guest_information")
+  .select("house_rules, hot_tub_instructions")
+  .eq("property_id", id)
+  .maybeSingle();
+
+if (guestInfoError) {
+  console.error("Could not load guest information:", guestInfoError);
+  setErrorMessage(
+    "Your property loaded, but house rules and hot-tub instructions could not be loaded."
+  );
+} else if (!cancelled) {
+  setArrivalDetails((current) => ({
+    ...current,
+    house_rules: guestInfoData?.house_rules ?? "",
+    hot_tub_instructions: guestInfoData?.hot_tub_instructions ?? "",
+  }));
+}
+
           .eq("property_id", id)
           .maybeSingle();
 
