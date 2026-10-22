@@ -388,14 +388,15 @@ async function saveProfile() {
     if (error) throw error;
 
     setProfile(data);
-
     setProfileForm({
       full_name: data.full_name || "",
       phone: data.phone || "",
       address: data.address || "",
     });
 
+    setIsEditingProfile(false);
     alert("Your account details have been saved.");
+   
   } catch (error) {
     console.error("Could not save account details:", error);
     alert("Sorry, we couldn't save your details. Please try again.");
