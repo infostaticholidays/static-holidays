@@ -116,6 +116,12 @@ export default function App() {
             path="/booking/:id"
             element={<BookingDetail />}
           />
+          
+<Route
+  path="/my-booking/:id"
+  element={<GuestBookingDetail />}
+/>
+
 <Route
   path="/payment-success"
   element={<PaymentSuccess />}
