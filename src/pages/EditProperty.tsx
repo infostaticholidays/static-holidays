@@ -220,12 +220,14 @@ export default function EditProperty() {
   const [newPhotos, setNewPhotos] = useState<File[]>([]);
   const [coverPhotoId, setCoverPhotoId] = useState("");
     const [arrivalDetails, setArrivalDetails] = useState({
-    check_in_instructions: "",
-    key_safe_location: "",
-    key_safe_code: "",
-    owner_contact_details: "",
-    arrival_notes: "",
-  });
+  house_rules: "",
+  hot_tub_instructions: "",
+  check_in_instructions: "",
+  key_safe_location: "",
+  key_safe_code: "",
+  owner_contact_details: "",
+  arrival_notes: "",
+});
 
   useEffect(() => {
     let cancelled = false;
