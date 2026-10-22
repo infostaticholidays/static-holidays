@@ -283,9 +283,12 @@ export default function EditProperty() {
           hot_tub_instructions: data.hot_tub_instructions ?? "",
           nearby_information: data.nearby_information ?? "",
           check_in_time: data.check_in_time
-            ? String(data.check_in_time).slice(0, 5)
-            : "15:00",
-          check_in_timezone: data.check_in_timezone ?? "Europe/London",
+  ? String(data.check_in_time).slice(0, 5)
+  : "15:00",
+check_out_time: data.check_out_time
+  ? String(data.check_out_time).slice(0, 5)
+  : "",
+check_in_timezone: data.check_in_timezone ?? "Europe/London",
           property_type: data.property_type ?? "",
           holiday_park: data.holiday_park ?? "",
           bedrooms: Number(data.bedrooms ?? 1),
