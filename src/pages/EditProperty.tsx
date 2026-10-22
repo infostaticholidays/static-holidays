@@ -331,6 +331,8 @@ export default function EditProperty() {
           );
         } else if (arrivalData && !cancelled) {
           setArrivalDetails({
+            house_rules: arrivalData.house_rules ?? "",
+hot_tub_instructions: arrivalData.hot_tub_instructions ?? "",
             check_in_instructions: arrivalData.check_in_instructions ?? "",
             key_safe_location: arrivalData.key_safe_location ?? "",
             key_safe_code: arrivalData.key_safe_code ?? "",
