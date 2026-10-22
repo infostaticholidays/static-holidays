@@ -313,7 +313,28 @@ export default function EditProperty() {
             ? data.equine_facilities
             : [],
         });
+        const { data: arrivalData, error: arrivalError } = await supabase
+          .from("property_arrival_details")
+          .select(
+            "check_in_instructions, key_safe_location, key_safe_code, owner_contact_details, arrival_notes"
+          )
+          .eq("property_id", id)
+          .maybeSingle();
 
+        if (arrivalError) {
+          console.error("Could not load private arrival details:", arrivalError);
+          setErrorMessage(
+            "Your property loaded, but private arrival details could not be loaded. Please check the arrival-information permissions in Supabase."
+          );
+        } else if (arrivalData && !cancelled) {
+          setArrivalDetails({
+            check_in_instructions: arrivalData.check_in_instructions ?? "",
+            key_safe_location: arrivalData.key_safe_location ?? "",
+            key_safe_code: arrivalData.key_safe_code ?? "",
+            owner_contact_details: arrivalData.owner_contact_details ?? "",
+            arrival_notes: arrivalData.arrival_notes ?? "",
+          });
+        }
         const { data: imageRows, error: imageError } = await supabase
           .from("property_images")
           .select("id, public_url, storage_path, is_cover")
