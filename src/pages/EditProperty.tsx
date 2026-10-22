@@ -51,6 +51,7 @@ const initialForm: PropertyForm = {
   hot_tub_instructions: "",
   nearby_information: "",
   check_in_time: "15:00",
+  check_out_time: "",
   check_in_timezone: "Europe/London",
   property_type: "",
   holiday_park: "",
