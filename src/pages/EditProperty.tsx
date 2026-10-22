@@ -507,6 +507,8 @@ hot_tub_instructions: arrivalData.hot_tub_instructions ?? "",
         .upsert(
           {
             property_id: id,
+            house_rules: arrivalDetails.house_rules.trim(),
+hot_tub_instructions: arrivalDetails.hot_tub_instructions.trim(),
             check_in_instructions:
               arrivalDetails.check_in_instructions.trim(),
             key_safe_location: arrivalDetails.key_safe_location.trim(),
