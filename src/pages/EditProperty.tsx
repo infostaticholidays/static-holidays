@@ -50,9 +50,9 @@ const initialForm: PropertyForm = {
     house_rules: "",
   hot_tub_instructions: "",
   nearby_information: "",
-  check_in_time: "15:00",
-  check_out_time: "",
-  check_in_timezone: "Europe/London",
+check_in_time: "15:00",
+check_out_time: "",
+check_in_timezone: "Europe/London",
   check_out_time: data.check_out_time
   ? String(data.check_out_time).slice(0, 5)
   : "",
