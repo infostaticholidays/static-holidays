@@ -1118,7 +1118,15 @@ hot_tub_instructions: arrivalDetails.hot_tub_instructions.trim(),
                     style={inputStyle}
                   />
                 </label>
-
+<label style={{ ...labelStyle, marginTop: 18 }}>
+  Standard check-out time
+  <input
+    type="time"
+    value={form.check_out_time}
+    onChange={(e) => update("check_out_time", e.target.value)}
+    style={inputStyle}
+  />
+</label>
                 <p style={{ color: "#758078", fontSize: 12, lineHeight: 1.6 }}>
                   Time zone: UK time (Europe/London). Default: 3:00 pm.
                 </p>
