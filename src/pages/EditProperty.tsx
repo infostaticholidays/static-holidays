@@ -1043,6 +1043,171 @@ hot_tub_instructions: arrivalDetails.hot_tub_instructions.trim(),
               </section>
 
               <section style={cardStyle}>
+                <h2 style={sectionHeadingStyle}>Guest information</h2>
+                <p style={sectionDescriptionStyle}>
+                  These details are private and are shown only to eligible guests
+                  with a confirmed booking after the release time.
+                </p>
+
+                <label style={labelStyle}>
+                  House rules
+                  <textarea
+                    rows={5}
+                    value={arrivalDetails.house_rules}
+                    onChange={(e) =>
+                      setArrivalDetails((current) => ({
+                        ...current,
+                        house_rules: e.target.value,
+                      }))
+                    }
+                    style={{ ...inputStyle, resize: "vertical", lineHeight: 1.7 }}
+                    placeholder="Quiet hours, smoking rules, pets and checkout expectations..."
+                  />
+                </label>
+
+                <label style={{ ...labelStyle, marginTop: 18 }}>
+                  Hot tub and facility instructions
+                  <textarea
+                    rows={4}
+                    value={arrivalDetails.hot_tub_instructions}
+                    onChange={(e) =>
+                      setArrivalDetails((current) => ({
+                        ...current,
+                        hot_tub_instructions: e.target.value,
+                      }))
+                    }
+                    style={{ ...inputStyle, resize: "vertical", lineHeight: 1.7 }}
+                    placeholder="Safe use of the hot tub and other facilities..."
+                  />
+                </label>
+
+                <label style={{ ...labelStyle, marginTop: 18 }}>
+                  Nearby places and local information
+                  <textarea
+                    rows={5}
+                    value={form.nearby_information}
+                    onChange={(e) =>
+                      update("nearby_information", e.target.value)
+                    }
+                    style={{ ...inputStyle, resize: "vertical", lineHeight: 1.7 }}
+                    placeholder="Nearby shops, pubs, walks, attractions and local tips..."
+                  />
+                </label>
+              </section>
+
+              <section style={cardStyle}>
+                <h2 style={sectionHeadingStyle}>Check-in time</h2>
+                <p style={sectionDescriptionStyle}>
+                  Private arrival information becomes available 24 hours before
+                  this check-in time on the arrival date.
+                </p>
+
+                <label style={labelStyle}>
+                  Standard check-in time
+                  <input
+                    type="time"
+                    required
+                    value={form.check_in_time}
+                    onChange={(e) => update("check_in_time", e.target.value)}
+                    style={inputStyle}
+                  />
+                </label>
+
+                <p style={{ color: "#758078", fontSize: 12, lineHeight: 1.6 }}>
+                  Time zone: UK time (Europe/London). Default: 3:00 pm.
+                </p>
+              </section>
+
+              <section style={cardStyle}>
+                <h2 style={sectionHeadingStyle}>Private arrival information</h2>
+                <p style={sectionDescriptionStyle}>
+                  Only you can manage these details. Eligible guests can view
+                  them after the 24-hour release point.
+                </p>
+
+                <label style={labelStyle}>
+                  Check-in instructions
+                  <textarea
+                    rows={4}
+                    value={arrivalDetails.check_in_instructions}
+                    onChange={(e) =>
+                      setArrivalDetails((current) => ({
+                        ...current,
+                        check_in_instructions: e.target.value,
+                      }))
+                    }
+                    style={{ ...inputStyle, resize: "vertical", lineHeight: 1.7 }}
+                    placeholder="How guests should arrive and enter..."
+                  />
+                </label>
+
+                <label style={{ ...labelStyle, marginTop: 18 }}>
+                  Key safe location
+                  <textarea
+                    rows={2}
+                    value={arrivalDetails.key_safe_location}
+                    onChange={(e) =>
+                      setArrivalDetails((current) => ({
+                        ...current,
+                        key_safe_location: e.target.value,
+                      }))
+                    }
+                    style={{ ...inputStyle, resize: "vertical" }}
+                    placeholder="Where the key safe is located..."
+                  />
+                </label>
+
+                <label style={{ ...labelStyle, marginTop: 18 }}>
+                  Key safe code
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={arrivalDetails.key_safe_code}
+                    onChange={(e) =>
+                      setArrivalDetails((current) => ({
+                        ...current,
+                        key_safe_code: e.target.value,
+                      }))
+                    }
+                    style={inputStyle}
+                    placeholder="Private key safe code"
+                  />
+                </label>
+
+                <label style={{ ...labelStyle, marginTop: 18 }}>
+                  Owner contact details
+                  <textarea
+                    rows={3}
+                    value={arrivalDetails.owner_contact_details}
+                    onChange={(e) =>
+                      setArrivalDetails((current) => ({
+                        ...current,
+                        owner_contact_details: e.target.value,
+                      }))
+                    }
+                    style={{ ...inputStyle, resize: "vertical", lineHeight: 1.7 }}
+                    placeholder="Contact name, phone number and best time to call..."
+                  />
+                </label>
+
+                <label style={{ ...labelStyle, marginTop: 18 }}>
+                  Additional arrival notes
+                  <textarea
+                    rows={4}
+                    value={arrivalDetails.arrival_notes}
+                    onChange={(e) =>
+                      setArrivalDetails((current) => ({
+                        ...current,
+                        arrival_notes: e.target.value,
+                      }))
+                    }
+                    style={{ ...inputStyle, resize: "vertical", lineHeight: 1.7 }}
+                    placeholder="Parking, gates and other arrival tips..."
+                  />
+                </label>
+              </section>
+
+              <section style={cardStyle}>
                 <div style={{ display: "flex", gap: 13, alignItems: "flex-start", marginBottom: 22 }}>
                   <div style={iconBoxStyle}>✳</div>
                   <div>
