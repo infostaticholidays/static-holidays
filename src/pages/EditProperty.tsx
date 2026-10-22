@@ -544,30 +544,49 @@ check_in_timezone: form.check_in_timezone,
           "No property was updated. Check that you own this listing and have permission to edit it."
         );
       }
-      const { error: arrivalSaveError } = await supabase
-        .from("property_arrival_details")
-        .upsert(
-          {
-            property_id: id,
-            house_rules: arrivalDetails.house_rules.trim(),
-hot_tub_instructions: arrivalDetails.hot_tub_instructions.trim(),
-            check_in_instructions:
-              arrivalDetails.check_in_instructions.trim(),
-            key_safe_location: arrivalDetails.key_safe_location.trim(),
-            key_safe_code: arrivalDetails.key_safe_code.trim(),
-            owner_contact_details:
-              arrivalDetails.owner_contact_details.trim(),
-            arrival_notes: arrivalDetails.arrival_notes.trim(),
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "property_id" }
-        );
+      
+const { error: guestInfoSaveError } = await supabase
+  .from("property_guest_information")
+  .upsert(
+    {
+      property_id: id,
+      house_rules: arrivalDetails.house_rules.trim(),
+      hot_tub_instructions:
+        arrivalDetails.hot_tub_instructions.trim(),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "property_id" }
+  );
 
-      if (arrivalSaveError) {
-        throw new Error(
-          `Property details were saved, but private arrival details could not be saved: ${arrivalSaveError.message}`
-        );
-      }
+if (guestInfoSaveError) {
+  throw new Error(
+    `Property details were saved, but house rules and hot-tub instructions could not be saved: ${guestInfoSaveError.message}`
+  );
+}
+
+const { error: arrivalSaveError } = await supabase
+  .from("property_arrival_details")
+  .upsert(
+    {
+      property_id: id,
+      check_in_instructions:
+        arrivalDetails.check_in_instructions.trim(),
+      key_safe_location: arrivalDetails.key_safe_location.trim(),
+      key_safe_code: arrivalDetails.key_safe_code.trim(),
+      owner_contact_details:
+        arrivalDetails.owner_contact_details.trim(),
+      arrival_notes: arrivalDetails.arrival_notes.trim(),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "property_id" }
+  );
+
+if (arrivalSaveError) {
+  throw new Error(
+    `Property details were saved, but private arrival details could not be saved: ${arrivalSaveError.message}`
+  );
+}
+
       const uploadedPhotos: PropertyPhoto[] = [];
 
       for (let index = 0; index < newPhotos.length; index++) {
