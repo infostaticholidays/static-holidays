@@ -7,6 +7,11 @@ type PropertyForm = {
   title: string;
   location: string;
   description: string;
+    house_rules: string;
+  hot_tub_instructions: string;
+  nearby_information: string;
+  check_in_time: string;
+  check_in_timezone: string;
   property_type: string;
   holiday_park: string;
   bedrooms: number;
