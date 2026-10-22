@@ -318,8 +318,9 @@ export default function EditProperty() {
         const { data: arrivalData, error: arrivalError } = await supabase
           .from("property_arrival_details")
           .select(
-            "check_in_instructions, key_safe_location, key_safe_code, owner_contact_details, arrival_notes"
-          )
+          
+  "house_rules, hot_tub_instructions, check_in_instructions, key_safe_location, key_safe_code, owner_contact_details, arrival_notes"
+)
           .eq("property_id", id)
           .maybeSingle();
 
