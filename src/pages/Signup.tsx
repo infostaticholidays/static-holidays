@@ -7,10 +7,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("guest");
-
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [newsletter, setNewsletter] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -29,14 +26,15 @@ export default function Signup() {
     setErrorMessage("");
 
     try {
+      const cleanEmail = email.trim();
+      const cleanName = fullName.trim();
+
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: cleanEmail,
         password,
         options: {
           data: {
-            full_name: fullName.trim(),
-            phone: phone.trim(),
-            address: address.trim(),
+            full_name: cleanName,
           },
         },
       });
@@ -46,22 +44,19 @@ export default function Signup() {
       const user = data.user;
 
       if (!user) {
-        throw new Error("Your account could not be created. Please try again.");
+        throw new Error(
+          "Your account could not be created. Please try again."
+        );
       }
 
-      // Save the details entered on the form.
-      // If email confirmation is enabled, the user may need
-      // to confirm their email before signing in.
       const { error: profileError } = await supabase
         .from("profiles")
         .upsert(
           {
             id: user.id,
-            email: email.trim(),
+            email: cleanEmail,
             role,
-            full_name: fullName.trim(),
-            phone: phone.trim(),
-            address: address.trim(),
+            full_name: cleanName,
             newsletter,
           },
           { onConflict: "id" }
@@ -264,54 +259,6 @@ export default function Signup() {
               </div>
 
               <div style={{ marginBottom: 18 }}>
-                <label htmlFor="phone" style={labelStyle}>
-                  Phone number
-                </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="Your contact number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  maxLength={30}
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={{ marginBottom: 18 }}>
-                <label htmlFor="address" style={labelStyle}>
-                  Home address
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  autoComplete="street-address"
-                  placeholder="Enter your home address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  rows={3}
-                  maxLength={500}
-                  style={{
-                    ...inputStyle,
-                    resize: "vertical",
-                  }}
-                />
-                <p
-                  style={{
-                    color: "#758174",
-                    fontSize: 12,
-                    lineHeight: 1.5,
-                    margin: "7px 0 0",
-                  }}
-                >
-                  Optional. Only provide this if you want it associated
-                  with your account.
-                </p>
-              </div>
-
-              <div style={{ marginBottom: 18 }}>
                 <label htmlFor="password" style={labelStyle}>
                   Password *
                 </label>
@@ -353,8 +300,12 @@ export default function Signup() {
                     cursor: "pointer",
                   }}
                 >
-                  <option value="guest">I'm looking for a holiday</option>
-                  <option value="host">I own a holiday property</option>
+                  <option value="guest">
+                    I'm looking for a holiday
+                  </option>
+                  <option value="host">
+                    I own a holiday property
+                  </option>
                 </select>
               </div>
 
@@ -401,7 +352,9 @@ export default function Signup() {
                   opacity: loading ? 0.8 : 1,
                 }}
               >
-                {loading ? "Creating your account..." : "Create my account"}
+                {loading
+                  ? "Creating your account..."
+                  : "Create my account"}
               </button>
             </form>
           )}
@@ -453,3 +406,4 @@ export default function Signup() {
     </main>
   );
 }
+
