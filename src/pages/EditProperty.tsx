@@ -497,7 +497,28 @@ export default function EditProperty() {
           "No property was updated. Check that you own this listing and have permission to edit it."
         );
       }
+      const { error: arrivalSaveError } = await supabase
+        .from("property_arrival_details")
+        .upsert(
+          {
+            property_id: id,
+            check_in_instructions:
+              arrivalDetails.check_in_instructions.trim(),
+            key_safe_location: arrivalDetails.key_safe_location.trim(),
+            key_safe_code: arrivalDetails.key_safe_code.trim(),
+            owner_contact_details:
+              arrivalDetails.owner_contact_details.trim(),
+            arrival_notes: arrivalDetails.arrival_notes.trim(),
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "property_id" }
+        );
 
+      if (arrivalSaveError) {
+        throw new Error(
+          `Property details were saved, but private arrival details could not be saved: ${arrivalSaveError.message}`
+        );
+      }
       const uploadedPhotos: PropertyPhoto[] = [];
 
       for (let index = 0; index < newPhotos.length; index++) {
