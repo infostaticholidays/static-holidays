@@ -371,10 +371,11 @@ export default function BookingDetail() {
           >
             <h2 style={{ marginTop: 0 }}>Your decision</h2>
 
-            <p style={{ color: "#64748b" }}>
-              Review the requested dates before deciding. Accepting here does
-              not capture a payment.
-            </p>
+           <p style={{ color: "#64748b" }}>
+  Review the requested dates before deciding. Accepting will ask
+  Stripe to capture the authorised payment. Declining will ask
+  Stripe to cancel the authorisation.
+</p>
 
             <div
               style={{
