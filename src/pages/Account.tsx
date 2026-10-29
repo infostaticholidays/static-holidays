@@ -251,7 +251,7 @@ setUpcomingTrips(tripsWithMessages);
 setTrip(tripsWithMessages[0] || null);
         console.log("Upcoming trips after filtering:", upcoming);
       }
-```tsx
+
       // Load declined bookings separately so they don't appear as upcoming trips.
       const { data: declinedData, error: declinedError } = await supabase
         .from("bookings")
