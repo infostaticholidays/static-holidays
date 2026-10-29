@@ -303,6 +303,12 @@ setTrip(tripsWithMessages[0] || null);
           const payment = paymentRows.find(
             (row: any) => row.booking_id === booking.id
           );
+          console.log(
+  "Declined booking payment debug:",
+  booking.id,
+  paymentRows,
+  payment
+);
 
           return {
             ...booking,
