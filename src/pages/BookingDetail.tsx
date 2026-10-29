@@ -197,7 +197,12 @@ export default function BookingDetail() {
     }
   }
 
-    return <main style={{ padding: 40 }}>Loading booking details...</main>;
+   if (loading) {
+    return (
+      <main style={{ padding: 40 }}>
+        Loading booking details...
+      </main>
+    );
   }
 
   if (!booking) {
