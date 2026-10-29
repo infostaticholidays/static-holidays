@@ -919,6 +919,75 @@ const firstName =
           )}
         </section>
 
+        {/* DECLINED BOOKINGS */}
+        {declinedBookings.length > 0 && (
+          <section style={{ ...cardStyle, marginBottom: 26 }}>
+            <h2 style={{ margin: "0 0 18px", fontSize: 23 }}>
+              Booking updates
+            </h2>
+
+            <div style={{ display: "grid", gap: 16 }}>
+              {declinedBookings.map((booking: any) => (
+                <div
+                  key={booking.id}
+                  style={{
+                    background: "#fff5f3",
+                    border: "1px solid #f0d4ce",
+                    borderRadius: 16,
+                    padding: 22,
+                  }}
+                >
+                  <h3 style={{ margin: "0 0 10px", color: "#934444" }}>
+                    We're sorry — your booking has been declined
+                  </h3>
+
+                  <p style={{ lineHeight: 1.7 }}>
+                    The owner has declined your booking for{" "}
+                    <strong>{booking.destination}</strong>
+                    {booking.check_in && booking.check_out && (
+                      <>
+                        {" "}from{" "}
+                        <strong>
+                          {new Date(booking.check_in).toLocaleDateString(
+                            "en-GB",
+                            { timeZone: "UTC" }
+                          )}
+                        </strong>
+                        {" "}to{" "}
+                        <strong>
+                          {new Date(booking.check_out).toLocaleDateString(
+                            "en-GB",
+                            { timeZone: "UTC" }
+                          )}
+                        </strong>
+                      </>
+                    )}
+                    .
+                  </p>
+
+                  {booking.paymentStatus === "cancelled" ? (
+                    <p style={{ lineHeight: 1.7, color: darkGreen }}>
+                      <strong>Payment authorisation cancelled.</strong>{" "}
+                      Your payment was not captured, and the authorisation
+                      has been cancelled. If your bank still shows a pending
+                      amount, it may take a little time to disappear.
+                    </p>
+                  ) : (
+                    <p style={{ lineHeight: 1.7, color: muted }}>
+                      Your booking is declined. If you have any questions
+                      about your payment, please contact us for assistance.
+                    </p>
+                  )}
+
+                  <p style={{ marginBottom: 0, fontWeight: 700 }}>
+                    Booking status: Declined
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
      
         {/* FAVOURITE PROPERTIES */}
         <section style={{ marginBottom: 28 }}>
