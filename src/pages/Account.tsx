@@ -316,7 +316,7 @@ setTrip(tripsWithMessages[0] || null);
 
         setDeclinedBookings(declinedTrips);
       }
-```
+
 
       const { data: reviewData, error: reviewError } = await supabase
         .from("reviews")
