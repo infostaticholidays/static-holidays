@@ -251,7 +251,72 @@ setUpcomingTrips(tripsWithMessages);
 setTrip(tripsWithMessages[0] || null);
         console.log("Upcoming trips after filtering:", upcoming);
       }
+```tsx
+      // Load declined bookings separately so they don't appear as upcoming trips.
+      const { data: declinedData, error: declinedError } = await supabase
+        .from("bookings")
+        .select(`
+          id,
+          check_in,
+          check_out,
+          booking_status,
+          properties (
+            title,
+            location
+          )
+        `)
+        .eq("guest_id", user.id)
+        .eq("booking_status", "declined")
+        .order("check_in", { ascending: true });
 
+      if (declinedError) {
+        console.error("Could not load declined bookings:", declinedError);
+      } else {
+        const declinedIds = (declinedData || []).map(
+          (booking: any) => booking.id
+        );
+
+        let paymentRows: any[] = [];
+
+        if (declinedIds.length > 0) {
+          const { data: payments, error: paymentsError } = await supabase
+            .from("booking_payments")
+            .select("booking_id, status, created_at")
+            .in("booking_id", declinedIds)
+            .order("created_at", { ascending: false });
+
+          if (paymentsError) {
+            console.error(
+              "Could not load declined booking payments:",
+              paymentsError
+            );
+          } else {
+            paymentRows = payments || [];
+          }
+        }
+
+        const declinedTrips = (declinedData || []).map((booking: any) => {
+          const property = Array.isArray(booking.properties)
+            ? booking.properties[0]
+            : booking.properties;
+
+          const payment = paymentRows.find(
+            (row: any) => row.booking_id === booking.id
+          );
+
+          return {
+            ...booking,
+            destination:
+              property?.title ||
+              property?.location ||
+              "Holiday property",
+            paymentStatus: payment?.status || null,
+          };
+        });
+
+        setDeclinedBookings(declinedTrips);
+      }
+```
 
       const { data: reviewData, error: reviewError } = await supabase
         .from("reviews")
