@@ -118,6 +118,7 @@ export default function BookingDetail() {
     void loadBooking();
   }, [id]);
 
+
   async function updateStatus(nextStatus: "confirmed" | "declined") {
     if (!booking || !property || saving) return;
 
@@ -125,15 +126,15 @@ export default function BookingDetail() {
     setMessage("");
 
     try {
-      const userResult = await supabase.auth.getUser();
-      const user = userResult.data.user;
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
 
-      if (userResult.error || !user) {
+      if (userError || !userData.user) {
         setError("Please sign in as the property owner.");
         return;
       }
 
-      if (property.owner_id !== user.id) {
+      if (property.owner_id !== userData.user.id) {
         setError("Only the property owner can manage this booking.");
         return;
       }
@@ -142,9 +143,7 @@ export default function BookingDetail() {
         booking.status !== "pending" ||
         booking.booking_status !== "pending"
       ) {
-        setError(
-          "Both booking status fields must be pending. Refresh the page and check the booking record."
-        );
+        setError("This booking is no longer pending. Please refresh the page.");
         return;
       }
 
@@ -152,59 +151,52 @@ export default function BookingDetail() {
         !booking.response_deadline ||
         new Date(booking.response_deadline).getTime() <= Date.now()
       ) {
-        setError(
-          "The response deadline has passed or is missing. This request cannot be changed here."
-        );
+        setError("The response deadline has passed or is missing.");
         return;
       }
 
       setSaving(true);
 
-      const result = await supabase
-        .from("bookings")
-        .update({
-          status: nextStatus,
-          booking_status: nextStatus,
-        })
-        .eq("id", booking.id)
-        .eq("owner_id", user.id)
-        .eq("status", "pending")
-        .eq("booking_status", "pending")
-        .select("*")
-        .maybeSingle();
+      const { data, error: functionError } =
+        await supabase.functions.invoke("owner-respond-booking", {
+          body: {
+            bookingId: booking.id,
+            action: nextStatus === "confirmed" ? "accept" : "decline",
+          },
+        });
 
-      if (result.error) {
-        setError(result.error.message);
-        return;
-      }
-
-      if (!result.data) {
-        setError(
-          "The booking was not updated. It may have changed, or you may not have permission. Refresh and try again."
-        );
-        await loadBooking();
-        return;
-      }
-
-      setBooking(result.data as Booking);
-
-      if (nextStatus === "confirmed") {
-        setMessage(
-          "Booking accepted. Stripe payment capture is not connected yet, so this action does not capture the deposit."
-        );
-      } else {
-        setMessage(
-          "Booking declined. Stripe authorisation cancellation is not connected yet."
+      if (functionError) {
+        throw new Error(
+          functionError.message ||
+            "The booking response function could not be reached."
         );
       }
-    } catch {
-      setError("Something went wrong while updating the booking.");
+
+      if (!data?.success) {
+        throw new Error(
+          data?.error || "The booking could not be updated."
+        );
+      }
+
+      setMessage(
+        data.message ||
+          (nextStatus === "confirmed"
+            ? "Booking accepted and payment captured."
+            : "Booking declined and authorisation cancelled.")
+      );
+
+      await loadBooking();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) {
     return <main style={{ padding: 40 }}>Loading booking details...</main>;
   }
 
