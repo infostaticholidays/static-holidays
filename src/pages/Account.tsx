@@ -966,12 +966,13 @@ const firstName =
                   </p>
 
                   {booking.paymentStatus === "cancelled" ? (
-                    <p style={{ lineHeight: 1.7, color: darkGreen }}>
-                      <strong>Payment authorisation cancelled.</strong>{" "}
-                      Your payment was not captured, and the authorisation
-                      has been cancelled. If your bank still shows a pending
-                      amount, it may take a little time to disappear.
-                    </p>
+                   <p style={{ lineHeight: 1.7, color: darkGreen }}>
+  <strong>Your card has not been charged.</strong>{" "}
+  The payment authorisation has been cancelled, so no payment
+  will be taken for this booking. If your bank app still shows
+  a pending amount, please don't worry — it can take a few
+  working days for your bank to remove it.
+</p>
                   ) : (
                     <p style={{ lineHeight: 1.7, color: muted }}>
                       Your booking is declined. If you have any questions
