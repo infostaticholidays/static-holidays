@@ -37,6 +37,7 @@ export default function Account() {
   const [trip, setTrip] = useState<any>(null);
   const [upcomingTrips, setUpcomingTrips] = useState<any[]>([]);
   const [previousTrips, setPreviousTrips] = useState<any[]>([]);
+  const [declinedBookings, setDeclinedBookings] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
