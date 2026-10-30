@@ -308,15 +308,19 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
       setCalendarError("");
 
       try {
-        const [
+              const [
           { data: calendarRows, error: calendarQueryError },
           { data: bookedRows, error: bookedQueryError },
+          { data: checkoutRows, error: checkoutQueryError },
         ] = await Promise.all([
           supabase
             .from("property_calendar_dates")
             .select("calendar_date, status, price")
             .eq("property_id", propertyId),
           supabase.rpc("get_public_booked_dates", {
+            p_property_id: propertyId,
+          }),
+          supabase.rpc("get_public_checkout_dates", {
             p_property_id: propertyId,
           }),
         ]);
