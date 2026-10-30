@@ -1694,11 +1694,11 @@ const fg = selected
                                 ? "2px solid #86b99a"
                                 : "1px solid #e5e7eb",
                             borderRadius: 7,
-                           background: selected
+                         background: selected
   ? "#176b50"
   : between
     ? "#bbf7d0"
-    : occupied.has(date) || bookedDates.has(date)
+    : bookedDates.has(date)
       ? "#ffedd5"
       : checkoutDates.has(date)
         ? "linear-gradient(90deg, #ffedd5 0 50%, #dcfce7 50% 100%)"
