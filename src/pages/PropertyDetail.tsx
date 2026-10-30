@@ -1466,8 +1466,7 @@ const bookingMode = String(ownerBookingMode ?? "")
                     borderRadius: 6,
                   }}
                 >
-                  Blocked
-                </span>
+               
                 <span
                   style={{
                     background: "#ffedd5",
