@@ -1471,9 +1471,7 @@ const bookingMode = String(ownerBookingMode ?? "")
                   style={{
                     background: "#ffedd5",
                     padding: "5px 8px",
-                    borderRadius: 6,
-                  }}
-                >
+                  
                   Booked
                 </span>
                 <span
