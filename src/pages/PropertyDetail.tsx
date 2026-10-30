@@ -326,9 +326,9 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
         ]);
 
         if (cancelled) return;
-        if (calendarQueryError) throw calendarQueryError;
+               if (calendarQueryError) throw calendarQueryError;
         if (bookedQueryError) throw bookedQueryError;
-
+        if (checkoutQueryError) throw checkoutQueryError;
         const dates: Record<string, CalendarDate> = {};
         for (const row of calendarRows ?? []) {
           dates[row.calendar_date] = row as CalendarDate;
