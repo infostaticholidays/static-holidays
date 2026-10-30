@@ -1645,23 +1645,19 @@ const bookingMode = String(ownerBookingMode ?? "")
                         date > startDate &&
                         date < endDate;
 
-                      const bg = selected
-                        ? "#176b50"
-                        : available
-                          ? "#dcfce7"
-                          : blocked
-                            ? "#fee2e2"
-                            : booked
-                              ? "#ffedd5"
-                              : "#f3f4f6";
+                   const bg = selected
+  ? "#176b50"
+  : available
+    ? "#dcfce7"
+    : blocked || booked
+      ? "#ffedd5"
+      : "#f3f4f6";
 
-                      const fg = selected
-                        ? "#ffffff"
-                        : blocked
-                          ? "#991b1b"
-                          : booked
-                            ? "#9a3412"
-                            : "#203128";
+const fg = selected
+  ? "#ffffff"
+  : blocked || booked
+    ? "#9a3412"
+    : "#203128";
 
                       const datePrice =
                         getPositivePrice(entry?.price) ?? basePrice;
