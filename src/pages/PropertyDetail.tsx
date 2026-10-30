@@ -185,6 +185,9 @@ export default function PropertyDetail() {
   const [bookedDates, setBookedDates] = useState<Set<string>>(
   () => new Set()
 );
+  const [checkoutDates, setCheckoutDates] = useState<Set<string>>(
+  () => new Set()
+);
   const [calendarLoading, setCalendarLoading] = useState(true);
   const [calendarError, setCalendarError] = useState("");
 
