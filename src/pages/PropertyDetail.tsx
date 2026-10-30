@@ -356,6 +356,7 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
         if (!cancelled) {
           setCalendarDates(dates);
           setBookedDates(occupied);
+          setCheckoutDates(checkoutSet);
         }
       } catch (error) {
         console.error("Could not load property availability:", error);
