@@ -352,7 +352,7 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
             price: existing?.price ?? null,
           };
         }
-
+console.log("Guest calendar booked dates:", [...occupied]);
         if (!cancelled) {
           setCalendarDates(dates);
           setBookedDates(occupied);
