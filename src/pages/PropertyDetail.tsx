@@ -1664,12 +1664,8 @@ const fg = selected
                           key={date}
                           type="button"
                           disabled={date < today() || !available}
-                          title={`${formatDate(date)} — ${
-                            status ?? "not set"
-                          }${
-                            datePrice !== null
-                              ? ` — ${formatPrice(datePrice)} per night`
-                              : ""
+                                                   title={`${formatDate(date)} — ${
+                            available ? "available" : "unavailable"
                           }`}
                           onClick={() => {
                             setBookingMessage("");
