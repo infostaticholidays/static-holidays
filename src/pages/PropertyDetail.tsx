@@ -330,6 +330,7 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
         if (bookedQueryError) throw bookedQueryError;
         if (checkoutQueryError) throw checkoutQueryError;
         const dates: Record<string, CalendarDate> = {};
+        console.log("Calendar RPC bookedRows:", bookedRows, bookedQueryError);
         for (const row of calendarRows ?? []) {
           dates[row.calendar_date] = row as CalendarDate;
         }
