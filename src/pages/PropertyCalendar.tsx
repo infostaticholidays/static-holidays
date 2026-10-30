@@ -122,7 +122,6 @@ export default function PropertyCalendar() {
       }
 
       setOwnerId(user.id);
-
       const { data, error } = await supabase
         .from("property_calendar_dates")
         .select("calendar_date, status, price")
@@ -130,8 +129,16 @@ export default function PropertyCalendar() {
 
       if (error) throw error;
 
+      const { data: bookingRows, error: bookingError } = await supabase
+        .from("bookings")
+        .select("check_in, check_out, status, booking_status, payment_status")
+        .eq("property_id", propertyId);
+
+      if (bookingError) throw bookingError;
+
       const saved: Record<string, DateInfo> = {};
 
+      // Load the saved calendar dates and prices first.
       for (const row of data ?? []) {
         saved[row.calendar_date] = {
           status: row.status as DateStatus,
@@ -141,7 +148,62 @@ export default function PropertyCalendar() {
         };
       }
 
+      // Overlay confirmed or paid bookings as booked dates.
+      for (const booking of bookingRows ?? []) {
+        const bookingStatus = (booking.booking_status || "").toLowerCase().trim();
+        const status = (booking.status || "").toLowerCase().trim();
+        const paymentStatus = (booking.payment_status || "").toLowerCase().trim();
+
+        const cancelledStatuses = [
+          "cancelled",
+          "canceled",
+          "declined",
+          "rejected",
+          "expired",
+        ];
+
+        const isCancelled =
+          cancelledStatuses.includes(bookingStatus) ||
+          cancelledStatuses.includes(status);
+
+        const isConfirmed =
+          ["confirmed", "accepted"].includes(bookingStatus) ||
+          ["confirmed", "accepted"].includes(status);
+
+        const isPaid = [
+          "paid",
+          "deposit_paid",
+          "partially_paid",
+        ].includes(paymentStatus);
+
+        if (
+          isCancelled ||
+          (!isConfirmed && !isPaid) ||
+          !booking.check_in ||
+          !booking.check_out
+        ) {
+          continue;
+        }
+
+        const current = new Date(`${booking.check_in.slice(0, 10)}T12:00:00`);
+        const checkout = new Date(`${booking.check_out.slice(0, 10)}T12:00:00`);
+
+        // Mark occupied nights only. The checkout date stays available.
+        while (current < checkout) {
+          const date = localDateKey(current);
+          const existing = saved[date] ?? { status: "available" as const };
+
+          saved[date] = {
+            ...existing,
+            status: "booked",
+          };
+
+          current.setDate(current.getDate() + 1);
+        }
+      }
+
       setCalendarDates(saved);
+    
     } catch (error) {
       console.error("LOAD CALENDAR ERROR:", error);
       setMessage(
