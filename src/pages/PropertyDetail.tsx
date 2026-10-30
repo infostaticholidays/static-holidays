@@ -363,6 +363,7 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
         if (!cancelled) {
           setCalendarDates({});
           setBookedDates(new Set());
+          setCheckoutDates(new Set());
           setCalendarError(
             "We couldn't verify availability. Please try again shortly."
           );
