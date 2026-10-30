@@ -333,7 +333,12 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
         for (const row of calendarRows ?? []) {
           dates[row.calendar_date] = row as CalendarDate;
         }
+        const checkoutSet = new Set<string>();
 
+        for (const row of checkoutRows ?? []) {
+          const date = String(row.calendar_date).slice(0, 10);
+          if (date) checkoutSet.add(date);
+        }
         const occupied = new Set<string>();
         for (const row of bookedRows ?? []) {
           const date = String(row.calendar_date).slice(0, 10);
