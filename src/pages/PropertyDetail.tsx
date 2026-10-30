@@ -1459,19 +1459,13 @@ const bookingMode = String(ownerBookingMode ?? "")
                 >
                   Available
                 </span>
-                <span
+                           <span
                   style={{
-                    background: "#fee2e2",
+                    background: "#ffedd5",
                     padding: "5px 8px",
                     borderRadius: 6,
                   }}
                 >
-               
-                <span
-                  style={{
-                    background: "#ffedd5",
-                    padding: "5px 8px",
-                  
                   Booked
                 </span>
                 <span
