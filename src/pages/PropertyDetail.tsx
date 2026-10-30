@@ -1656,9 +1656,7 @@ const fg = selected
     ? "#9a3412"
     : "#203128";
 
-                      const datePrice =
-                        getPositivePrice(entry?.price) ?? basePrice;
-
+                   
                       cells.push(
                         <button
                           key={date}
