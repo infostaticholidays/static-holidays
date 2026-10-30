@@ -1705,19 +1705,7 @@ const fg = selected
                             {day}
                           </span>
 
-                          {datePrice !== null && (
-                            <span
-                              style={{
-                                fontSize: 11,
-                                lineHeight: 1.2,
-                                fontWeight: 700,
-                                whiteSpace: "nowrap",
-                                color: selected ? "#ffffff" : fg,
-                              }}
-                            >
-                              {formatPrice(datePrice)}
-                            </span>
-                          )}
+                    
                         </button>
                       );
                     }
