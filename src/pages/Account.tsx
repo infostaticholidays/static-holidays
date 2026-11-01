@@ -969,67 +969,86 @@ const firstName =
   </div>
 
   {previousTrips.length === 0 ? (
-    <p style={{ color: muted }}>
-      Your completed holidays will appear here.
-    </p>
-  ) : (
-    <div style={{ display: "grid", gap: 14 }}>
-     {previousTrips.map((holiday: any) => {
-  const property = Array.isArray(holiday.properties)
-    ? holiday.properties[0]
-    : holiday.properties;
-
-  const image = Array.isArray(property?.images)
-    ? property.images[0]
-    : property?.images;
-
-  return (
+  <p style={{ color: muted }}>
+    Your completed holidays will appear here.
+  </p>
+) : (
+  <div style={{ display: "grid", gap: 18 }}>
+    {previousTrips.map((holiday: any) => {
       const property = Array.isArray(holiday.properties)
-  ? holiday.properties[0]
-  : holiday.properties;
+        ? holiday.properties[0]
+        : holiday.properties;
 
-const image = Array.isArray(property?.images)
-  ? property.images[0]
-  : property?.images;
-        <Link
+      const image = Array.isArray(property?.images)
+        ? property.images[0]
+        : property?.images;
+
+      return (
+        <div
           key={holiday.id}
-          to={`/my-booking/${holiday.id}`}
           style={{
-            display: "block",
+            display: "grid",
+            gridTemplateColumns: "160px 1fr",
+            gap: 18,
             background: sage,
             borderRadius: 16,
-            padding: 20,
+            padding: 16,
             color: "#26352b",
-            textDecoration: "none",
           }}
         >
-          <h3 style={{ margin: "0 0 10px", fontSize: 20 }}>
-            {holiday.destination || "Your previous holiday"}
-          </h3>
+          {image && (
+            <img
+              src={image}
+              alt={property?.title || "Previous stay"}
+              style={{
+                width: "100%",
+                height: 130,
+                objectFit: "cover",
+                borderRadius: 12,
+              }}
+            />
+          )}
 
-          <p style={{ margin: "0 0 8px", color: muted }}>
-            <strong>Check-in:</strong>{" "}
-            {holiday.start_date
-              ? new Date(holiday.start_date).toLocaleDateString("en-GB")
-              : "Not set"}
-          </p>
+          <div>
+            <h3 style={{ margin: "0 0 8px", fontSize: 20 }}>
+              {property?.title || holiday.destination || "Your previous stay"}
+            </h3>
 
-          <p style={{ margin: "0 0 12px", color: muted }}>
-            <strong>Check-out:</strong>{" "}
-            {holiday.end_date
-              ? new Date(holiday.end_date).toLocaleDateString("en-GB")
-              : "Not set"}
-          </p>
+            <p style={{ margin: "0 0 8px", color: muted }}>
+              {property?.location || ""}
+            </p>
 
-          <span style={{ color: green, fontWeight: 700 }}>
-            View stay and reviews →
-          </span>
-        </Link>
-      ))}
-    </div>
-  )}
+            <p style={{ margin: "0 0 8px", color: muted }}>
+              <strong>Check-in:</strong>{" "}
+              {holiday.start_date
+                ? new Date(holiday.start_date).toLocaleDateString("en-GB")
+                : "Not set"}
+            </p>
+
+            <p style={{ margin: "0 0 12px", color: muted }}>
+              <strong>Check-out:</strong>{" "}
+              {holiday.end_date
+                ? new Date(holiday.end_date).toLocaleDateString("en-GB")
+                : "Not set"}
+            </p>
+
+            <Link
+              to={`/property/${holiday.property_id}`}
+              style={{
+                ...buttonStyle,
+                textAlign: "center",
+                whiteSpace: "nowrap",
+              }}
+            >
+              View property & reviews →
+            </Link>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
 </section>
-
 
 
         
