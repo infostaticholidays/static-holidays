@@ -129,7 +129,7 @@ const [guestReviews, setGuestReviews] = useState<GuestReview[]>([]);
 if (currentBooking.guest_id) {
   const profileResult = await supabase
     .from("profiles")
-    .select("id, full_name, first_name, last_name")
+   .select("id, full_name, first_name, last_name, email")
     .eq("id", currentBooking.guest_id)
     .maybeSingle();
 
