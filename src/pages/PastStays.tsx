@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -17,12 +18,20 @@ type PastStay = {
   properties: {
     title: string;
     location: string | null;
+    owner_id: string;
     property_images: PropertyImage[] | null;
   } | null;
 };
 
 type Review = {
   booking_id: string;
+  rating: number;
+  cleanliness_rating: number;
+  communication_rating: number;
+  accuracy_rating: number;
+  respect_rating: number;
+  review_text: string;
+  created_at: string;
 };
 
 const pageStyle: React.CSSProperties = {
@@ -44,43 +53,48 @@ const cardStyle: React.CSSProperties = {
   overflow: "hidden",
   display: "grid",
   gridTemplateColumns: "minmax(240px, 38%) 1fr",
-  marginBottom: 24,
+  marginBottom: 28,
   boxShadow: "0 4px 16px rgba(53, 76, 60, 0.05)",
 };
 
 const imageStyle: React.CSSProperties = {
   width: "100%",
   height: "100%",
-  minHeight: 250,
+  minHeight: 300,
   objectFit: "cover",
   display: "block",
 };
 
 const contentStyle: React.CSSProperties = {
-  padding: "28px",
+  padding: 28,
   display: "flex",
   flexDirection: "column",
-  alignItems: "flex-start",
+  alignItems: "stretch",
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  padding: "12px 14px",
+  border: "1px solid #DCE3D7",
+  borderRadius: 9,
+  background: "#FCFCF9",
+  color: "#354C3C",
+  fontSize: 14,
+  marginTop: 7,
 };
 
 const buttonStyle: React.CSSProperties = {
   display: "inline-block",
   background: "#52765A",
   color: "#FFFFFF",
-  padding: "12px 19px",
+  padding: "13px 22px",
+  border: "none",
   borderRadius: 9,
   textDecoration: "none",
   fontWeight: 600,
   fontSize: 14,
-};
-
-const secondaryLinkStyle: React.CSSProperties = {
-  display: "inline-block",
-  color: "#52765A",
-  fontWeight: 600,
-  fontSize: 14,
-  textDecoration: "none",
-  marginTop: 16,
+  cursor: "pointer",
 };
 
 function formatDate(date: string) {
@@ -91,11 +105,53 @@ function formatDate(date: string) {
   });
 }
 
+function StarRating({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (rating: number) => void;
+}) {
+  return (
+    <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => onChange(star)}
+          aria-label={`${star} star${star === 1 ? "" : "s"}`}
+          style={{
+            border: "none",
+            background: "transparent",
+            padding: 0,
+            fontSize: 30,
+            cursor: "pointer",
+            color: star <= value ? "#C69B45" : "#D9DED5",
+          }}
+        >
+          ★
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function PastStays() {
   const [pastStays, setPastStays] = useState<PastStay[]>([]);
-  const [reviewedBookingIds, setReviewedBookingIds] = useState<string[]>([]);
+  const [submittedReviews, setSubmittedReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [submittingId, setSubmittingId] = useState("");
+  const [formValues, setFormValues] = useState<
+    Record<string, {
+      rating: number;
+      cleanliness: number;
+      communication: number;
+      accuracy: number;
+      respect: number;
+      reviewText: string;
+    }>
+  >({});
 
   useEffect(() => {
     let cancelled = false;
@@ -134,6 +190,7 @@ export default function PastStays() {
           properties (
             title,
             location,
+            owner_id,
             property_images (
               id,
               public_url,
@@ -167,7 +224,16 @@ export default function PastStays() {
 
         const { data: reviews, error: reviewsError } = await supabase
           .from("reviews")
-          .select("booking_id")
+          .select(`
+            booking_id,
+            rating,
+            cleanliness_rating,
+            communication_rating,
+            accuracy_rating,
+            respect_rating,
+            review_text,
+            created_at
+          `)
           .in("booking_id", bookingIds)
           .eq("reviewer_id", user.id)
           .eq("review_type", "guest_to_owner");
@@ -175,16 +241,11 @@ export default function PastStays() {
         if (reviewsError) {
           console.error("Could not load submitted reviews:", reviewsError);
         } else if (!cancelled) {
-          const submittedIds = (reviews ?? []).map(
-            (review: Review) => review.booking_id
-          );
-          setReviewedBookingIds(submittedIds);
+          setSubmittedReviews((reviews ?? []) as Review[]);
         }
       }
 
-      if (!cancelled) {
-        setLoading(false);
-      }
+      if (!cancelled) setLoading(false);
     }
 
     loadPastStays();
@@ -193,6 +254,104 @@ export default function PastStays() {
       cancelled = true;
     };
   }, []);
+
+  function updateForm(
+    bookingId: string,
+    field: string,
+    value: string | number
+  ) {
+    setFormValues((previous) => ({
+      ...previous,
+      [bookingId]: {
+        rating: 5,
+        cleanliness: 5,
+        communication: 5,
+        accuracy: 5,
+        respect: 5,
+        reviewText: "",
+        ...previous[bookingId],
+        [field]: value,
+      },
+    }));
+  }
+
+  async function submitReview(stay: PastStay) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Please sign in to submit your review.");
+      return;
+    }
+
+    const ownerId = stay.properties?.owner_id;
+
+    if (!ownerId) {
+      alert("We couldn't identify the property owner. Please contact support.");
+      return;
+    }
+
+    const values = {
+      rating: 5,
+      cleanliness: 5,
+      communication: 5,
+      accuracy: 5,
+      respect: 5,
+      reviewText: "",
+      ...formValues[stay.id],
+    };
+
+    if (!values.reviewText.trim()) {
+      alert("Please write a few words about your stay before submitting.");
+      return;
+    }
+
+    setSubmittingId(stay.id);
+
+    const { error } = await supabase.from("reviews").insert({
+      booking_id: stay.id,
+      property_id: stay.property_id,
+      reviewer_id: user.id,
+      reviewed_user_id: ownerId,
+      review_type: "guest_to_owner",
+      verified_stay: true,
+      booking_completed: true,
+      rating: values.rating,
+      cleanliness_rating: values.cleanliness,
+      communication_rating: values.communication,
+      accuracy_rating: values.accuracy,
+      respect_rating: values.respect,
+      review_text: values.reviewText.trim(),
+    });
+
+    if (error) {
+      console.error("Could not submit review:", error);
+      alert(
+        error.code === "23505"
+          ? "You have already submitted a review for this stay."
+          : error.message
+      );
+      setSubmittingId("");
+      return;
+    }
+
+    setSubmittedReviews((previous) => [
+      ...previous,
+      {
+        booking_id: stay.id,
+        rating: values.rating,
+        cleanliness_rating: values.cleanliness,
+        communication_rating: values.communication,
+        accuracy_rating: values.accuracy,
+        respect_rating: values.respect,
+        review_text: values.reviewText.trim(),
+        created_at: new Date().toISOString(),
+      },
+    ]);
+
+    setSubmittingId("");
+  }
 
   return (
     <main style={pageStyle}>
@@ -229,10 +388,9 @@ export default function PastStays() {
               lineHeight: 1.15,
               margin: "0 0 14px",
               color: "#354C3C",
-              fontWeight: 700,
             }}
           >
-            Your Past Stays
+            Your Reviews
           </h1>
 
           <p
@@ -244,43 +402,18 @@ export default function PastStays() {
               maxWidth: 650,
             }}
           >
-            Look back at your holidays, revisit properties and share your
-            experience.
+            Share your experience and help our hosts – it only takes a minute.
           </p>
         </header>
 
         <section>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 12,
-              flexWrap: "wrap",
-              marginBottom: 22,
-            }}
-          >
-            <div>
-              <h2
-                style={{
-                  fontSize: 22,
-                  margin: 0,
-                  color: "#354C3C",
-                }}
-              >
-                Your completed holidays
-              </h2>
-              <p
-                style={{
-                  color: "#718071",
-                  fontSize: 14,
-                  margin: "7px 0 0",
-                }}
-              >
-                {pastStays.length}{" "}
-                {pastStays.length === 1 ? "stay" : "stays"}
-              </p>
-            </div>
+          <div style={{ marginBottom: 24 }}>
+            <h2 style={{ fontSize: 23, margin: 0, color: "#354C3C" }}>
+              Your past stays
+            </h2>
+            <p style={{ color: "#718071", fontSize: 14, marginTop: 7 }}>
+              Leave a review for the properties you’ve stayed at.
+            </p>
           </div>
 
           {loading && (
@@ -305,11 +438,9 @@ export default function PastStays() {
                 textAlign: "center",
               }}
             >
-              <h3 style={{ marginTop: 0, color: "#354C3C" }}>
-                No past stays yet
-              </h3>
+              <h3 style={{ marginTop: 0 }}>No past stays yet</h3>
               <p style={{ color: "#59685A", lineHeight: 1.6 }}>
-                Once you've completed a holiday, it will appear here.
+                Once you’ve completed a holiday, it will appear here.
               </p>
             </div>
           )}
@@ -317,25 +448,31 @@ export default function PastStays() {
           {!loading &&
             !errorMessage &&
             pastStays.map((stay) => {
-              const propertyImages = stay.properties?.property_images ?? [];
-
-              const sortedImages = [...propertyImages].sort(
+              const images = stay.properties?.property_images ?? [];
+              const sortedImages = [...images].sort(
                 (a, b) =>
                   Number(b.is_cover) - Number(a.is_cover) ||
                   a.position - b.position
               );
-
               const coverImage = sortedImages[0];
-              const hasReviewed = reviewedBookingIds.includes(stay.id);
+
+              const review = submittedReviews.find(
+                (item) => item.booking_id === stay.id
+              );
+
+              const values = {
+                rating: 5,
+                cleanliness: 5,
+                communication: 5,
+                accuracy: 5,
+                respect: 5,
+                reviewText: "",
+                ...formValues[stay.id],
+              };
 
               return (
                 <article key={stay.id} style={cardStyle}>
-                  <div
-                    style={{
-                      minHeight: 250,
-                      background: "#EAF0E6",
-                    }}
-                  >
+                  <div style={{ minHeight: 300, background: "#EAF0E6" }}>
                     {coverImage?.public_url ? (
                       <img
                         src={coverImage.public_url}
@@ -350,7 +487,6 @@ export default function PastStays() {
                           alignItems: "center",
                           justifyContent: "center",
                           color: "#718071",
-                          fontSize: 15,
                         }}
                       >
                         Property photo unavailable
@@ -361,13 +497,13 @@ export default function PastStays() {
                   <div style={contentStyle}>
                     <span
                       style={{
-                        display: "inline-block",
                         background: "#EAF0E6",
                         color: "#52765A",
                         borderRadius: 20,
                         padding: "7px 12px",
                         fontSize: 12,
                         fontWeight: 700,
+                        alignSelf: "flex-start",
                         marginBottom: 14,
                       }}
                     >
@@ -378,7 +514,6 @@ export default function PastStays() {
                       style={{
                         color: "#354C3C",
                         fontSize: 23,
-                        lineHeight: 1.3,
                         margin: "0 0 6px",
                       }}
                     >
@@ -390,7 +525,7 @@ export default function PastStays() {
                         style={{
                           color: "#718071",
                           fontSize: 14,
-                          margin: "0 0 20px",
+                          margin: "0 0 18px",
                         }}
                       >
                         {stay.properties.location}
@@ -400,95 +535,167 @@ export default function PastStays() {
                     <div
                       style={{
                         display: "flex",
-                        gap: 30,
+                        gap: 28,
                         flexWrap: "wrap",
-                        marginBottom: 22,
+                        marginBottom: 24,
                       }}
                     >
                       <div>
-                        <p
-                          style={{
-                            color: "#718071",
-                            fontSize: 11,
-                            fontWeight: 700,
-                            letterSpacing: 1,
-                            textTransform: "uppercase",
-                            margin: "0 0 5px",
-                          }}
-                        >
-                          Check-in
+                        <p style={{ color: "#718071", fontSize: 11, margin: "0 0 5px", fontWeight: 700 }}>
+                          CHECK-IN
                         </p>
-                        <p
-                          style={{
-                            color: "#354C3C",
-                            fontSize: 14,
-                            fontWeight: 600,
-                            margin: 0,
-                          }}
-                        >
+                        <strong style={{ fontSize: 14 }}>
                           {formatDate(stay.check_in)}
-                        </p>
+                        </strong>
                       </div>
-
                       <div>
-                        <p
-                          style={{
-                            color: "#718071",
-                            fontSize: 11,
-                            fontWeight: 700,
-                            letterSpacing: 1,
-                            textTransform: "uppercase",
-                            margin: "0 0 5px",
-                          }}
-                        >
-                          Check-out
+                        <p style={{ color: "#718071", fontSize: 11, margin: "0 0 5px", fontWeight: 700 }}>
+                          CHECK-OUT
                         </p>
-                        <p
-                          style={{
-                            color: "#354C3C",
-                            fontSize: 14,
-                            fontWeight: 600,
-                            margin: 0,
-                          }}
-                        >
+                        <strong style={{ fontSize: 14 }}>
                           {formatDate(stay.check_out)}
-                        </p>
+                        </strong>
                       </div>
                     </div>
 
-                    {hasReviewed ? (
-                      <p
+                    {review ? (
+                      <div
                         style={{
-                          color: "#52765A",
-                          fontWeight: 700,
-                          fontSize: 14,
-                          margin: "0 0 18px",
+                          background: "#F3F6EF",
+                          border: "1px solid #E0E8DA",
+                          borderRadius: 13,
+                          padding: 20,
+                          width: "100%",
+                          boxSizing: "border-box",
                         }}
                       >
-                        ★★★★★ Review submitted
-                      </p>
+                        <h4 style={{ margin: "0 0 8px", color: "#354C3C" }}>
+                          Thanks for your review!
+                        </h4>
+                        <p style={{ color: "#C69B45", fontSize: 23, margin: "0 0 10px" }}>
+                          {"★".repeat(Math.max(0, Math.min(5, Math.round(review.rating || 0)))}
+                          {"☆".repeat(5 - Math.max(0, Math.min(5, Math.round(review.rating || 0))))}
+                        </p>
+                        <p style={{ color: "#59685A", lineHeight: 1.7, margin: 0 }}>
+                          {review.review_text}
+                        </p>
+                        <p style={{ color: "#718071", fontSize: 12, marginBottom: 0 }}>
+                          Your review has been submitted.
+                        </p>
+                      </div>
                     ) : (
-                      <Link
-                        to={`/my-booking/${stay.id}`}
-                        style={buttonStyle}
+                      <form
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          submitReview(stay);
+                        }}
+                        style={{
+                          width: "100%",
+                          borderTop: "1px solid #E8ECE4",
+                          paddingTop: 20,
+                        }}
                       >
-                        Leave a review
-                      </Link>
+                        <h4 style={{ fontSize: 18, margin: "0 0 6px" }}>
+                          Your review
+                        </h4>
+                        <p style={{ color: "#718071", fontSize: 14, margin: "0 0 16px" }}>
+                          Tell us about your stay...
+                        </p>
+
+                        {([
+                          ["rating", "Overall rating"],
+                          ["cleanliness", "Cleanliness"],
+                          ["communication", "Communication"],
+                          ["accuracy", "Accuracy"],
+                          ["respect", "Respect"],
+                        ] as const).map(([field, label]) => (
+                          <div key={field} style={{ marginBottom: 14 }}>
+                            <label style={{ fontSize: 14, fontWeight: 600 }}>
+                              {label}
+                            </label>
+                            <StarRating
+                              value={values[field]}
+                              onChange={(value) =>
+                                updateForm(stay.id, field, value)
+                              }
+                            />
+                          </div>
+                        ))}
+
+                        <label
+                          htmlFor={`review-${stay.id}`}
+                          style={{ fontSize: 14, fontWeight: 600 }}
+                        >
+                          Your comments
+                        </label>
+                        <textarea
+                          id={`review-${stay.id}`}
+                          rows={5}
+                          required
+                          maxLength={2000}
+                          value={values.reviewText}
+                          onChange={(event) =>
+                            updateForm(stay.id, "reviewText", event.target.value)
+                          }
+                          placeholder="Tell us what you thought about the property and your host..."
+                          style={{
+                            ...inputStyle,
+                            resize: "vertical",
+                            lineHeight: 1.6,
+                          }}
+                        />
+
+                        <button
+                          type="submit"
+                          disabled={submittingId === stay.id}
+                          style={{
+                            ...buttonStyle,
+                            marginTop: 18,
+                            opacity: submittingId === stay.id ? 0.65 : 1,
+                          }}
+                        >
+                          {submittingId === stay.id
+                            ? "Submitting..."
+                            : "Submit review"}
+                        </button>
+                      </form>
                     )}
 
                     <Link
                       to={`/property/${stay.property_id}`}
-                      style={secondaryLinkStyle}
+                      style={{
+                        color: "#52765A",
+                        fontWeight: 600,
+                        fontSize: 14,
+                        textDecoration: "none",
+                        marginTop: 20,
+                      }}
                     >
                       View property details →
                     </Link>
-
-           
                   </div>
                 </article>
               );
             })}
         </section>
+
+        <div
+          style={{
+            marginTop: 36,
+            background: "#EAF0E6",
+            borderRadius: 18,
+            padding: "28px 24px",
+            textAlign: "center",
+          }}
+        >
+          <h3 style={{ color: "#354C3C", margin: "0 0 9px", fontSize: 21 }}>
+            Thank you!
+          </h3>
+          <p style={{ color: "#59685A", lineHeight: 1.7, margin: 0 }}>
+            Your reviews help our hosts and future guests. Thank you for being
+            part of Static Holidays!
+          </p>
+        </div>
       </div>
 
       <style>
@@ -508,3 +715,4 @@ export default function PastStays() {
     </main>
   );
 }
+
