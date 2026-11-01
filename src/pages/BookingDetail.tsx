@@ -68,6 +68,8 @@ export default function BookingDetail() {
 
   const [booking, setBooking] = useState<Booking | null>(null);
   const [property, setProperty] = useState<Property | null>(null);
+  const [guestProfile, setGuestProfile] = useState<GuestProfile | null>(null);
+const [guestReviews, setGuestReviews] = useState<GuestReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
