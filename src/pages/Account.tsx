@@ -336,11 +336,28 @@ setTrip(tripsWithMessages[0] || null);
       }
 
       setReviews(reviewData || []);
+const { data: hostReviewData, error: hostReviewError } = await supabase
+  .from("reviews")
+  .select("*")
+  .eq("reviewed_user_id", user.id)
+  .eq("review_type", "owner_to_guest")
+  .order("created_at", { ascending: false });
+
+if (hostReviewError) {
+  console.error("Could not load reviews from hosts:", hostReviewError);
+} else {
+  setHostReviews(hostReviewData || []);
+}
+
+
+
+      
      } finally {
       console.log("ACCOUNT: loading finished");
       setLoading(false);
     }
   }
+
 
  
   useEffect(() => {
