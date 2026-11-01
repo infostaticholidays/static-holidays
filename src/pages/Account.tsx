@@ -41,6 +41,7 @@ export default function Account() {
   const [declinedBookings, setDeclinedBookings] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
+  const [hostReviews, setHostReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [newsletterSaving, setNewsletterSaving] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
