@@ -73,6 +73,10 @@ export default function App() {
 
           <Route path="/properties" element={<Properties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route
+  path="/property/:id/reviews"
+  element={<PropertyReviews />}
+/>
           <Route path="/add-property" element={<AddProperty />} />
 
           <Route
