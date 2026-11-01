@@ -777,13 +777,21 @@ const firstName =
               value: previousTrips.length,
             },
           ].map((item) => (
-            <div
-              key={item.label}
-              style={{
-                ...cardStyle,
-                padding: "20px 18px",
-              }}
-            >
+          <div
+  key={item.label}
+  onClick={() => {
+    if (item.label === "Past trips") {
+      window.location.href = "/past-stays";
+    }
+  }}
+  role={item.label === "Past trips" ? "link" : undefined}
+  tabIndex={item.label === "Past trips" ? 0 : undefined}
+  style={{
+    ...cardStyle,
+    padding: "20px 18px",
+    cursor: item.label === "Past trips" ? "pointer" : "default",
+  }}
+>
               <div
                 style={{
                   width: 40,
