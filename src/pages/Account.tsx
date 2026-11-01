@@ -974,7 +974,16 @@ const firstName =
     </p>
   ) : (
     <div style={{ display: "grid", gap: 14 }}>
-      {previousTrips.map((holiday: any) => (
+     {previousTrips.map((holiday: any) => {
+  const property = Array.isArray(holiday.properties)
+    ? holiday.properties[0]
+    : holiday.properties;
+
+  const image = Array.isArray(property?.images)
+    ? property.images[0]
+    : property?.images;
+
+  return (
       const property = Array.isArray(holiday.properties)
   ? holiday.properties[0]
   : holiday.properties;
