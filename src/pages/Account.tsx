@@ -930,7 +930,7 @@ const firstName =
                     <div style={{ fontSize: 56 }}>🏡</div>
 
                     <Link
-                      to={`/my-booking/${holiday.id}`}
+                      to={holiday.property_id ? `/property/${holiday.property_id}` : "#"}
                       style={{
                         ...buttonStyle,
                         textAlign: "center",
