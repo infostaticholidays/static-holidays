@@ -268,13 +268,40 @@ if (currentBooking.guest_id) {
   ).trim();
 
   const isPending = status.toLowerCase() === "pending";
-
   const deadlinePassed =
     !booking.response_deadline ||
     new Date(booking.response_deadline).getTime() <= Date.now();
 
+  const ratedReviews = guestReviews.filter(
+    (review) => review.rating !== null
+  );
+
+  const averageGuestRating =
+    ratedReviews.length > 0
+      ? ratedReviews.reduce(
+          (total, review) => total + (review.rating ?? 0),
+          0
+        ) / ratedReviews.length
+      : null;
+
+  const wouldHostAgainReviews = guestReviews.filter(
+    (review) => review.would_host_again !== null
+  );
+
+  const wouldHostAgainPercentage =
+    wouldHostAgainReviews.length > 0
+      ? Math.round(
+          (wouldHostAgainReviews.filter(
+            (review) => review.would_host_again === true
+          ).length /
+            wouldHostAgainReviews.length) *
+            100
+        )
+      : null;
+
   return (
     <main
+ 
       style={{
         minHeight: "100vh",
         background: "#f5f7fa",
