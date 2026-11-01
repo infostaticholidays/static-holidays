@@ -149,9 +149,12 @@ if (verificationError) {
 status,
 completed,
 properties (
-            title,
-            location
-          )
+  id,
+  title,
+  location,
+  images,
+  price_per_night
+)
         `)
         .eq("guest_id", user.id)
         .eq("booking_status", "confirmed")
