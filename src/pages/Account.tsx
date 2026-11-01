@@ -766,13 +766,24 @@ const firstName =
               value: previousTrips.length,
             },
           ].map((item) => (
-            <div
-              key={item.label}
-              style={{
-                ...cardStyle,
-                padding: "20px 18px",
-              }}
-            >
+         <div
+  key={item.label}
+  onClick={() => {
+    if (item.label === "Past trips") {
+      document.getElementById("previous-stays")?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }}
+  role={item.label === "Past trips" ? "button" : undefined}
+  tabIndex={item.label === "Past trips" ? 0 : undefined}
+  style={{
+    ...cardStyle,
+    padding: "20px 18px",
+    cursor: item.label === "Past trips" ? "pointer" : "default",
+  }}
+>
+            
               <div
                 style={{
                   width: 40,
