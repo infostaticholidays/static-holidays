@@ -235,7 +235,19 @@ if (reviewCheckError) {
 } else if (!cancelled) {
   setHasReviewed(!!existingReview);
 }
+const { data: ownerReviewData, error: ownerReviewError } = await supabase
+  .from("reviews")
+  .select("rating, review_text, would_host_again, created_at")
+  .eq("booking_id", currentBooking.id)
+  .eq("reviewed_user_id", user.id)
+  .eq("review_type", "owner_to_guest")
+  .maybeSingle();
 
+if (ownerReviewError) {
+  console.error("Could not load owner's review:", ownerReviewError);
+} else if (!cancelled) {
+  setOwnerReview(ownerReviewData);
+}
         const { data: info, error: infoError } = await supabase
           .from("property_guest_information")
           .select("house_rules, hot_tub_instructions")
