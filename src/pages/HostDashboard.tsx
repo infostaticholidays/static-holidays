@@ -459,11 +459,11 @@ setDetailsForm({
           setConversations(conversationResult.data ?? []);
         }
 
-        const reviewResult = await supabase
-          .from("reviews")
-          .select("*")
-          .eq("host_id", currentUser.id);
-
+      const reviewResult = await supabase
+  .from("reviews")
+  .select("*")
+  .eq("reviewed_user_id", currentUser.id)
+  .eq("review_type", "guest_to_owner");
         if (!mountedCheck()) return;
 
         if (reviewResult.error) {
