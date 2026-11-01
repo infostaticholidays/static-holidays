@@ -141,8 +141,8 @@ if (currentBooking.guest_id) {
     .select("id, rating, review_text, created_at, would_host_again")
     .eq("reviewed_user_id", currentBooking.guest_id)
     .eq("review_type", "owner_to_guest")
-    .neq("booking_id", currentBooking.id)
-    .order("created_at", { ascending: false });
+  
+ .order("created_at", { ascending: false });
 
   if (reviewsResult.error) throw reviewsResult.error;
 
