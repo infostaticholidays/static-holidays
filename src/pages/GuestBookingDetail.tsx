@@ -646,8 +646,7 @@ if (reviewCheckError) {
               )}
             </section>
 
-      
-{booking.completed && userId && (
+      {booking.completed && userId && !hasReviewed && (
   <GuestReviewForm
     bookingId={booking.id}
     propertyId={booking.property_id}
