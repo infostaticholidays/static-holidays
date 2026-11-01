@@ -500,7 +500,7 @@ if (currentBooking.guest_id) {
       This guest has no previous host reviews.
     </p>
   ) : (
-    guestReviews.map((review) => (
+       (showAllReviews ? guestReviews : guestReviews.slice(0, 5)).map((review) => (
       <article
         key={review.id}
         style={{
