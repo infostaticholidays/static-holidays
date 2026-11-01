@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import GuestReviewForm from "../components/GuestReviewForm";
 
 type BookingDetails = {
   id: string;
