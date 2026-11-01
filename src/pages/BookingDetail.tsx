@@ -25,6 +25,7 @@ type GuestProfile = {
   full_name: string | null;
   first_name: string | null;
   last_name: string | null;
+  email: string | null;
 };
 
 type GuestReview = {
