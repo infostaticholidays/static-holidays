@@ -473,7 +473,7 @@ export default function PastStays() {
 
               return (
                 <article key={stay.id} style={cardStyle}>
-                  <div style={{ minHeight: 300, background: "#EAF0E6" }}>
+                <div style={{ height: 220, background: "#EAF0E6" }}>
                     {coverImage?.public_url ? (
                       <img
                         src={coverImage.public_url}
