@@ -145,8 +145,10 @@ if (verificationError) {
           property_id,
           check_in,
           check_out,
-          booking_status,
-          properties (
+      booking_status,
+status,
+completed,
+properties (
             title,
             location
           )
