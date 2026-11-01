@@ -12,9 +12,10 @@ export default function ReviewsList({ propertyId }: { propertyId: string }) {
     const { data, error } = await supabase
       .from("reviews")
       .select("*")
-      .eq("property_id", propertyId)
-      .order("created_at", { ascending: false });
-
+     .eq("property_id", propertyId)
+.eq("review_type", "guest_to_owner")
+.order("created_at", { ascending: false });
+    
     if (error) {
       console.error(error);
       return;
