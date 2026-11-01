@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 type Booking = {
   id: string;
   property_id: string;
+    guest_id: string | null;
   owner_id?: string | null;
   check_in: string;
   check_out: string;
