@@ -125,6 +125,33 @@ const [guestReviews, setGuestReviews] = useState<GuestReview[]>([]);
       } else {
         setProperty(propertyResult.data as Property);
       }
+if (currentBooking.guest_id) {
+  const profileResult = await supabase
+    .from("profiles")
+    .select("id, full_name, first_name, last_name")
+    .eq("id", currentBooking.guest_id)
+    .maybeSingle();
+
+  if (profileResult.error) throw profileResult.error;
+
+  setGuestProfile(profileResult.data as GuestProfile | null);
+
+  const reviewsResult = await supabase
+    .from("reviews")
+    .select("id, rating, review_text, created_at, would_host_again")
+    .eq("reviewed_user_id", currentBooking.guest_id)
+    .eq("review_type", "owner_to_guest")
+    .neq("booking_id", currentBooking.id)
+    .order("created_at", { ascending: false });
+
+  if (reviewsResult.error) throw reviewsResult.error;
+
+  setGuestReviews((reviewsResult.data ?? []) as GuestReview[]);
+} else {
+  setGuestProfile(null);
+  setGuestReviews([]);
+}
+      
     } catch {
       setError("Unable to load the booking. Please try again.");
     }
