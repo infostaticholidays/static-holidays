@@ -943,9 +943,11 @@ const firstName =
             </div>
           )}
         </section>
-
-{/* PREVIOUS STAYS */}
-<section style={{ ...cardStyle, marginBottom: 26 }}>
+        
+<section
+  id="previous-stays"
+  style={{ ...cardStyle, marginBottom: 26 }}
+>
   <div style={{ marginBottom: 18 }}>
     <p
       style={{
