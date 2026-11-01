@@ -1559,7 +1559,7 @@ const firstName =
             </div>
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
-              {reviews.map((r) => (
+             {[...reviews, ...hostReviews].map((r) => (
                 <article
                   key={r.id}
                   style={{
