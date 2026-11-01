@@ -645,6 +645,14 @@ properties (
               <br />
               We hope you have a wonderful stay.
             </p>
+            {booking.completed && (
+  <GuestReviewForm
+    bookingId={booking.id}
+    propertyId={booking.property_id}
+    reviewerId={(await supabase.auth.getUser()).data.user?.id ?? ""}
+    reviewedUserId={booking.owner_id}
+  />
+)}
           </>
         )}
       </div>
