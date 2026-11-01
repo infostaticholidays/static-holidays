@@ -633,28 +633,30 @@ properties (
               )}
             </section>
 
-            <p
-              style={{
-                textAlign: "center",
-                color: colors.text,
-                fontSize: 12,
-                lineHeight: 1.7,
-                marginTop: 30,
-              }}
-            >
-              STATIC HOLIDAYS
-              <br />
-              We hope you have a wonderful stay.
-            </p>
-         {booking.completed && userId && (
+      
+{booking.completed && userId && (
   <GuestReviewForm
     bookingId={booking.id}
     propertyId={booking.property_id}
-  reviewerId={userId}
+    reviewerId={userId}
     reviewedUserId={booking.owner_id}
   />
 )}
-          </>
+
+<p
+  style={{
+    textAlign: "center",
+    color: colors.text,
+    fontSize: 12,
+    lineHeight: 1.7,
+    marginTop: 30,
+  }}
+>
+  STATIC HOLIDAYS
+  <br />
+  We hope you have a wonderful stay.
+</p>
+                      </>
         )}
       </div>
     </main>
