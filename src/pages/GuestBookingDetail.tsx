@@ -650,7 +650,7 @@ properties (
   <GuestReviewForm
     bookingId={booking.id}
     propertyId={booking.property_id}
-    reviewerId={(await supabase.auth.getUser()).data.user?.id ?? ""}
+  reviewerId={userId}
     reviewedUserId={booking.owner_id}
   />
 )}
