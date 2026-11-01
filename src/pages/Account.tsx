@@ -324,11 +324,11 @@ setTrip(tripsWithMessages[0] || null);
       }
 
 
-      const { data: reviewData, error: reviewError } = await supabase
-        .from("reviews")
-        .select("*")
-        .order("created_at", { ascending: false });
-
+   const { data: reviewData, error: reviewError } = await supabase
+  .from("reviews")
+  .select("*")
+  .eq("reviewer_id", user.id)
+  .order("created_at", { ascending: false });
       if (reviewError) {
         console.error("Could not load reviews:", reviewError);
       }
