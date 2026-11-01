@@ -188,9 +188,11 @@ export default function GuestBookingDetail() {
             property_id,
             check_in,
             check_out,
-            status,
-            booking_status,
-            properties (
+          status,
+booking_status,
+owner_id,
+completed,
+properties (
               title,
               location,
               nearby_information,
