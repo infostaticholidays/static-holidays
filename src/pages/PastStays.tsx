@@ -483,15 +483,7 @@ export default function PastStays() {
                       View property details →
                     </Link>
 
-                    <Link
-                      to={`/my-booking/${stay.id}`}
-                      style={{
-                        ...secondaryLinkStyle,
-                        marginTop: 10,
-                      }}
-                    >
-                      View booking and host feedback →
-                    </Link>
+           
                   </div>
                 </article>
               );
