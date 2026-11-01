@@ -7,6 +7,8 @@ import GuestReviewForm from "../components/GuestReviewForm";
 
 type BookingDetails = {
   id: string;
+    owner_id: string;
+  completed: boolean;
   property_id: string;
   check_in: string;
   check_out: string;
