@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
+import PropertyReviews from "./pages/PropertyReviews";
 import AddProperty from "./pages/AddProperty";
 import Adverts from "./pages/Adverts";
 import Shop from "./pages/Shop";
