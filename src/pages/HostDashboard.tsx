@@ -1899,9 +1899,7 @@ const handleSaveDetails = async () => {
           <div style={styles.card}>
             {reviews.length === 0 ? (
               <p style={{ ...styles.muted, margin: 0 }}>
-                No reviews to display yet. If you expected reviews here, check
-                the browser console for “Reviews could not be loaded” and verify
-                that your reviews table has a host_id column.
+         No guest reviews to display yet. Reviews will appear here after a guest has completed a stay and submitted a review.
               </p>
             ) : (
               reviews.slice(0, 5).map((review: any) => (
