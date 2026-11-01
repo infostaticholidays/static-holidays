@@ -937,7 +937,7 @@ const firstName =
                         whiteSpace: "nowrap",
                       }}
                     >
-                      View booking details →
+                     View property & reviews →
                     </Link>
                   </div>
 
