@@ -221,6 +221,19 @@ properties (
 
         const currentBooking = data as unknown as BookingDetails;
         setBooking(currentBooking);
+        const { data: existingReview, error: reviewCheckError } = await supabase
+  .from("reviews")
+  .select("id")
+  .eq("booking_id", currentBooking.id)
+  .eq("reviewer_id", user.id)
+  .eq("review_type", "guest_to_owner")
+  .maybeSingle();
+
+if (reviewCheckError) {
+  console.error("Could not check existing review:", reviewCheckError);
+} else if (!cancelled) {
+  setHasReviewed(!!existingReview);
+}
 
         const { data: info, error: infoError } = await supabase
           .from("property_guest_information")
