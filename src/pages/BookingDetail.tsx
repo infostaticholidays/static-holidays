@@ -20,6 +20,21 @@ type Property = {
   owner_id: string;
   title?: string;
 };
+type GuestProfile = {
+  id: string;
+  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+};
+
+type GuestReview = {
+  id: string;
+  rating: number | null;
+  review_text: string | null;
+  created_at: string | null;
+  would_host_again: boolean | null;
+};
+
 
 function formatDate(value: string | null | undefined): string {
   if (!value) return "Not set";
