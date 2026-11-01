@@ -176,7 +176,7 @@ export default function GuestBookingDetail() {
           setErrorMessage("Please sign in to view your booking.");
           return;
         }
-
+setUserId(user.id);
         if (!id) {
           setErrorMessage("No booking ID was provided.");
           return;
