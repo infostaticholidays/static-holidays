@@ -573,8 +573,8 @@ export default function PastStays() {
                           Thanks for your review!
                         </h4>
                         <p style={{ color: "#C69B45", fontSize: 23, margin: "0 0 10px" }}>
-                          {"★".repeat(Math.max(0, Math.min(5, Math.round(review.rating || 0)))}
-                          {"☆".repeat(5 - Math.max(0, Math.min(5, Math.round(review.rating || 0))))}
+                      {"★".repeat(Math.max(0, Math.min(5, Math.round(review.rating || 0))))}
+{"☆".repeat(5 - Math.max(0, Math.min(5, Math.round(review.rating || 0))))}
                         </p>
                         <p style={{ color: "#59685A", lineHeight: 1.7, margin: 0 }}>
                           {review.review_text}
