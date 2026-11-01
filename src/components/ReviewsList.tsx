@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 type Review = {
@@ -40,17 +41,31 @@ function RatingRow({
         justifyContent: "space-between",
         alignItems: "center",
         gap: 12,
-        padding: "7px 0",
-        borderBottom: "1px solid #edf0ed",
-        fontSize: 13,
+        padding: "5px 0",
+        fontSize: 12,
       }}
     >
       <span style={{ color: "#536258" }}>{label}</span>
-      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
         <Stars rating={rating} />
         <strong style={{ color: "#405448" }}>{rating}/5</strong>
       </span>
     </div>
+  );
+}
+
+function averageRating(reviews: Review[], field: keyof Review) {
+  const values = reviews
+    .map((review) => review[field])
+    .filter(
+      (value): value is number =>
+        typeof value === "number" && Number.isFinite(value)
+    );
+
+  if (values.length === 0) return null;
+
+  return (
+    values.reduce((total, value) => total + value, 0) / values.length
   );
 }
 
@@ -99,6 +114,9 @@ export default function ReviewsList({
     };
   }, [propertyId]);
 
+  const overallAverage = averageRating(reviews, "rating");
+  const latestReview = reviews[0];
+
   return (
     <div style={{ marginTop: 20 }}>
       {loading ? (
@@ -110,15 +128,77 @@ export default function ReviewsList({
           No reviews yet for this property.
         </p>
       ) : (
-        reviews.map((review) => (
-          <article
-            key={review.id}
+        <div
+          style={{
+            padding: 18,
+            border: "1px solid #e3eae3",
+            borderRadius: 12,
+            background: "#fff",
+          }}
+        >
+          <div
             style={{
-              marginTop: 16,
-              padding: 18,
-              border: "1px solid #e3eae3",
-              borderRadius: 12,
-              background: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 12,
+              marginBottom: 16,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 9,
+                  flexWrap: "wrap",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#d49b32",
+                    fontSize: 21,
+                    fontWeight: 700,
+                  }}
+                >
+                  ★ {overallAverage?.toFixed(1) ?? "—"}/5
+                </span>
+
+                <span style={{ color: "#758078", fontSize: 13 }}>
+                  ({reviews.length}{" "}
+                  {reviews.length === 1 ? "review" : "reviews"})
+                </span>
+              </div>
+
+              <p
+                style={{
+                  color: "#758078",
+                  fontSize: 12,
+                  margin: "4px 0 0",
+                }}
+              >
+                Guest ratings
+              </p>
+            </div>
+
+            <Link
+              to={`/property/${propertyId}/reviews`}
+              style={{
+                color: "#52765A",
+                fontWeight: 600,
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              Read all reviews →
+            </Link>
+          </div>
+
+          <div
+            style={{
+              borderTop: "1px solid #edf0ed",
+              paddingTop: 14,
             }}
           >
             <div
@@ -128,18 +208,22 @@ export default function ReviewsList({
                 alignItems: "center",
                 flexWrap: "wrap",
                 gap: 8,
-                marginBottom: 12,
+                marginBottom: 10,
               }}
             >
               <strong style={{ color: "#203128", fontSize: 14 }}>
-                Guest review
+                Latest guest review
               </strong>
+
               <span style={{ color: "#758078", fontSize: 12 }}>
-                {new Date(review.created_at).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
+                {new Date(latestReview.created_at).toLocaleDateString(
+                  "en-GB",
+                  {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  }
+                )}
               </span>
             </div>
 
@@ -148,7 +232,7 @@ export default function ReviewsList({
                 background: "#f6f9f5",
                 borderRadius: 9,
                 padding: 12,
-                marginBottom: 12,
+                marginBottom: 10,
               }}
             >
               <div
@@ -163,10 +247,17 @@ export default function ReviewsList({
                 <strong style={{ color: "#315640", fontSize: 13 }}>
                   Overall rating
                 </strong>
-                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Stars rating={review.rating} />
+
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 7,
+                  }}
+                >
+                  <Stars rating={latestReview.rating} />
                   <strong style={{ color: "#405448", fontSize: 13 }}>
-                    {review.rating ?? "—"}/5
+                    {latestReview.rating ?? "—"}/5
                   </strong>
                 </span>
               </div>
@@ -175,39 +266,59 @@ export default function ReviewsList({
             <div>
               <RatingRow
                 label="Cleanliness"
-                rating={review.cleanliness_rating}
+                rating={latestReview.cleanliness_rating}
               />
               <RatingRow
                 label="Communication"
-                rating={review.communication_rating}
+                rating={latestReview.communication_rating}
               />
               <RatingRow
                 label="Accuracy"
-                rating={review.accuracy_rating}
+                rating={latestReview.accuracy_rating}
               />
               <RatingRow
                 label="Respect"
-                rating={review.respect_rating}
+                rating={latestReview.respect_rating}
               />
             </div>
 
-            {review.review_text && (
+            {latestReview.review_text && (
               <p
                 style={{
                   color: "#536258",
                   fontSize: 14,
-                  lineHeight: 1.7,
-                  margin: "15px 0 0",
+                  lineHeight: 1.6,
+                  margin: "12px 0 0",
                   whiteSpace: "pre-line",
                 }}
               >
-                {review.review_text}
+                {latestReview.review_text}
               </p>
             )}
-          </article>
-        ))
+          </div>
+
+          <div
+            style={{
+              borderTop: "1px solid #edf0ed",
+              marginTop: 14,
+              paddingTop: 12,
+              textAlign: "center",
+            }}
+          >
+            <Link
+              to={`/property/${propertyId}/reviews`}
+              style={{
+                color: "#52765A",
+                fontWeight: 600,
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              Read all {reviews.length} reviews →
+            </Link>
+          </div>
+        </div>
       )}
     </div>
   );
 }
-
