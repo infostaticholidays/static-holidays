@@ -646,7 +646,7 @@ properties (
               <br />
               We hope you have a wonderful stay.
             </p>
-            {booking.completed && (
+         {booking.completed && userId && (
   <GuestReviewForm
     bookingId={booking.id}
     propertyId={booking.property_id}
