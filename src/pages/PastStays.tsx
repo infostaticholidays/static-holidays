@@ -49,18 +49,19 @@ const containerStyle: React.CSSProperties = {
 const cardStyle: React.CSSProperties = {
   background: "#FFFFFF",
   border: "1px solid #E4E8DE",
-  borderRadius: 18,
+  borderRadius: 16,
   overflow: "hidden",
   display: "grid",
-  gridTemplateColumns: "minmax(240px, 38%) 1fr",
-  marginBottom: 28,
+  gridTemplateColumns: "280px minmax(0, 1fr)",
+  alignItems: "stretch",
+  marginBottom: 18,
   boxShadow: "0 4px 16px rgba(53, 76, 60, 0.05)",
 };
 
 const imageStyle: React.CSSProperties = {
   width: "100%",
-  height: "100%",
-  minHeight: 300,
+  height: 220,
+  minHeight: 220,
   objectFit: "cover",
   display: "block",
 };
