@@ -484,22 +484,7 @@ export default function PropertyReviews() {
           })
         )}
 
-        <section
-          style={{
-            marginTop: 35,
-            padding: "28px 20px",
-            borderRadius: 18,
-            background: "#f0f4eb",
-            textAlign: "center",
-          }}
-        >
-          <h2 style={{ color: green, margin: "0 0 8px" }}>
-            Thank you for your feedback!
-          </h2>
-          <p style={{ color: "#536258", margin: 0 }}>
-            Guest reviews help us maintain the high standards our guests love.
-          </p>
-        </section>
+
       </main>
     </div>
   );
