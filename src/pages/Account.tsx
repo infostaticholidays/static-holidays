@@ -1,4 +1,5 @@
 
+
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -145,16 +146,11 @@ if (verificationError) {
           property_id,
           check_in,
           check_out,
-      booking_status,
-status,
-completed,
-properties (
-  id,
-  title,
-  location,
-  images,
-  price_per_night
-)
+          booking_status,
+          properties (
+            title,
+            location
+          )
         `)
         .eq("guest_id", user.id)
         .eq("booking_status", "confirmed")
@@ -184,15 +180,9 @@ console.log("Bookings returned from Supabase:", bookingsData);
           };
         });
 
-   const previous = confirmedTrips
-  .filter(
-    (t: any) => t.end_date && new Date(t.end_date) < today
-  )
-  .sort(
-    (a: any, b: any) =>
-      new Date(b.start_date).getTime() -
-      new Date(a.start_date).getTime()
-  );
+        const previous = confirmedTrips.filter(
+          (t: any) => t.end_date && new Date(t.end_date) < today
+        );
 
         const upcoming = confirmedTrips
           .filter((t: any) => t.end_date && new Date(t.end_date) >= today)
@@ -769,24 +759,13 @@ const firstName =
               value: previousTrips.length,
             },
           ].map((item) => (
-         <div
-  key={item.label}
-  onClick={() => {
-    if (item.label === "Past trips") {
-      document.getElementById("previous-stays")?.scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  }}
-  role={item.label === "Past trips" ? "button" : undefined}
-  tabIndex={item.label === "Past trips" ? 0 : undefined}
-  style={{
-    ...cardStyle,
-    padding: "20px 18px",
-    cursor: item.label === "Past trips" ? "pointer" : "default",
-  }}
->
-            
+            <div
+              key={item.label}
+              style={{
+                ...cardStyle,
+                padding: "20px 18px",
+              }}
+            >
               <div
                 style={{
                   width: 40,
@@ -930,14 +909,14 @@ const firstName =
                     <div style={{ fontSize: 56 }}>🏡</div>
 
                     <Link
-                      to={holiday.property_id ? `/property/${holiday.property_id}` : "#"}
+                      to={`/my-booking/${holiday.id}`}
                       style={{
                         ...buttonStyle,
                         textAlign: "center",
                         whiteSpace: "nowrap",
                       }}
                     >
-                     View property & reviews →
+                      View booking details →
                     </Link>
                   </div>
 
@@ -946,112 +925,7 @@ const firstName =
             </div>
           )}
         </section>
-        
-<section
-  id="previous-stays"
-  style={{ ...cardStyle, marginBottom: 26 }}
->
-  <div style={{ marginBottom: 18 }}>
-    <p
-      style={{
-        margin: "0 0 6px",
-        fontSize: 12,
-        color: green,
-        fontWeight: 700,
-        letterSpacing: 1.5,
-      }}
-    >
-      YOUR HOLIDAY HISTORY
-    </p>
-    <h2 style={{ margin: 0, fontSize: 23 }}>
-      My previous stays
-    </h2>
-  </div>
 
-  {previousTrips.length === 0 ? (
-  <p style={{ color: muted }}>
-    Your completed holidays will appear here.
-  </p>
-) : (
-  <div style={{ display: "grid", gap: 18 }}>
-    {previousTrips.map((holiday: any) => {
-      const property = Array.isArray(holiday.properties)
-        ? holiday.properties[0]
-        : holiday.properties;
-
-      const image = Array.isArray(property?.images)
-        ? property.images[0]
-        : property?.images;
-
-      return (
-        <div
-          key={holiday.id}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "160px 1fr",
-            gap: 18,
-            background: sage,
-            borderRadius: 16,
-            padding: 16,
-            color: "#26352b",
-          }}
-        >
-          {image && (
-            <img
-              src={image}
-              alt={property?.title || "Previous stay"}
-              style={{
-                width: "100%",
-                height: 130,
-                objectFit: "cover",
-                borderRadius: 12,
-              }}
-            />
-          )}
-
-          <div>
-            <h3 style={{ margin: "0 0 8px", fontSize: 20 }}>
-              {property?.title || holiday.destination || "Your previous stay"}
-            </h3>
-
-            <p style={{ margin: "0 0 8px", color: muted }}>
-              {property?.location || ""}
-            </p>
-
-            <p style={{ margin: "0 0 8px", color: muted }}>
-              <strong>Check-in:</strong>{" "}
-              {holiday.start_date
-                ? new Date(holiday.start_date).toLocaleDateString("en-GB")
-                : "Not set"}
-            </p>
-
-            <p style={{ margin: "0 0 12px", color: muted }}>
-              <strong>Check-out:</strong>{" "}
-              {holiday.end_date
-                ? new Date(holiday.end_date).toLocaleDateString("en-GB")
-                : "Not set"}
-            </p>
-
-            <Link
-              to={`/property/${holiday.property_id}`}
-              style={{
-                ...buttonStyle,
-                textAlign: "center",
-                whiteSpace: "nowrap",
-              }}
-            >
-              View property & reviews →
-            </Link>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-)}
-</section>
-
-
-        
         {/* DECLINED BOOKINGS */}
         {declinedBookings.length > 0 && (
           <section style={{ ...cardStyle, marginBottom: 26 }}>
