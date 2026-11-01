@@ -975,6 +975,13 @@ const firstName =
   ) : (
     <div style={{ display: "grid", gap: 14 }}>
       {previousTrips.map((holiday: any) => (
+      const property = Array.isArray(holiday.properties)
+  ? holiday.properties[0]
+  : holiday.properties;
+
+const image = Array.isArray(property?.images)
+  ? property.images[0]
+  : property?.images;
         <Link
           key={holiday.id}
           to={`/my-booking/${holiday.id}`}
