@@ -409,7 +409,75 @@ if (currentBooking.guest_id) {
             </div>
           )}
         </section>
+<section
+  style={{
+    background: "#fff",
+    border: "1px solid #e7ebf0",
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 20,
+  }}
+>
+  <h2 style={{ marginTop: 0 }}>Guest information</h2>
 
+  <p>
+    <strong>Guest name: </strong>
+    {guestProfile?.full_name ||
+      [guestProfile?.first_name, guestProfile?.last_name]
+        .filter(Boolean)
+        .join(" ") ||
+      "Guest"}
+  </p>
+
+  <h3>Previous host reviews</h3>
+
+  {guestReviews.length === 0 ? (
+    <p style={{ color: "#64748b" }}>
+      This guest has no previous host reviews.
+    </p>
+  ) : (
+    guestReviews.map((review) => (
+      <article
+        key={review.id}
+        style={{
+          borderTop: "1px solid #e7ebf0",
+          paddingTop: 14,
+          marginTop: 14,
+        }}
+      >
+        <p style={{ color: "#e4a72e", fontSize: 20 }}>
+          {"★".repeat(Math.max(0, Math.min(5, Math.round(review.rating ?? 0))))}
+          {"☆".repeat(5 - Math.max(0, Math.min(5, Math.round(review.rating ?? 0))))}
+          <span style={{ color: "#64748b", fontSize: 13, marginLeft: 8 }}>
+            {review.rating ?? "No rating"} / 5
+          </span>
+        </p>
+
+        <p style={{ lineHeight: 1.6 }}>
+          {review.review_text || "No written comment."}
+        </p>
+
+        {review.would_host_again !== null && (
+          <p style={{ color: "#64748b", fontSize: 14 }}>
+            {review.would_host_again
+              ? "✓ Previous host would host this guest again"
+              : "Previous host would not host this guest again"}
+          </p>
+        )}
+
+        <p style={{ color: "#64748b", fontSize: 13 }}>
+          {review.created_at
+            ? new Date(review.created_at).toLocaleDateString("en-GB")
+            : ""}
+        </p>
+      </article>
+    ))
+  )}
+</section>
+
+
+
+        
         {property && isPending && !deadlinePassed && (
           <section
             style={{
