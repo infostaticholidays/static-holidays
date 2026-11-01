@@ -458,7 +458,43 @@ if (currentBooking.guest_id) {
   </p>
 
   <h3>Previous host reviews</h3>
+  <div
+    style={{
+      background: "#f8fafc",
+      borderRadius: 12,
+      padding: 18,
+      marginTop: 18,
+      marginBottom: 20,
+    }}
+  >
+    <h3 style={{ marginTop: 0 }}>Guest rating</h3>
 
+    <p style={{ fontSize: 28, fontWeight: 700, margin: "8px 0" }}>
+      {averageGuestRating !== null
+        ? `${averageGuestRating.toFixed(1)} / 5`
+        : "No rating yet"}
+    </p>
+
+    <p style={{ color: "#e4a72e", fontSize: 22, margin: "4px 0" }}>
+      {averageGuestRating !== null
+        ? "★".repeat(Math.round(averageGuestRating)) +
+          "☆".repeat(5 - Math.round(averageGuestRating))
+        : "☆☆☆☆☆"}
+    </p>
+
+    <p style={{ color: "#64748b", marginBottom: 8 }}>
+      Based on {ratedReviews.length} rated reviews
+    </p>
+
+    <p style={{ color: "#64748b", marginBottom: 0 }}>
+      Would host again:{" "}
+      <strong>
+        {wouldHostAgainPercentage !== null
+          ? `${wouldHostAgainPercentage}%`
+          : "No data yet"}
+      </strong>
+    </p>
+  </div>
   {guestReviews.length === 0 ? (
     <p style={{ color: "#64748b" }}>
       This guest has no previous host reviews.
