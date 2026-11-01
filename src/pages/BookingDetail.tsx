@@ -537,6 +537,24 @@ if (currentBooking.guest_id) {
       </article>
     ))
   )}
+    {guestReviews.length > 5 && (
+    <button
+      type="button"
+      onClick={() => setShowAllReviews(!showAllReviews)}
+      style={{
+        background: "transparent",
+        color: "#2563eb",
+        border: "1px solid #2563eb",
+        borderRadius: 8,
+        padding: "10px 16px",
+        fontWeight: 700,
+        cursor: "pointer",
+        marginTop: 16,
+      }}
+    >
+      {showAllReviews ? "Show fewer reviews" : "Show all reviews"}
+    </button>
+  )}
 </section>
 
 
