@@ -668,6 +668,26 @@ if (ownerReviewError) {
   />
 )}
 
+     {ownerReview && (
+  <section style={cardStyle}>
+    <h2 style={headingStyle}>Your review from the host</h2>
+
+    <p style={{ ...textStyle, fontWeight: 700 }}>
+      Host rating: {ownerReview.rating}/5
+    </p>
+
+    {ownerReview.review_text && (
+      <p style={textStyle}>{ownerReview.review_text}</p>
+    )}
+
+    <p style={textStyle}>
+      {ownerReview.would_host_again
+        ? "The host would be happy to welcome you again."
+        : "The host has left feedback about your stay."}
+    </p>
+  </section>
+)}       
+
 <p
   style={{
     textAlign: "center",
