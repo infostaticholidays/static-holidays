@@ -1543,7 +1543,7 @@ const firstName =
             <h2 style={{ margin: 0, fontSize: 24 }}>My reviews</h2>
           </div>
 
-          {reviews.length === 0 ? (
+          {reviews.length === 0 && hostReviews.length === 0 ? (
             <div
               style={{
                 background: sage,
