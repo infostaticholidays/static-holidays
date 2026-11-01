@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-
 type PastStay = {
   id: string;
   property_id: string;
@@ -10,6 +9,12 @@ type PastStay = {
   properties: {
     title: string;
     location: string | null;
+    property_images: {
+      id: string;
+      public_url: string;
+      is_cover: boolean;
+      position: number;
+    }[];
   } | null;
 };
 
