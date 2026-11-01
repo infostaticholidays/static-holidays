@@ -34,6 +34,15 @@ type Review = {
   created_at: string;
 };
 
+type ReviewFormValues = {
+  rating: number;
+  cleanliness: number;
+  communication: number;
+  accuracy: number;
+  respect: number;
+  reviewText: string;
+};
+
 const pageStyle: React.CSSProperties = {
   minHeight: "100vh",
   background: "#F6F4EE",
@@ -115,7 +124,7 @@ function StarRating({
   onChange: (rating: number) => void;
 }) {
   return (
-    <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+    <div style={{ display: "flex", gap: 5, marginTop: 4 }}>
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
@@ -126,7 +135,7 @@ function StarRating({
             border: "none",
             background: "transparent",
             padding: 0,
-            fontSize: 30,
+            fontSize: 23,
             cursor: "pointer",
             color: star <= value ? "#C69B45" : "#D9DED5",
           }}
@@ -146,7 +155,7 @@ export default function PastStays() {
   const [submittingId, setSubmittingId] = useState("");
 
   const [formValues, setFormValues] = useState<
-    Record<string, { rating: number; reviewText: string }>
+    Record<string, ReviewFormValues>
   >({});
 
   useEffect(() => {
@@ -258,13 +267,17 @@ export default function PastStays() {
 
   function updateForm(
     bookingId: string,
-    field: "rating" | "reviewText",
+    field: keyof ReviewFormValues,
     value: number | string
   ) {
     setFormValues((previous) => ({
       ...previous,
       [bookingId]: {
         rating: 5,
+        cleanliness: 5,
+        communication: 5,
+        accuracy: 5,
+        respect: 5,
         reviewText: "",
         ...previous[bookingId],
         [field]: value,
@@ -289,8 +302,12 @@ export default function PastStays() {
       return;
     }
 
-    const values = {
+    const values: ReviewFormValues = {
       rating: 5,
+      cleanliness: 5,
+      communication: 5,
+      accuracy: 5,
+      respect: 5,
       reviewText: "",
       ...formValues[stay.id],
     };
@@ -311,10 +328,10 @@ export default function PastStays() {
       verified_stay: true,
       booking_completed: true,
       rating: values.rating,
-      cleanliness_rating: values.rating,
-      communication_rating: values.rating,
-      accuracy_rating: values.rating,
-      respect_rating: values.rating,
+      cleanliness_rating: values.cleanliness,
+      communication_rating: values.communication,
+      accuracy_rating: values.accuracy,
+      respect_rating: values.respect,
       review_text: values.reviewText.trim(),
     });
 
@@ -336,10 +353,10 @@ export default function PastStays() {
       {
         booking_id: stay.id,
         rating: values.rating,
-        cleanliness_rating: values.rating,
-        communication_rating: values.rating,
-        accuracy_rating: values.rating,
-        respect_rating: values.rating,
+        cleanliness_rating: values.cleanliness,
+        communication_rating: values.communication,
+        accuracy_rating: values.accuracy,
+        respect_rating: values.respect,
         review_text: values.reviewText.trim(),
         created_at: new Date().toISOString(),
       },
@@ -474,8 +491,12 @@ export default function PastStays() {
                 (item) => item.booking_id === stay.id
               );
 
-              const values = {
+              const values: ReviewFormValues = {
                 rating: 5,
+                cleanliness: 5,
+                communication: 5,
+                accuracy: 5,
+                respect: 5,
                 reviewText: "",
                 ...formValues[stay.id],
               };
@@ -689,23 +710,41 @@ export default function PastStays() {
                           Tell us about your stay...
                         </p>
 
-                        <div style={{ marginBottom: 16 }}>
-                          <label
-                            style={{
-                              fontSize: 14,
-                              fontWeight: 600,
-                              color: "#354C3C",
-                            }}
-                          >
-                            Overall rating
-                          </label>
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              "repeat(auto-fit, minmax(190px, 1fr))",
+                            gap: "12px 20px",
+                            marginBottom: 16,
+                          }}
+                        >
+                          {([
+                            ["rating", "Overall rating"],
+                            ["cleanliness", "Cleanliness"],
+                            ["communication", "Communication"],
+                            ["accuracy", "Accuracy"],
+                            ["respect", "Respect"],
+                          ] as const).map(([field, label]) => (
+                            <div key={field}>
+                              <label
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 600,
+                                  color: "#354C3C",
+                                }}
+                              >
+                                {label}
+                              </label>
 
-                          <StarRating
-                            value={values.rating}
-                            onChange={(value) =>
-                              updateForm(stay.id, "rating", value)
-                            }
-                          />
+                              <StarRating
+                                value={values[field]}
+                                onChange={(value) =>
+                                  updateForm(stay.id, field, value)
+                                }
+                              />
+                            </div>
+                          ))}
                         </div>
 
                         <label
