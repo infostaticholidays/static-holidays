@@ -152,7 +152,7 @@ export default function GuestBookingDetail() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [userId, setUserId] = useState("");
-
+const [hasReviewed, setHasReviewed] = useState(false);
   useEffect(() => {
     let cancelled = false;
 
