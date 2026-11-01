@@ -448,12 +448,13 @@ if (currentBooking.guest_id) {
 >
   <h2 style={{ marginTop: 0 }}>Guest information</h2>
 
-  <p>
+   <p>
     <strong>Guest name: </strong>
-    {guestProfile?.full_name ||
+    {guestProfile?.full_name?.trim() ||
       [guestProfile?.first_name, guestProfile?.last_name]
-        .filter(Boolean)
+        .filter((name) => name?.trim())
         .join(" ") ||
+      guestProfile?.email ||
       "Guest"}
   </p>
 
