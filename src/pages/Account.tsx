@@ -925,6 +925,74 @@ const firstName =
           )}
         </section>
 
+{/* PREVIOUS STAYS */}
+<section style={{ ...cardStyle, marginBottom: 26 }}>
+  <div style={{ marginBottom: 18 }}>
+    <p
+      style={{
+        margin: "0 0 6px",
+        fontSize: 12,
+        color: green,
+        fontWeight: 700,
+        letterSpacing: 1.5,
+      }}
+    >
+      YOUR HOLIDAY HISTORY
+    </p>
+    <h2 style={{ margin: 0, fontSize: 23 }}>
+      My previous stays
+    </h2>
+  </div>
+
+  {previousTrips.length === 0 ? (
+    <p style={{ color: muted }}>
+      Your completed holidays will appear here.
+    </p>
+  ) : (
+    <div style={{ display: "grid", gap: 14 }}>
+      {previousTrips.map((holiday: any) => (
+        <Link
+          key={holiday.id}
+          to={`/my-booking/${holiday.id}`}
+          style={{
+            display: "block",
+            background: sage,
+            borderRadius: 16,
+            padding: 20,
+            color: "#26352b",
+            textDecoration: "none",
+          }}
+        >
+          <h3 style={{ margin: "0 0 10px", fontSize: 20 }}>
+            {holiday.destination || "Your previous holiday"}
+          </h3>
+
+          <p style={{ margin: "0 0 8px", color: muted }}>
+            <strong>Check-in:</strong>{" "}
+            {holiday.start_date
+              ? new Date(holiday.start_date).toLocaleDateString("en-GB")
+              : "Not set"}
+          </p>
+
+          <p style={{ margin: "0 0 12px", color: muted }}>
+            <strong>Check-out:</strong>{" "}
+            {holiday.end_date
+              ? new Date(holiday.end_date).toLocaleDateString("en-GB")
+              : "Not set"}
+          </p>
+
+          <span style={{ color: green, fontWeight: 700 }}>
+            View stay and reviews →
+          </span>
+        </Link>
+      ))}
+    </div>
+  )}
+</section>
+
+
+
+        
         {/* DECLINED BOOKINGS */}
         {declinedBookings.length > 0 && (
           <section style={{ ...cardStyle, marginBottom: 26 }}>
