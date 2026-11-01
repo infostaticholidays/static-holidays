@@ -181,9 +181,15 @@ console.log("Bookings returned from Supabase:", bookingsData);
           };
         });
 
-        const previous = confirmedTrips.filter(
-          (t: any) => t.end_date && new Date(t.end_date) < today
-        );
+   const previous = confirmedTrips
+  .filter(
+    (t: any) => t.end_date && new Date(t.end_date) < today
+  )
+  .sort(
+    (a: any, b: any) =>
+      new Date(b.start_date).getTime() -
+      new Date(a.start_date).getTime()
+  );
 
         const upcoming = confirmedTrips
           .filter((t: any) => t.end_date && new Date(t.end_date) >= today)
