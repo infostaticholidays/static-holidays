@@ -23,6 +23,7 @@ import Businesses from "./pages/Businesses";
 import Services from "./pages/Services";
 import Profile from "./pages/Profile";
 import Account from "./pages/Account";
+import PastStays from "./pages/PastStays";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import HostCompliance from "./pages/HostCompliance";
