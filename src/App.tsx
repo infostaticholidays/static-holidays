@@ -132,6 +132,7 @@ export default function App() {
 
           <Route path="/profile" element={<Profile />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/past-stays" element={<PastStays />} />
 
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
