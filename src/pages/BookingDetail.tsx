@@ -137,6 +137,7 @@ if (currentBooking.guest_id) {
   if (profileResult.error) throw profileResult.error;
 
   setGuestProfile(profileResult.data as GuestProfile | null);
+  console.log("Guest profile lookup:", profileResult);
 
   const reviewsResult = await supabase
     .from("reviews")
