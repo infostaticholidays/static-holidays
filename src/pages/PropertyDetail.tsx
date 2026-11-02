@@ -1988,8 +1988,7 @@ const fg = selected
       >
         <strong>Full payment required</strong>
         <p style={{ margin: "5px 0 0" }}>
-          Because your stay costs £100 or less, or check-in is
-          within 30 days, the full amount must be paid.
+        Because your stay costs no more than the booking deposit, or check-in is within 30 days, the full amount must be paid.
         </p>
         <strong>{formatPrice(stayPriceInfo.total)}</strong>
       </div>
