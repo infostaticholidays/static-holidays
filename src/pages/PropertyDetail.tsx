@@ -1386,6 +1386,31 @@ const bookingMode = String(ownerBookingMode ?? "")
                 )}
               </div>
 
+<div
+  style={{
+    marginTop: 10,
+    color: "#405448",
+    fontSize: 13,
+    lineHeight: 1.6,
+  }}
+>
+  <strong>
+    Booking deposit: {formatPrice(bookingDeposit)}
+  </strong>
+  <span
+    style={{
+      display: "block",
+      color: "#758078",
+      fontSize: 11,
+    }}
+  >
+    This is a non-refundable part-payment towards your holiday.
+    The remaining balance is payable separately under the booking terms.
+  </span>
+</div>
+
+              
+
               {displayPrice === null && (
                 <p
                   style={{
