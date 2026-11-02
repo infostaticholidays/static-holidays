@@ -423,7 +423,9 @@ useEffect(() => {
   }, [property]);
 
   const basePrice = getPositivePrice(property?.nightly_price);
-
+  const bookingDeposit = getPositivePrice(
+    property?.booking_deposit_amount
+  ) ?? 100;
   const stayDates = useMemo(
     () => getStayDates(startDate, endDate),
     [startDate, endDate]
