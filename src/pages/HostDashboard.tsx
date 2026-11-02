@@ -506,7 +506,15 @@ setDetailsForm({
 const displayedGuestReviews = showAllGuestReviews
   ? sortedGuestReviews
   : sortedGuestReviews.slice(0, 3);
-
+const averageGuestRating =
+  reviews.length > 0
+    ? (
+        reviews.reduce(
+          (total, review) => total + (Number(review.rating) || 0),
+          0
+        ) / reviews.length
+      ).toFixed(1)
+    : "0.0";
 const averageGuestRating =
   reviews.length > 0
     ? (
