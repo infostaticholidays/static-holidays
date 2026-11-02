@@ -181,7 +181,18 @@ export default function AddProperty() {
       setMessage("Bedrooms, bathrooms and guest capacity must be at least 1.");
       return;
     }
+const depositAmount = Number(bookingDeposit);
 
+if (
+  bookingDeposit.trim() === "" ||
+  !Number.isFinite(depositAmount) ||
+  !Number.isInteger(depositAmount * 100) ||
+  depositAmount < 1 ||
+  depositAmount > 100
+) {
+  setMessage("The booking deposit must be between £1 and £100, with no more than two decimal places.");
+  return;
+}
     setSaving(true);
 
     try {
