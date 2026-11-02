@@ -2028,7 +2028,7 @@ const fg = selected
           <span>
             <strong>Choose another amount</strong>
             <span style={{ display: "block", marginTop: 3, color: "#758078" }}>
-              Minimum £100, up to the full booking total.
+             Minimum {formatPrice(bookingDeposit)}, up to the full booking total.
             </span>
           </span>
         </label>
