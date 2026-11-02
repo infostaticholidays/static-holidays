@@ -302,6 +302,7 @@ const [detailsForm, setDetailsForm] = useState({
   const [bookings, setBookings] = useState<any[]>([]);
   const [conversations, setConversations] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [showAllGuestReviews, setShowAllGuestReviews] = useState(false);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   const [loading, setLoading] = useState(true);
