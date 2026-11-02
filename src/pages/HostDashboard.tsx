@@ -1976,8 +1976,24 @@ const handleSaveDetails = async () => {
                   </p>
                 </article>
                 ))}
+                           )}
+
+                {sortedGuestReviews.length > 3 && (
+                  <button
+                    type="button"
+                    style={{ ...styles.secondaryButton, marginTop: 14 }}
+                    onClick={() =>
+                      setShowAllGuestReviews((previous) => !previous)
+                    }
+                  >
+                    {showAllGuestReviews
+                      ? "Show fewer reviews"
+                      : "View all reviews"}
+                  </button>
+                )}
               </>
             )}
+            
           </div>
         </section>
 
