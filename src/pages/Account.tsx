@@ -1568,6 +1568,10 @@ const averageRating =
               YOUR FEEDBACK
             </p>
             <h2 style={{ margin: 0, fontSize: 24 }}>My reviews</h2>
+            <p style={{ margin: "8px 0 0", color: muted, fontSize: 14 }}>
+  ⭐ {averageRating} / 5 average · {allReviews.length}{" "}
+  {allReviews.length === 1 ? "review" : "reviews"}
+</p>
           </div>
 
           {reviews.length === 0 && hostReviews.length === 0 ? (
