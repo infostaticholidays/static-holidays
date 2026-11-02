@@ -1579,7 +1579,7 @@ return (
             </div>
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
-             {[...reviews, ...hostReviews].map((r) => (
+            {displayedReviews.map((r) => (
                 <article
                   key={r.id}
                   style={{
