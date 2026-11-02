@@ -1545,7 +1545,7 @@ const displayedReviews = showAllReviews
           </div>
         </section>
 
-        {/* REVIEWS */}
+            {/* REVIEWS */}
         <section style={{ ...cardStyle, marginBottom: 28 }}>
           <div style={{ marginBottom: 20 }}>
             <p
@@ -1577,53 +1577,51 @@ const displayedReviews = showAllReviews
               </p>
             </div>
           ) : (
-            <div style={{ display: "grid", gap: 12 }}>
-            {displayedReviews.map((r) => (
-                <article
-                  key={r.id}
-                  style={{
-                    background: sage,
-                    borderRadius: 12,
-                    padding: 18,
-                  }}
-                >
-                  <p
+            <>
+              <div style={{ display: "grid", gap: 12 }}>
+                {displayedReviews.map((r) => (
+                  <article
+                    key={r.id}
                     style={{
-                      color: "#b78327",
-                      margin: "0 0 8px",
-                      letterSpacing: 2,
+                      background: sage,
+                      borderRadius: 12,
+                      padding: 18,
                     }}
                   >
-                    {"★".repeat(
-                      Math.max(0, Math.min(5, Number(r.rating) || 0))
-                    )}
-                    {"☆".repeat(
-                      5 - Math.max(0, Math.min(5, Number(r.rating) || 0))
-                    )}
-                  </p>
-                  <p style={{ margin: 0, lineHeight: 1.7 }}>
-                    {r.review_text}
-                  </p>
-                </article>
-              ))}
-            </div>
+                    <p
+                      style={{
+                        color: "#b78327",
+                        margin: "0 0 8px",
+                        letterSpacing: 2,
+                      }}
+                    >
+                      {"★".repeat(
+                        Math.max(0, Math.min(5, Number(r.rating) || 0))
+                      )}
+                      {"☆".repeat(
+                        5 - Math.max(0, Math.min(5, Number(r.rating) || 0))
+                      )}
+                    </p>
+                    <p style={{ margin: 0, lineHeight: 1.7 }}>
+                      {r.review_text}
+                    </p>
+                  </article>
                 ))}
-            </div>
+              </div>
 
-            {allReviews.length > 2 && (
-              <button
-                type="button"
-                onClick={() => setShowAllReviews((previous) => !previous)}
-                style={{
-                  ...buttonStyle,
-                  marginTop: 8,
-                }}
-              >
-                {showAllReviews ? "Show fewer reviews" : "View all reviews"}
-              </button>
-            )}
-          )}
-        </section>
+              {allReviews.length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllReviews((previous) => !previous)}
+                  style={{
+                    ...buttonStyle,
+                    marginTop: 8,
+                  }}
+                >
+                  {showAllReviews ? "Show fewer reviews" : "View all reviews"}
+                </button>
+              )}
+            </>
           )}
         </section>
 
