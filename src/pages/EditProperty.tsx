@@ -1088,6 +1088,24 @@ if (arrivalSaveError) {
                       placeholder="e.g. 125"
                     />
                   </label>
+                  <label style={labelStyle}>
+  Non-refundable booking deposit (£)
+  <input
+    type="number"
+    min="1"
+    max="100"
+    step="0.01"
+    value={form.booking_deposit_amount}
+    onChange={(e) =>
+      update("booking_deposit_amount", e.target.value)
+    }
+    style={inputStyle}
+  />
+  <span style={{ display: "block", color: "#758078", fontSize: 12, marginTop: 6 }}>
+    Choose an amount between £1 and £100. This applies to new bookings only.
+    Existing bookings keep their agreed deposit.
+  </span>
+</label>
                 </div>
               </section>
 
