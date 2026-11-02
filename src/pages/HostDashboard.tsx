@@ -497,6 +497,25 @@ setDetailsForm({
   }, [loadDashboard]);
 
   const currentPlan = getPlanId(profile?.plan);
+  const sortedGuestReviews = [...reviews].sort(
+  (a, b) =>
+    new Date(b.created_at).getTime() -
+    new Date(a.created_at).getTime()
+);
+
+const displayedGuestReviews = showAllGuestReviews
+  ? sortedGuestReviews
+  : sortedGuestReviews.slice(0, 3);
+
+const averageGuestRating =
+  reviews.length > 0
+    ? (
+        reviews.reduce(
+          (total, review) => total + (Number(review.rating) || 0),
+          0
+        ) / reviews.length
+      ).toFixed(1)
+    : "0.0";
 
   const isVerified = Boolean(
     profile?.id_verified && profile?.insurance_verified
