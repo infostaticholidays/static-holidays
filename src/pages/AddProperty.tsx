@@ -384,21 +384,37 @@ export default function AddProperty() {
                 onChange={(e) => setHolidayPark(e.target.value)}
               />
             </div>
+<div>
+  <label style={labelStyle}>Price per night (£)</label>
+  <input
+    style={inputStyle}
+    type="number"
+    min="0"
+    step="0.01"
+    placeholder="e.g. 95"
+    value={price}
+    onChange={(e) => setPrice(e.target.value)}
+  />
+</div>
 
-            <div>
-              <label style={labelStyle}>Price per night (£)</label>
-              <input
-                style={inputStyle}
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="e.g. 95"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-          </div>
-
+<div>
+  <label style={labelStyle}>Non-refundable booking deposit (£)</label>
+  <input
+    style={inputStyle}
+    type="number"
+    min="1"
+    max="100"
+    step="0.01"
+    value={bookingDeposit}
+    onChange={(e) => setBookingDeposit(e.target.value)}
+  />
+  <p style={{ color: "#6b7280", fontSize: 12, marginTop: 6 }}>
+    Choose an amount between £1 and £100. This is the part-payment
+    guests pay when booking and is non-refundable.
+  </p>
+</div>
+</div>
+            
           <div style={{ marginTop: 20 }}>
             <label style={labelStyle}>Property description *</label>
             <textarea
