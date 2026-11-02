@@ -824,10 +824,12 @@ const bookingMode = String(ownerBookingMode ?? "")
           check_in: startDate,
           check_out: endDate,
           total_price: Number(freshTotal.toFixed(2)),
+          deposit_amount: bookingDeposit,
           status: "pending",
           booking_status: "pending",
           response_deadline: responseDeadline,
         })
+        
         .select("id")
         .single();
       if (insertError) {
