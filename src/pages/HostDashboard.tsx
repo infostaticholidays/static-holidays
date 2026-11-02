@@ -1922,7 +1922,7 @@ const handleSaveDetails = async () => {
          No guest reviews to display yet. Reviews will appear here after a guest has completed a stay and submitted a review.
               </p>
             ) : (
-              reviews.slice(0, 5).map((review: any) => (
+             displayedGuestReviews.map((review: any) => (
                 <article
                   key={review.id}
                   style={{
