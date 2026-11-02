@@ -483,7 +483,19 @@ if (guestInfoError) {
       if (price !== null && (!Number.isFinite(price) || price < 0)) {
         throw new Error("Enter a valid nightly price.");
       }
+const depositAmount = Number(form.booking_deposit_amount);
 
+if (
+  form.booking_deposit_amount.trim() === "" ||
+  !Number.isFinite(depositAmount) ||
+  !Number.isInteger(depositAmount * 100) ||
+  depositAmount < 1 ||
+  depositAmount > 100
+) {
+  throw new Error(
+    "The booking deposit must be between £1 and £100, with no more than two decimal places."
+  );
+}
       const propertyUpdate = {
         title: form.title.trim(),
         location: form.location.trim(),
