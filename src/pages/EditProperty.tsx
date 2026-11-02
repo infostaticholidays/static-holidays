@@ -19,6 +19,7 @@ check_in_timezone: string;
   bathrooms: number;
   sleeps: number;
   nightly_price: string;
+  booking_deposit_amount: string;
   pet_friendly: boolean;
   family_friendly: boolean;
   equine_friendly: boolean;
