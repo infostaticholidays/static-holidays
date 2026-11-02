@@ -11,6 +11,7 @@ type Property = {
   description?: string | null;
   nightly_price?: number | string | null;
   price_per_night?: number | string | null;
+    booking_deposit_amount?: number | string | null;
   bedrooms?: number | null;
   bathrooms?: number | null;
   sleeps?: number | null;
