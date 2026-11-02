@@ -87,7 +87,8 @@ export default function CookieConsent() {
             zIndex: 9999,
             background: "#ffffff",
             color: "#26352b",
-            padding: "24px",
+         
+          padding: "12px 18px",
             boxShadow: "0 -4px 20px rgba(0,0,0,0.15)",
             borderTop: "3px solid #286442",
           }}
