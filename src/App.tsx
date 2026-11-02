@@ -42,6 +42,7 @@ import CookiePolicy from "./pages/CookiePolicy";
 import OwnerTerms from "./pages/OwnerTerms";
 import ResetPassword from "./pages/ResetPassword";
 import AdminDocumentReview from "./pages/AdminDocumentReview";
+import CookieConsent from "./components/CookieConsent";
 
 function NotFound() {
   return (
