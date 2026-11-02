@@ -1608,6 +1608,23 @@ return (
                 </article>
               ))}
             </div>
+                ))}
+            </div>
+
+            {allReviews.length > 2 && (
+              <button
+                type="button"
+                onClick={() => setShowAllReviews((previous) => !previous)}
+                style={{
+                  ...buttonStyle,
+                  marginTop: 8,
+                }}
+              >
+                {showAllReviews ? "Show fewer reviews" : "View all reviews"}
+              </button>
+            )}
+          )}
+        </section>
           )}
         </section>
 
