@@ -201,7 +201,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-
+   <CookieConsent />
       <footer
         style={{
           padding: "24px",
