@@ -101,6 +101,7 @@ export default function AddProperty() {
   const [sleeps, setSleeps] = useState(2);
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [bookingDeposit, setBookingDeposit] = useState("100");
 
   const [holidayTypes, setHolidayTypes] = useState<string[]>([
     "Family holidays",
