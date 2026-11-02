@@ -128,17 +128,28 @@ const [guestReviews, setGuestReviews] = useState<GuestReview[]>([]);
         setProperty(propertyResult.data as Property);
       }
 if (currentBooking.guest_id) {
-  const profileResult = await supabase
-    .from("profiles")
-   .select("id, full_name, first_name, last_name, email")
-    .eq("id", currentBooking.guest_id)
-    .maybeSingle();
+const profileResult = await supabase.rpc(
+  "get_booking_guest_name",
+  {
+    p_booking_id: currentBooking.id,
+  }
+);
 
-  if (profileResult.error) throw profileResult.error;
+if (profileResult.error) throw profileResult.error;
 
-  setGuestProfile(profileResult.data as GuestProfile | null);
-  console.log("Guest profile lookup:", profileResult);
+const guestName = profileResult.data?.[0] ?? null;
 
+setGuestProfile(
+  guestName
+    ? {
+        id: currentBooking.guest_id,
+        full_name: guestName.full_name,
+        first_name: guestName.first_name,
+        last_name: guestName.last_name,
+        email: null,
+      }
+    : null
+);
   const reviewsResult = await supabase
     .from("reviews")
     .select("id, rating, review_text, created_at, would_host_again")
