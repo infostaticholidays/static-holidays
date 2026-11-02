@@ -42,6 +42,7 @@ export default function Account() {
   const [timeLeft, setTimeLeft] = useState("");
   const [reviews, setReviews] = useState<any[]>([]);
   const [hostReviews, setHostReviews] = useState<any[]>([]);
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const [loading, setLoading] = useState(true);
   const [newsletterSaving, setNewsletterSaving] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
