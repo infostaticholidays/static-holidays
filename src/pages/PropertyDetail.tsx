@@ -497,9 +497,9 @@ useEffect(() => {
       )
     : 0;
 
-  const fullPaymentRequired =
-    stayPriceInfo.valid &&
-    (stayPriceInfo.total <= 100 || daysToArrival <= 30);
+ const fullPaymentRequired =
+  stayPriceInfo.valid &&
+  (stayPriceInfo.total <= bookingDeposit || daysToArrival <= 30);
 
   const displayPrice = useMemo(() => {
 
