@@ -2009,7 +2009,7 @@ const fg = selected
             onChange={() => setPaymentChoice("deposit")}
           />
           <span>
-            <strong>Pay £100 deposit</strong>
+            <strong>Pay {formatPrice(bookingDeposit)} deposit</strong>
             <span style={{ display: "block", marginTop: 3, color: "#758078" }}>
               Pay £100 now.
             </span>
