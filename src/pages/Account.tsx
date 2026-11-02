@@ -639,7 +639,15 @@ const displayedReviews = showAllReviews
   ? allReviews
   : allReviews.slice(0, 2);
 
-
+const averageRating =
+  allReviews.length > 0
+    ? (
+        allReviews.reduce(
+          (total, review) => total + (Number(review.rating) || 0),
+          0
+        ) / allReviews.length
+      ).toFixed(1)
+    : "0.0";
 
   return (
     <div
