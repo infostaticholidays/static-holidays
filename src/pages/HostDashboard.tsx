@@ -1976,7 +1976,7 @@ const handleSaveDetails = async () => {
                   </p>
                 </article>
                 ))}
-                           )}
+                        
 
                 {sortedGuestReviews.length > 3 && (
                   <button
