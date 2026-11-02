@@ -1975,7 +1975,8 @@ const handleSaveDetails = async () => {
                       "No written comment."}
                   </p>
                 </article>
-              ))
+                ))}
+              </>
             )}
           </div>
         </section>
