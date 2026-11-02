@@ -301,6 +301,7 @@ check_in_timezone: data.check_in_timezone ?? "Europe/London",
               : data.price_per_night != null
                 ? String(data.price_per_night)
                 : "",
+          booking_deposit_amount: String(data.booking_deposit_amount ?? 100),
           pet_friendly: Boolean(data.pet_friendly),
           family_friendly: Boolean(data.family_friendly),
           equine_friendly: Boolean(data.equine_friendly),
