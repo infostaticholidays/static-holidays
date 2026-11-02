@@ -639,7 +639,6 @@ const displayedReviews = showAllReviews
   ? allReviews
   : allReviews.slice(0, 2);
 
-return (
 
 
   return (
