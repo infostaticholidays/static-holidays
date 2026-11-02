@@ -628,7 +628,18 @@ const firstName =
   user?.user_metadata?.full_name?.trim()?.split(/\s+/)[0] ||
   user?.user_metadata?.name?.trim()?.split(/\s+/)[0] ||
   "holidaymaker";
+  
+const allReviews = [...reviews, ...hostReviews].sort(
+  (a, b) =>
+    new Date(b.created_at).getTime() -
+    new Date(a.created_at).getTime()
+);
 
+const displayedReviews = showAllReviews
+  ? allReviews
+  : allReviews.slice(0, 2);
+
+return (
 
 
   return (
