@@ -228,6 +228,7 @@ export default function AddProperty() {
           features,
           equine_facilities: equineFacilities,
           nightly_price: price.trim() ? Number(price) : null,
+          booking_deposit_amount: Number(bookingDeposit),
           status: "draft",
         })
         .select()
