@@ -1921,8 +1921,14 @@ const handleSaveDetails = async () => {
               <p style={{ ...styles.muted, margin: 0 }}>
          No guest reviews to display yet. Reviews will appear here after a guest has completed a stay and submitted a review.
               </p>
-            ) : (
-             displayedGuestReviews.map((review: any) => (
+           ) : (
+              <>
+                <p style={{ ...styles.muted, margin: "0 0 16px" }}>
+                  ⭐ {averageGuestRating} / 5 average · {reviews.length}{" "}
+                  {reviews.length === 1 ? "review" : "reviews"}
+                </p>
+
+                {displayedGuestReviews.map((review: any) => (
                 <article
                   key={review.id}
                   style={{
