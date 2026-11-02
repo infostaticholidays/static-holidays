@@ -2011,7 +2011,7 @@ const fg = selected
           <span>
             <strong>Pay {formatPrice(bookingDeposit)} deposit</strong>
             <span style={{ display: "block", marginTop: 3, color: "#758078" }}>
-              Pay £100 now.
+              Pay {formatPrice(bookingDeposit)} now. This payment is non-refundable.
             </span>
           </span>
         </label>
