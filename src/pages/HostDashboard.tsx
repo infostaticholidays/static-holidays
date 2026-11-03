@@ -742,10 +742,21 @@ const handleSaveDetails = async () => {
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>🌿</div>
-          <strong>Loading your host dashboard…</strong>
-        </div>
+       <div style={{ textAlign: "center" }}>
+  <img
+    src="/Static%20Holidays%20Green%20Logo.png"
+    alt="Static Holidays"
+    style={{
+      display: "block",
+      width: "180px",
+      maxWidth: "100%",
+      height: "auto",
+      margin: "0 auto 12px",
+      objectFit: "contain",
+    }}
+  />
+  <strong>Loading your host dashboard…</strong>
+</div>
       </div>
     );
   }
