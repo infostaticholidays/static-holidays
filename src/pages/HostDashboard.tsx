@@ -787,7 +787,17 @@ const handleSaveDetails = async () => {
   return (
     <div style={styles.page}>
       <aside style={styles.sidebar}>
-        <div style={styles.brand}>🌿 Static Holidays</div>
+        <div style={styles.brand}>
+  <img
+    src="/logo.png"
+    alt="Static Holidays"
+    style={{
+      width: "190px",
+      height: "auto",
+      objectFit: "contain",
+    }}
+  />
+</div>
 
         <nav
           aria-label="Host dashboard navigation"
