@@ -1229,7 +1229,11 @@ export default function Home() {
 
       <header className="sh-nav">
      <Link to="/" className="sh-brand" aria-label="Static Holidays homepage">
-          <span className="sh-brand-icon">⌂</span>
+          <img
+  src="/Static%20Holidays%20Green%20Logo.png"
+  alt="Static Holidays"
+  style={{ width: 54, height: 54, objectFit: "contain" }}
+/>
           <span>
             <span className="sh-brand-name" style={{ display: "block" }}>
               Static Holidays
