@@ -798,7 +798,7 @@ const handleSaveDetails = async () => {
   }
 
   return (
- <aside style={styles.sidebar}>
+<aside style={styles.sidebar}>
   <div style={styles.brand}>
     <img
       src="/Static%20Holidays%20Green%20Logo.png"
