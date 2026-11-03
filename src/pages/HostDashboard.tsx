@@ -146,13 +146,15 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     gap: 8,
   },
-  brand: {
-    fontSize: 22,
-    fontWeight: 800,
-    letterSpacing: "-0.7px",
-    padding: "0 12px",
-    marginBottom: 28,
-  },
+ brand: {
+  display: "flex",
+  alignItems: "center",
+  width: "100%",
+  boxSizing: "border-box",
+  padding: "0 12px",
+  marginBottom: 28,
+  minHeight: 60,
+},
   navItem: {
     display: "block",
     width: "100%",
