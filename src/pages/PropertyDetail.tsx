@@ -32,11 +32,15 @@ type Property = {
   equine_facilities?: string[] | null;
 };
 
-type PropertyImage = {
+type PropertyExtra = {
   id: string;
-  public_url: string;
-  is_cover: boolean;
-  position: number;
+  extra_type: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: number | string;
+  pricing_type: string;
+  is_available: boolean;
 };
 
 type DateStatus = "available" | "blocked" | "booked" | "offer" | "season";
