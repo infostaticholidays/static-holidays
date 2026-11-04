@@ -958,7 +958,33 @@ const averageRating =
                       gap: 12,
                     }}
                   >
-                    <div style={{ fontSize: 56 }}>🏡</div>
+           {holiday.propertyImage ? (
+  <img
+    src={holiday.propertyImage}
+    alt={holiday.destination || "Holiday property"}
+    style={{
+      width: 190,
+      height: 125,
+      objectFit: "cover",
+      borderRadius: 12,
+      display: "block",
+    }}
+  />
+) : (
+  <div
+    style={{
+      width: 190,
+      height: 125,
+      borderRadius: 12,
+      background: "#e8f0e7",
+      display: "grid",
+      placeItems: "center",
+      fontSize: 48,
+    }}
+  >
+    🏡
+  </div>
+)}
 
                     <Link
                       to={`/my-booking/${holiday.id}`}
