@@ -2081,7 +2081,22 @@ const fg = selected
                   {endDate ? ` · Check-out: ${formatDate(endDate)}` : ""}
                 </p>
               )}
-
+{!extrasLoading && propertyExtras.length > 0 && (
+  <section
+    style={{
+      marginTop: 20,
+      padding: 15,
+      border: "1px solid #e1ebe0",
+      borderRadius: 12,
+      background: "#fff",
+    }}
+  >
+    <h3 style={{ margin: "0 0 12px", fontSize: 15, color: green }}>
+      Choose your extras
+    </h3>
+    {renderExtraCards(propertyExtras)}
+  </section>
+)}
               {endDate && countNights(startDate, endDate) > 0 && (
                 <div
                   style={{
