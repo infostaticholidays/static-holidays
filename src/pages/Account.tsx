@@ -1140,7 +1140,6 @@ const averageRating =
 
      
         {/* FAVOURITE PROPERTIES */}
-           {/* FAVOURITE PROPERTIES */}
         <section style={{ marginBottom: 28 }}>
           <div
             style={{
@@ -1193,13 +1192,7 @@ const averageRating =
               </Link>
             </div>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(245px, 1fr))",
-                gap: 20,
-              }}
-            >
+            <div style={{ display: "grid", gap: 22 }}>
               {favourites.map((fav: any) => {
                 const p = Array.isArray(fav.properties)
                   ? fav.properties[0]
@@ -1212,149 +1205,69 @@ const averageRating =
                   Math.max(0, propertyImages.length - 4)
                 );
 
+                const visiblePhotos = propertyImages.slice(
+                  photoStart,
+                  photoStart + 4
+                );
+
+                const bedrooms = p?.bedrooms;
+                const bathrooms = p?.bathrooms;
+                const guests =
+                  p?.max_guests ?? p?.sleeps ?? p?.guests;
+
                 return (
                   <article
                     key={fav.id}
                     style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fit, minmax(300px, 1fr))",
+                      gap: 24,
+                      alignItems: "stretch",
                       background: "#ffffff",
                       border: `1px solid ${border}`,
-                      borderRadius: 18,
+                      borderRadius: 20,
+                      padding: 20,
+                      boxShadow: "0 5px 20px rgba(24,65,43,0.06)",
                       overflow: "hidden",
-                      boxShadow: "0 5px 20px rgba(24,65,43,0.05)",
                     }}
                   >
-                    {propertyImages.length > 0 ? (
-                      <div style={{ padding: 0 }}>
-                        <div
-                          style={{
-                            display: "grid",
-                           gridTemplateColumns: `repeat(${Math.min(propertyImages.length, 4)}, minmax(0, 1fr))`,
-                          gap: 0,
-                          }}
-                        >
-                          {propertyImages
-                            .slice(photoStart, photoStart + 4)
-                            .map((photo: string, index: number) => (
-                              <img
-                                key={`${photo}-${index}`}
-                                src={photo}
-                                alt={`${p?.title || "Favourite holiday property"} photo ${photoStart + index + 1}`}
-style={{
-  width: "100%",
-  height: 240,
-  objectFit: "cover",
-  objectPosition: "center",
-  display: "block",
-  background: sage,
-}}
-                                
-                                />
-                            ))}
-                        </div>
-
-                        {propertyImages.length > 4 && (
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              marginTop: 8,
-                            }}
-                          >
-                            <span style={{ fontSize: 12, color: "#526451" }}>
-                              Showing {photoStart + 1}–
-                              {Math.min(photoStart + 4, propertyImages.length)}
-                              {" of "}
-                              {propertyImages.length} photos
-                            </span>
-
-                            <div style={{ display: "flex", gap: 8 }}>
-                              <button
-                                type="button"
-                                disabled={photoStart === 0}
-                                onClick={() =>
-                                  setFavourites((current: any[]) =>
-                                    current.map((item: any) =>
-                                      item.id === fav.id
-                                        ? {
-                                            ...item,
-                                            photoPage: Math.max(
-                                              0,
-                                              (item.photoPage || 0) - 1
-                                            ),
-                                          }
-                                        : item
-                                    )
-                                  )
-                                }
-                                style={{
-                                  padding: "5px 12px",
-                                  borderRadius: 8,
-                                  border: "1px solid #b8c8b5",
-                                  background: "white",
-                                  cursor: "pointer",
-                                  opacity: photoStart === 0 ? 0.4 : 1,
-                                }}
-                              >
-                                ‹
-                              </button>
-
-                              <button
-                                type="button"
-                                disabled={
-                                  photoStart + 4 >= propertyImages.length
-                                }
-                                onClick={() =>
-                                  setFavourites((current: any[]) =>
-                                    current.map((item: any) =>
-                                      item.id === fav.id
-                                        ? {
-                                            ...item,
-                                            photoPage:
-                                              (item.photoPage || 0) + 1,
-                                          }
-                                        : item
-                                    )
-                                  )
-                                }
-                                style={{
-                                  padding: "5px 12px",
-                                  borderRadius: 8,
-                                  border: "1px solid #b8c8b5",
-                                  background: "white",
-                                  cursor: "pointer",
-                                  opacity:
-                                    photoStart + 4 >= propertyImages.length
-                                      ? 0.4
-                                      : 1,
-                                }}
-                              >
-                                ›
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
+                    {/* PROPERTY INFORMATION */}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        minWidth: 0,
+                        padding: "8px 4px",
+                      }}
+                    >
                       <div
                         style={{
-                          height: 200,
-                          background: "#e8f0e7",
-                          display: "grid",
-                          placeItems: "center",
-                          fontSize: 48,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 8,
+                          alignSelf: "flex-start",
+                          background: "#e8f0df",
+                          color: darkGreen,
+                          padding: "9px 15px",
+                          borderRadius: 30,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          letterSpacing: 1,
+                          marginBottom: 20,
                         }}
                       >
-                        🏡
+                        <span style={{ fontSize: 19 }}>♡</span>
+                        SAVED FOR LATER
                       </div>
-                    )}
 
-                    <div style={{ padding: 18 }}>
                       <h3
                         style={{
-                          margin: "0 0 8px",
-                          fontSize: 19,
+                          margin: "0 0 12px",
+                          fontSize: 30,
                           color: darkGreen,
+                          lineHeight: 1.2,
                         }}
                       >
                         {p?.title || "Holiday property"}
@@ -1362,9 +1275,9 @@ style={{
 
                       <p
                         style={{
-                          margin: "0 0 12px",
+                          margin: "0 0 18px",
                           color: muted,
-                          fontSize: 14,
+                          fontSize: 17,
                         }}
                       >
                         📍 {p?.location || "Location not listed"}
@@ -1373,34 +1286,112 @@ style={{
                       {p?.price_per_night != null && (
                         <p
                           style={{
-                            margin: "0 0 16px",
-                            color: green,
-                            fontWeight: 700,
+                            margin: "0 0 20px",
+                            color: darkGreen,
+                            fontSize: 30,
+                            fontWeight: 800,
                           }}
                         >
-                          £{Number(p.price_per_night).toFixed(2)}{" "}
+                          £{Number(p.price_per_night).toFixed(2)}
                           <span
                             style={{
                               color: muted,
+                              fontSize: 16,
                               fontWeight: 400,
                             }}
                           >
-                            / night
+                            {" "}/ night
                           </span>
                         </p>
                       )}
 
-                      <div style={{ display: "flex", gap: 10 }}>
+                      {/* PROPERTY FEATURES */}
+                      {(bedrooms != null ||
+                        bathrooms != null ||
+                        guests != null) && (
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                            borderTop: `1px solid ${border}`,
+                            borderBottom: `1px solid ${border}`,
+                            padding: "18px 0",
+                            marginBottom: 22,
+                            textAlign: "center",
+                          }}
+                        >
+                          {[
+                            {
+                              icon: "🛏",
+                              value: bedrooms,
+                              label: "Bedrooms",
+                            },
+                            {
+                              icon: "🚿",
+                              value: bathrooms,
+                              label: "Bathrooms",
+                            },
+                            {
+                              icon: "👥",
+                              value: guests,
+                              label: "Sleeps",
+                            },
+                          ].map((feature, index) => (
+                            <div
+                              key={feature.label}
+                              style={{
+                                borderRight:
+                                  index < 2 ? `1px solid ${border}` : "none",
+                                padding: "0 5px",
+                              }}
+                            >
+                              <div style={{ fontSize: 23, marginBottom: 5 }}>
+                                {feature.icon}
+                              </div>
+                              <div
+                                style={{
+                                  color: darkGreen,
+                                  fontWeight: 700,
+                                  fontSize: 20,
+                                }}
+                              >
+                                {feature.value ?? "—"}
+                              </div>
+                              <div
+                                style={{
+                                  color: muted,
+                                  fontSize: 12,
+                                  marginTop: 3,
+                                }}
+                              >
+                                {feature.label}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* ACTION BUTTONS */}
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 10,
+                          marginTop: "auto",
+                        }}
+                      >
                         {p?.id ? (
                           <Link
                             to={`/property/${p.id}`}
                             style={{
                               ...buttonStyle,
                               flex: 1,
+                              minWidth: 120,
                               textAlign: "center",
+                              padding: "13px 16px",
                             }}
                           >
-                            View stay
+                            View stay →
                           </Link>
                         ) : (
                           <span style={{ color: muted, fontSize: 13 }}>
@@ -1409,12 +1400,13 @@ style={{
                         )}
 
                         <button
+                          type="button"
                           onClick={() => removeFavourite(fav.id)}
                           style={{
                             background: "#ffffff",
                             border: `1px solid ${border}`,
                             borderRadius: 10,
-                            padding: "10px 12px",
+                            padding: "12px 16px",
                             color: "#8a4545",
                             cursor: "pointer",
                             fontWeight: 600,
@@ -1424,12 +1416,163 @@ style={{
                         </button>
                       </div>
                     </div>
+
+                    {/* FOUR-PHOTO GALLERY */}
+                    <div style={{ minWidth: 0 }}>
+                      {propertyImages.length > 0 ? (
+                        <>
+                          <div
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                              gap: 8,
+                            }}
+                          >
+                            {visiblePhotos.map(
+                              (photo: string, index: number) => (
+                                <img
+                                  key={`${photo}-${index}`}
+                                  src={photo}
+                                  alt={`${p?.title || "Property"} photo ${photoStart + index + 1}`}
+                                  style={{
+                                    width: "100%",
+                                    aspectRatio: "1.35 / 1",
+                                    objectFit: "cover",
+                                    objectPosition: "center",
+                                    display: "block",
+                                    borderRadius: 10,
+                                    background: sage,
+                                  }}
+                                />
+                              )
+                            )}
+                          </div>
+
+                          {propertyImages.length > 4 && (
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                gap: 10,
+                                marginTop: 12,
+                              }}
+                            >
+                              <span
+                                style={{ color: muted, fontSize: 12 }}
+                              >
+                                Showing {photoStart + 1}–
+                                {Math.min(
+                                  photoStart + 4,
+                                  propertyImages.length
+                                )}{" "}
+                                of {propertyImages.length} photos
+                              </span>
+
+                              <div style={{ display: "flex", gap: 8 }}>
+                                <button
+                                  type="button"
+                                  aria-label="Previous photos"
+                                  disabled={photoStart === 0}
+                                  onClick={() =>
+                                    setFavourites((current: any[]) =>
+                                      current.map((item: any) =>
+                                        item.id === fav.id
+                                          ? {
+                                              ...item,
+                                              photoPage: Math.max(
+                                                0,
+                                                (item.photoPage || 0) - 1
+                                              ),
+                                            }
+                                          : item
+                                      )
+                                    )
+                                  }
+                                  style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: "50%",
+                                    border: `1px solid ${border}`,
+                                    background: "#ffffff",
+                                    color: darkGreen,
+                                    fontSize: 22,
+                                    cursor: photoStart === 0
+                                      ? "default"
+                                      : "pointer",
+                                    opacity: photoStart === 0 ? 0.4 : 1,
+                                  }}
+                                >
+                                  ‹
+                                </button>
+
+                                <button
+                                  type="button"
+                                  aria-label="Next photos"
+                                  disabled={
+                                    photoStart + 4 >= propertyImages.length
+                                  }
+                                  onClick={() =>
+                                    setFavourites((current: any[]) =>
+                                      current.map((item: any) =>
+                                        item.id === fav.id
+                                          ? {
+                                              ...item,
+                                              photoPage:
+                                                (item.photoPage || 0) + 1,
+                                            }
+                                          : item
+                                      )
+                                    )
+                                  }
+                                  style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: "50%",
+                                    border: `1px solid ${border}`,
+                                    background: "#ffffff",
+                                    color: darkGreen,
+                                    fontSize: 22,
+                                    cursor:
+                                      photoStart + 4 >= propertyImages.length
+                                        ? "default"
+                                        : "pointer",
+                                    opacity:
+                                      photoStart + 4 >= propertyImages.length
+                                        ? 0.4
+                                        : 1,
+                                  }}
+                                >
+                                  ›
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div
+                          style={{
+                            minHeight: 260,
+                            height: "100%",
+                            background: sage,
+                            borderRadius: 12,
+                            display: "grid",
+                            placeItems: "center",
+                            fontSize: 48,
+                          }}
+                        >
+                          🏡
+                        </div>
+                      )}
+                    </div>
                   </article>
                 );
               })}
             </div>
           )}
         </section>
+
+     
         
 {/* IDENTITY VERIFICATION */}
 <section style={{ ...cardStyle, marginBottom: 28 }}>
