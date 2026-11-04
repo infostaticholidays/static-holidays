@@ -180,13 +180,7 @@ const favouritesWithImages = await Promise.all(
           .data.publicUrl
       );
 
-    const propertyImages = [
-      ...(p.cover_image_url ? [p.cover_image_url] : []),
-      ...storageImages,
-    ].filter(
-      (photo, index, photos) =>
-        photo && photos.indexOf(photo) === index
-    );
+   const propertyImages = fav.propertyImages || [];
 
     return {
       ...fav,
