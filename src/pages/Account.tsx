@@ -1213,10 +1213,9 @@ const averageRating =
                   photoStart + 4
                 );
 
-              const bedrooms = p?.bedrooms;
+     const bedrooms = p?.bedrooms;
 const bathrooms = p?.bathrooms;
-const guests = p?.sleeps;
-                  p?.max_guests ?? p?.sleeps ?? p?.guests;
+const guests = p?.max_guests ?? p?.sleeps ?? p?.guests;
 
                 return (
                   <article
