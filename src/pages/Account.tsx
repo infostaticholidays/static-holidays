@@ -1168,32 +1168,50 @@ const averageRating =
                       boxShadow: "0 5px 20px rgba(24,65,43,0.05)",
                     }}
                   >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={p?.title || "Favourite holiday property"}
-                        style={{
-  width: "100%",
-  height: 200,
-  objectFit: "contain",
-  objectPosition: "center",
- background: sage,
-  display: "block",
-}}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          height: 200,
-                          background: "#e8f0e7",
-                          display: "grid",
-                          placeItems: "center",
-                          fontSize: 48,
-                        }}
-                      >
-                        🏡
-                      </div>
-                    )}
+    
+                    {propertyImages.length > 0 ? (
+  <div
+    style={{
+      display: "flex",
+      gap: 8,
+      overflowX: "auto",
+      padding: 8,
+      background: sage,
+      scrollSnapType: "x mandatory",
+    }}
+  >
+    {propertyImages.map((photo, index) => (
+      <img
+        key={`${photo}-${index}`}
+        src={photo}
+        alt={`${p?.title || "Favourite holiday property"} photo ${index + 1}`}
+        style={{
+          flex: "0 0 180px",
+          width: 180,
+          height: 130,
+          objectFit: "contain",
+          objectPosition: "center",
+          background: sage,
+          borderRadius: 10,
+          scrollSnapAlign: "start",
+          display: "block",
+        }}
+      />
+    ))}
+  </div>
+) : (
+  <div
+    style={{
+      height: 200,
+      background: "#e8f0e7",
+      display: "grid",
+      placeItems: "center",
+      fontSize: 48,
+    }}
+  >
+    🏡
+  </div>
+)}
 
                     <div style={{ padding: 18 }}>
                       <h3
