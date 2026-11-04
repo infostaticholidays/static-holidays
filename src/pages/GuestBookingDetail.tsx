@@ -153,6 +153,7 @@ export default function GuestBookingDetail() {
   const { id } = useParams<{ id: string }>();
 
   const [booking, setBooking] = useState<BookingDetails | null>(null);
+  const [bookingExtras, setBookingExtras] = useState<BookingExtra[]>([]);
   const [guestInfo, setGuestInfo] = useState<GuestInfo | null>(null);
   const [arrivalInfo, setArrivalInfo] = useState<ArrivalInfo | null>(null);
   const [arrivalReleased, setArrivalReleased] = useState(false);
