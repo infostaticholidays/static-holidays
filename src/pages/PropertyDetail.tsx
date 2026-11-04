@@ -230,74 +230,115 @@ const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     "success" | "error"
   >("error");
 
-  
   // Load the property and its photos.
-  useEffect(() => {
-    let cancelled = false;
+useEffect(() => {
+  let cancelled = false;
 
-    async function loadProperty() {
-      if (!propertyId) {
+  async function loadProperty() {
+    if (!propertyId) {
+      setProperty(null);
+      setImages([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("*")
+        .eq("id", propertyId)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (error || !data) {
+        console.error("Could not load property:", error);
         setProperty(null);
         setImages([]);
-        setLoading(false);
         return;
       }
 
-      setLoading(true);
+      setProperty(data as Property);
 
-      try {
-        const { data, error } = await supabase
-          .from("properties")
-          .select("*")
-          .eq("id", propertyId)
-          .maybeSingle();
+      const { data: imageRows, error: imageError } = await supabase
+        .from("property_images")
+        .select("id, public_url, is_cover, position")
+        .eq("property_id", propertyId)
+        .order("position", { ascending: true });
 
-        if (cancelled) return;
+      if (cancelled) return;
 
-        if (error || !data) {
-          console.error("Could not load property:", error);
-          setProperty(null);
-          setImages([]);
-          return;
-        }
-
-        setProperty(data as Property);
-
-        const { data: imageRows, error: imageError } = await supabase
-          .from("property_images")
-          .select("id, public_url, is_cover, position")
-          .eq("property_id", propertyId)
-          .order("position", { ascending: true });
-
-        if (cancelled) return;
-
-        if (imageError) {
-          console.error("Could not load property photos:", imageError);
-          setImages([]);
-        } else {
-          const orderedImages = (imageRows ?? []) as PropertyImage[];
-          orderedImages.sort(
-            (a, b) => Number(b.is_cover) - Number(a.is_cover)
-          );
-          setImages(orderedImages);
-        }
-      } catch (error) {
-        console.error("Could not load property:", error);
-        if (!cancelled) {
-          setProperty(null);
-          setImages([]);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+      if (imageError) {
+        console.error("Could not load property photos:", imageError);
+        setImages([]);
+      } else {
+        const orderedImages = (imageRows ?? []) as PropertyImage[];
+        orderedImages.sort(
+          (a, b) => Number(b.is_cover) - Number(a.is_cover)
+        );
+        setImages(orderedImages);
       }
+    } catch (error) {
+      console.error("Could not load property:", error);
+      if (!cancelled) {
+        setProperty(null);
+        setImages([]);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  }
+
+  void loadProperty();
+
+  return () => {
+    cancelled = true;
+  };
+}, [propertyId]);
+
+// Load available property extras.
+useEffect(() => {
+  let cancelled = false;
+
+  async function loadPropertyExtras() {
+    if (!propertyId) {
+      setPropertyExtras([]);
+      setExtrasLoading(false);
+      return;
     }
 
-    void loadProperty();
+    setExtrasLoading(true);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [propertyId]);
+    const { data, error } = await supabase
+      .from("property_extras")
+      .select(
+        "id, extra_type, name, description, image_url, price, pricing_type, is_available"
+      )
+      .eq("property_id", propertyId)
+      .eq("is_available", true)
+      .order("sort_order", { ascending: true });
+
+    if (cancelled) return;
+
+    if (error) {
+      console.error("Could not load property extras:", error);
+      setPropertyExtras([]);
+    } else {
+      setPropertyExtras((data ?? []) as PropertyExtra[]);
+    }
+
+    setExtrasLoading(false);
+  }
+
+  void loadPropertyExtras();
+
+  return () => {
+    cancelled = true;
+  };
+}, [propertyId]);
+ 
 
   // Load host calendar dates and occupied dates without exposing booking records.
   useEffect(() => {
