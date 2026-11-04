@@ -1201,20 +1201,8 @@ const averageRating =
                 const p = Array.isArray(fav.properties)
                   ? fav.properties[0]
                   : fav.properties;
-
-    const propertyImages = [
-  ...(p?.cover_image_url ? [p.cover_image_url] : []),
-  ...(Array.isArray(p?.images)
-    ? p.images
-    : p?.images
-      ? [p.images]
-      : []),
-].filter(
-  (photo, index, photos) =>
-    typeof photo === "string" &&
-    photo.trim() !== "" &&
-    photos.indexOf(photo) === index
-);
+const propertyImages = fav.propertyImages || [];
+   
                 return (
                   <article
                     key={fav.id}
