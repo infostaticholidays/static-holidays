@@ -907,7 +907,27 @@ const freshBookingTotal = freshTotal + selectedExtrasTotal;
         );
       }
 
- 
+ const selectedExtras = propertyExtras.filter((extra) =>
+  selectedExtraIds.includes(extra.id)
+);
+
+if (selectedExtras.length > 0) {
+  const { error: extrasInsertError } = await supabase
+    .from("booking_extras")
+    .insert(
+      selectedExtras.map((extra) => ({
+        booking_id: newBooking.id,
+        property_extra_id: extra.id,
+        extra_name: extra.name,
+        unit_price: Number(extra.price),
+        quantity: 1,
+        line_total: Number(extra.price),
+        payment_timing: extra.payment_timing,
+      }))
+    );
+
+  if (extrasInsertError) throw extrasInsertError;
+}
       
       // Start the existing Stripe Checkout flow.
       
