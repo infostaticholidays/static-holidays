@@ -1144,12 +1144,19 @@ const averageRating =
                   ? fav.properties[0]
                   : fav.properties;
 
-               const image =
-  p?.cover_image_url ||
-  (Array.isArray(p?.images)
-    ? p.images[0]
-    : p?.images);
-
+    const propertyImages = [
+  ...(p?.cover_image_url ? [p.cover_image_url] : []),
+  ...(Array.isArray(p?.images)
+    ? p.images
+    : p?.images
+      ? [p.images]
+      : []),
+].filter(
+  (photo, index, photos) =>
+    typeof photo === "string" &&
+    photo.trim() !== "" &&
+    photos.indexOf(photo) === index
+);
                 return (
                   <article
                     key={fav.id}
