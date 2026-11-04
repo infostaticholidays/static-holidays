@@ -24,11 +24,14 @@ const labelStyle = {
   color: "#374151",
 };
 
+type PaymentTiming = "deposit" | "balance";
+
 type StandardKey = "dog" | "horse" | "cot";
 
 type StandardExtra = {
   enabled: boolean;
   price: string;
+  paymentTiming: PaymentTiming;
   id?: string;
 };
 
@@ -38,6 +41,7 @@ type ExtraItem = {
   name: string;
   description: string;
   price: string;
+  paymentTiming: PaymentTiming;
   imageUrl?: string;
   imageFile?: File;
   imagePreview?: string;
@@ -55,6 +59,7 @@ type ExtraRow = {
   is_available: boolean;
   requires_approval: boolean;
   sort_order: number;
+  payment_timing: PaymentTiming;
 };
 
 const standardDefinitions: {
@@ -87,6 +92,38 @@ const standardDefinitions: {
   },
 ];
 
+function PaymentTimingSelect({
+  value,
+  onChange,
+}: {
+  value: PaymentTiming;
+  onChange: (value: PaymentTiming) => void;
+}) {
+  return (
+    <div style={{ marginTop: 14 }}>
+      <label style={labelStyle}>When should the guest pay for this extra?</label>
+
+      <select
+        style={inputStyle}
+        value={value}
+        onChange={(event) =>
+          onChange(event.target.value as PaymentTiming)
+        }
+      >
+        <option value="deposit">With booking deposit</option>
+        <option value="balance">
+          With remaining balance (30 days before arrival)
+        </option>
+      </select>
+
+      <p style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.5 }}>
+        If the booking is made within 30 days of arrival, the guest pays for
+        this extra at checkout with the rest of the holiday.
+      </p>
+    </div>
+  );
+}
+
 export default function PropertyExtras() {
   const { propertyId } = useParams<{ propertyId: string }>();
   const navigate = useNavigate();
@@ -96,9 +133,9 @@ export default function PropertyExtras() {
   const [standardExtras, setStandardExtras] = useState<
     Record<StandardKey, StandardExtra>
   >({
-    dog: { enabled: false, price: "0" },
-    horse: { enabled: false, price: "0" },
-    cot: { enabled: false, price: "0" },
+    dog: { enabled: false, price: "0", paymentTiming: "deposit" },
+    horse: { enabled: false, price: "0", paymentTiming: "deposit" },
+    cot: { enabled: false, price: "0", paymentTiming: "deposit" },
   });
 
   const [customExtras, setCustomExtras] = useState<ExtraItem[]>([]);
@@ -152,9 +189,9 @@ export default function PropertyExtras() {
         const loadedRows = (rows || []) as ExtraRow[];
 
         const standardState: Record<StandardKey, StandardExtra> = {
-          dog: { enabled: false, price: "0" },
-          horse: { enabled: false, price: "0" },
-          cot: { enabled: false, price: "0" },
+          dog: { enabled: false, price: "0", paymentTiming: "deposit" },
+          horse: { enabled: false, price: "0", paymentTiming: "deposit" },
+          cot: { enabled: false, price: "0", paymentTiming: "deposit" },
         };
 
         const customState: ExtraItem[] = [];
@@ -162,6 +199,9 @@ export default function PropertyExtras() {
         const preservedRows: ExtraRow[] = [];
 
         loadedRows.forEach((row, index) => {
+          const paymentTiming: PaymentTiming =
+            row.payment_timing === "balance" ? "balance" : "deposit";
+
           if (
             row.extra_type === "dog" ||
             row.extra_type === "horse" ||
@@ -172,6 +212,7 @@ export default function PropertyExtras() {
             standardState[key] = {
               enabled: row.is_available,
               price: String(row.price),
+              paymentTiming,
               id: row.id,
             };
           } else if (
@@ -184,6 +225,7 @@ export default function PropertyExtras() {
               name: row.name,
               description: row.description || "",
               price: String(row.price),
+              paymentTiming,
               imageUrl: row.image_url || "",
               imagePreview: row.image_url || "",
             };
@@ -226,7 +268,7 @@ export default function PropertyExtras() {
 
   function updateStandardExtra(
     key: StandardKey,
-    field: "enabled" | "price",
+    field: "enabled" | "price" | "paymentTiming",
     value: boolean | string
   ) {
     setStandardExtras((current) => ({
@@ -246,6 +288,7 @@ export default function PropertyExtras() {
         name: "",
         description: "",
         price: "",
+        paymentTiming: "deposit",
         imageUrl: "",
         imagePreview: "",
       },
@@ -255,7 +298,7 @@ export default function PropertyExtras() {
   function updateItem(
     setItems: React.Dispatch<React.SetStateAction<ExtraItem[]>>,
     localId: number,
-    field: "name" | "description" | "price",
+    field: "name" | "description" | "price" | "paymentTiming",
     value: string
   ) {
     setItems((current) =>
@@ -466,6 +509,7 @@ export default function PropertyExtras() {
             description: definition.description,
             price: Number(extra.price),
             pricing_type: "per_stay",
+            payment_timing: extra.paymentTiming,
             is_available: true,
             requires_approval: false,
             sort_order: definition.sortOrder,
@@ -481,6 +525,7 @@ export default function PropertyExtras() {
         image_url: extra.imageUrl || null,
         price: Number(extra.price),
         pricing_type: "per_stay",
+        payment_timing: extra.paymentTiming,
         is_available: true,
         requires_approval: false,
         sort_order: index + 4,
@@ -495,6 +540,7 @@ export default function PropertyExtras() {
         image_url: extra.imageUrl || null,
         price: Number(extra.price),
         pricing_type: "per_stay",
+        payment_timing: extra.paymentTiming,
         is_available: true,
         requires_approval: false,
         sort_order: index + 20,
@@ -734,6 +780,18 @@ export default function PropertyExtras() {
               Enter 0 if this {itemLabel.toLowerCase()} is free. The price is
               charged once per booking.
             </p>
+
+            <PaymentTimingSelect
+              value={item.paymentTiming}
+              onChange={(value) =>
+                updateItem(
+                  setItems,
+                  item.localId,
+                  "paymentTiming",
+                  value
+                )
+              }
+            />
           </div>
         ))}
 
@@ -912,6 +970,17 @@ export default function PropertyExtras() {
                     <p style={{ color: "#6b7280", fontSize: 12 }}>
                       Enter 0 if this extra is free. Maximum £20.
                     </p>
+
+                    <PaymentTimingSelect
+                      value={extra.paymentTiming}
+                      onChange={(value) =>
+                        updateStandardExtra(
+                          definition.key,
+                          "paymentTiming",
+                          value
+                        )
+                      }
+                    />
                   </div>
                 )}
               </div>
@@ -998,4 +1067,3 @@ export default function PropertyExtras() {
     </div>
   );
 }
-
