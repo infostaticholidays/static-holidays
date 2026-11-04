@@ -1138,6 +1138,7 @@ const averageRating =
 
      
         {/* FAVOURITE PROPERTIES */}
+           {/* FAVOURITE PROPERTIES */}
         <section style={{ marginBottom: 28 }}>
           <div
             style={{
@@ -1197,7 +1198,21 @@ const averageRating =
                 gap: 20,
               }}
             >
-              const propertyImages = fav.propertyImages || [];
+              {favourites.map((fav: any) => {
+                const p = Array.isArray(fav.properties)
+                  ? fav.properties[0]
+                  : fav.properties;
+
+                const propertyImages = fav.propertyImages || [];
+
+                const photoStart = Math.min(
+                  (fav.photoPage || 0) * 4,
+                  Math.max(0, propertyImages.length - 4)
+                );
+
+                return (
+                  <article
+                    key={fav.id}
                     style={{
                       background: "#ffffff",
                       border: `1px solid ${border}`,
@@ -1206,142 +1221,132 @@ const averageRating =
                       boxShadow: "0 5px 20px rgba(24,65,43,0.05)",
                     }}
                   >
-    
-{propertyImages.length > 0 ? (
-  <div style={{ padding: 8, background: sage }}>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-        gap: 6,
-      }}
-    >
-      {propertyImages
-        .slice(
-          Math.min(
-            (fav.photoPage || 0) * 4,
-            Math.max(0, propertyImages.length - 4)
-          ),
-          Math.min(
-            (fav.photoPage || 0) * 4,
-            Math.max(0, propertyImages.length - 4)
-          ) + 4
-        )
-        .map((photo: string, index: number) => (
-          <img
-            key={`${photo}-${index}`}
-            src={photo}
-            alt={`${p?.title || "Favourite holiday property"} photo ${
-              Math.min(
-                (fav.photoPage || 0) * 4,
-                Math.max(0, propertyImages.length - 4)
-              ) + index + 1
-            }`}
-            style={{
-              width: "100%",
-              height: 110,
-              objectFit: "contain",
-              objectPosition: "center",
-              background: sage,
-              borderRadius: 8,
-              display: "block",
-            }}
-          />
-        ))}
-    </div>
+                    {propertyImages.length > 0 ? (
+                      <div style={{ padding: 8, background: sage }}>
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                            gap: 6,
+                          }}
+                        >
+                          {propertyImages
+                            .slice(photoStart, photoStart + 4)
+                            .map((photo: string, index: number) => (
+                              <img
+                                key={`${photo}-${index}`}
+                                src={photo}
+                                alt={`${p?.title || "Favourite holiday property"} photo ${photoStart + index + 1}`}
+                                style={{
+                                  width: "100%",
+                                  height: 110,
+                                  objectFit: "contain",
+                                  objectPosition: "center",
+                                  background: sage,
+                                  borderRadius: 8,
+                                  display: "block",
+                                }}
+                              />
+                            ))}
+                        </div>
 
-    {propertyImages.length > 4 && (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: 8,
-        }}
-      >
-        <span style={{ fontSize: 12, color: "#526451" }}>
-          Showing{" "}
-          {Math.min((fav.photoPage || 0) * 4 + 1, propertyImages.length)}
-          {"–"}
-          {Math.min((fav.photoPage || 0) * 4 + 4, propertyImages.length)}
-          {" of "}
-          {propertyImages.length} photos
-        </span>
+                        {propertyImages.length > 4 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              marginTop: 8,
+                            }}
+                          >
+                            <span style={{ fontSize: 12, color: "#526451" }}>
+                              Showing {photoStart + 1}–
+                              {Math.min(photoStart + 4, propertyImages.length)}
+                              {" of "}
+                              {propertyImages.length} photos
+                            </span>
 
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            type="button"
-            disabled={!fav.photoPage || fav.photoPage === 0}
-            onClick={() =>
-              setFavourites((current: any[]) =>
-                current.map((item: any) =>
-                  item.id === fav.id
-                    ? { ...item, photoPage: Math.max(0, (item.photoPage || 0) - 1) }
-                    : item
-                )
-              )
-            }
-            style={{
-              padding: "5px 12px",
-              borderRadius: 8,
-              border: "1px solid #b8c8b5",
-              background: "white",
-              cursor: "pointer",
-              opacity: !fav.photoPage || fav.photoPage === 0 ? 0.4 : 1,
-            }}
-          >
-            ‹
-          </button>
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <button
+                                type="button"
+                                disabled={photoStart === 0}
+                                onClick={() =>
+                                  setFavourites((current: any[]) =>
+                                    current.map((item: any) =>
+                                      item.id === fav.id
+                                        ? {
+                                            ...item,
+                                            photoPage: Math.max(
+                                              0,
+                                              (item.photoPage || 0) - 1
+                                            ),
+                                          }
+                                        : item
+                                    )
+                                  )
+                                }
+                                style={{
+                                  padding: "5px 12px",
+                                  borderRadius: 8,
+                                  border: "1px solid #b8c8b5",
+                                  background: "white",
+                                  cursor: "pointer",
+                                  opacity: photoStart === 0 ? 0.4 : 1,
+                                }}
+                              >
+                                ‹
+                              </button>
 
-          <button
-            type="button"
-            disabled={
-              (fav.photoPage || 0) >=
-              Math.ceil(propertyImages.length / 4) - 1
-            }
-            onClick={() =>
-              setFavourites((current: any[]) =>
-                current.map((item: any) =>
-                  item.id === fav.id
-                    ? { ...item, photoPage: (item.photoPage || 0) + 1 }
-                    : item
-                )
-              )
-            }
-            style={{
-              padding: "5px 12px",
-              borderRadius: 8,
-              border: "1px solid #b8c8b5",
-              background: "white",
-              cursor: "pointer",
-              opacity:
-                (fav.photoPage || 0) >=
-                Math.ceil(propertyImages.length / 4) - 1
-                  ? 0.4
-                  : 1,
-            }}
-          >
-            ›
-          </button>
-        </div>
-      </div>
-    )}
-  </div>
-) : (
-  <div
-    style={{
-      height: 200,
-      background: "#e8f0e7",
-      display: "grid",
-      placeItems: "center",
-      fontSize: 48,
-    }}
-  >
-    🏡
-  </div>
-)}
+                              <button
+                                type="button"
+                                disabled={
+                                  photoStart + 4 >= propertyImages.length
+                                }
+                                onClick={() =>
+                                  setFavourites((current: any[]) =>
+                                    current.map((item: any) =>
+                                      item.id === fav.id
+                                        ? {
+                                            ...item,
+                                            photoPage:
+                                              (item.photoPage || 0) + 1,
+                                          }
+                                        : item
+                                    )
+                                  )
+                                }
+                                style={{
+                                  padding: "5px 12px",
+                                  borderRadius: 8,
+                                  border: "1px solid #b8c8b5",
+                                  background: "white",
+                                  cursor: "pointer",
+                                  opacity:
+                                    photoStart + 4 >= propertyImages.length
+                                      ? 0.4
+                                      : 1,
+                                }}
+                              >
+                                ›
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          height: 200,
+                          background: "#e8f0e7",
+                          display: "grid",
+                          placeItems: "center",
+                          fontSize: 48,
+                        }}
+                      >
+                        🏡
+                      </div>
+                    )}
 
-                    
                     <div style={{ padding: 18 }}>
                       <h3
                         style={{
@@ -1387,7 +1392,11 @@ const averageRating =
                         {p?.id ? (
                           <Link
                             to={`/property/${p.id}`}
-                            style={{ ...buttonStyle, flex: 1, textAlign: "center" }}
+                            style={{
+                              ...buttonStyle,
+                              flex: 1,
+                              textAlign: "center",
+                            }}
                           >
                             View stay
                           </Link>
