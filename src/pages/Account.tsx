@@ -179,26 +179,7 @@ console.log("Bookings returned from Supabase:", bookingsData);
       : booking.properties?.images,
   }))
 );
-        const confirmedTrips = (bookingsData || []).map((booking: any) => {
-          const property = Array.isArray(booking.properties)
-            const image = Array.isArray(property?.images)
-  ? property.images[0]
-  : property?.images;
-            ? booking.properties[0]
-            : booking.properties;
-const propertyImage = Array.isArray(property?.images)
-  ? property.images[0]
-  : property?.images;
-
-return {
-  ...booking,
-  destination:
-    property?.title ||
-    property?.location ||
-    "Your upcoming holiday",
-  propertyImage,
-  start_date: booking.check_in,
-  end_date: booking.check_out,
+      
 };
     
         });
