@@ -181,6 +181,9 @@ console.log("Bookings returned from Supabase:", bookingsData);
 );
         const confirmedTrips = (bookingsData || []).map((booking: any) => {
           const property = Array.isArray(booking.properties)
+            const image = Array.isArray(property?.images)
+  ? property.images[0]
+  : property?.images;
             ? booking.properties[0]
             : booking.properties;
 const propertyImage = Array.isArray(property?.images)
