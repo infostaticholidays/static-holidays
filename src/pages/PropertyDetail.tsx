@@ -1102,7 +1102,7 @@ function renderExtraCards(extras: PropertyExtra[]) {
               </strong>
 
               {Number(extra.price) > 0 && (
-                <span style={{ color: "#758078", fontSize: 12 }}>
+             <span style={{ color: "#758078", fontSize: 12, marginLeft: 5 }}>
                   {" "}{getPricingLabel(extra.pricing_type)}
                 </span>
               )}
