@@ -38,6 +38,9 @@ type CustomExtra = {
   name: string;
   description: string;
   price: string;
+  imageUrl?: string;
+  imageFile?: File;
+  imagePreview?: string;
 };
 
 type ExtraRow = {
@@ -46,6 +49,7 @@ type ExtraRow = {
   extra_type: string;
   name: string;
   description: string | null;
+  image_url: string | null;
   price: number;
   pricing_type: string;
   is_available: boolean;
@@ -88,6 +92,7 @@ export default function PropertyExtras() {
   const navigate = useNavigate();
 
   const [propertyName, setPropertyName] = useState("");
+
   const [standardExtras, setStandardExtras] = useState<
     Record<StandardKey, StandardExtra>
   >({
@@ -95,6 +100,7 @@ export default function PropertyExtras() {
     horse: { enabled: false, price: "0" },
     cot: { enabled: false, price: "0" },
   });
+
   const [customExtras, setCustomExtras] = useState<CustomExtra[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -157,6 +163,7 @@ export default function PropertyExtras() {
             row.extra_type === "cot"
           ) {
             const key = row.extra_type as StandardKey;
+
             standardState[key] = {
               enabled: row.is_available,
               price: String(row.price),
@@ -169,6 +176,8 @@ export default function PropertyExtras() {
               name: row.name,
               description: row.description || "",
               price: String(row.price),
+              imageUrl: row.image_url || "",
+              imagePreview: row.image_url || "",
             });
           }
         });
@@ -177,6 +186,7 @@ export default function PropertyExtras() {
         setCustomExtras(customState);
       } catch (error) {
         console.error("LOAD PROPERTY EXTRAS ERROR:", error);
+
         setMessage(
           error instanceof Error
             ? error.message
@@ -212,6 +222,8 @@ export default function PropertyExtras() {
         name: "",
         description: "",
         price: "",
+        imageUrl: "",
+        imagePreview: "",
       },
     ]);
   }
@@ -233,6 +245,59 @@ export default function PropertyExtras() {
   function removeCustomExtra(localId: number) {
     setCustomExtras((current) =>
       current.filter((extra) => extra.localId !== localId)
+    );
+  }
+
+  function handleCustomImageChange(localId: number, file?: File) {
+    if (!file) return;
+
+    setMessage("");
+
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please select an image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("Please choose an image smaller than 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setCustomExtras((current) =>
+        current.map((extra) =>
+          extra.localId === localId
+            ? {
+                ...extra,
+                imageFile: file,
+                imagePreview: String(reader.result),
+              }
+            : extra
+        )
+      );
+    };
+
+    reader.onerror = () => {
+      setMessage("Could not preview that image. Please try another.");
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  function removeCustomImage(localId: number) {
+    setCustomExtras((current) =>
+      current.map((extra) =>
+        extra.localId === localId
+          ? {
+              ...extra,
+              imageUrl: "",
+              imageFile: undefined,
+              imagePreview: "",
+            }
+          : extra
+      )
     );
   }
 
@@ -291,6 +356,50 @@ export default function PropertyExtras() {
     setSaving(true);
 
     try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+      if (!user) throw new Error("Please log in again.");
+
+      const preparedCustomExtras = await Promise.all(
+        customExtras.map(async (extra) => {
+          let imageUrl = extra.imageUrl || "";
+
+          if (extra.imageFile) {
+            const safeName = extra.imageFile.name.replace(
+              /[^a-zA-Z0-9.-]/g,
+              "-"
+            );
+
+            const filePath =
+              `${user.id}/${propertyId}/extras/${Date.now()}-${safeName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from("property-images")
+              .upload(filePath, extra.imageFile, {
+                contentType: extra.imageFile.type,
+                upsert: false,
+              });
+
+            if (uploadError) throw uploadError;
+
+            const { data: publicUrlData } = supabase.storage
+              .from("property-images")
+              .getPublicUrl(filePath);
+
+            imageUrl = publicUrlData.publicUrl;
+          }
+
+          return {
+            ...extra,
+            imageUrl,
+          };
+        })
+      );
+
       const rowsToSave = [
         ...standardDefinitions
           .filter((definition) => standardExtras[definition.key].enabled)
@@ -311,12 +420,13 @@ export default function PropertyExtras() {
             };
           }),
 
-        ...customExtras.map((extra, index) => ({
+        ...preparedCustomExtras.map((extra, index) => ({
           ...(extra.id ? { id: extra.id } : {}),
           property_id: propertyId,
           extra_type: "custom",
           name: extra.name.trim(),
           description: extra.description.trim(),
+          image_url: extra.imageUrl || null,
           price: Number(extra.price),
           pricing_type: "per_stay",
           is_available: true,
@@ -325,7 +435,6 @@ export default function PropertyExtras() {
         })),
       ];
 
-      // Get existing extras BEFORE saving anything.
       const { data: currentRows, error: currentError } = await supabase
         .from("property_extras")
         .select("id")
@@ -339,7 +448,6 @@ export default function PropertyExtras() {
         .map((row) => ("id" in row ? row.id : undefined))
         .filter((id): id is string => Boolean(id));
 
-      // Save enabled extras and update existing ones.
       if (rowsToSave.length > 0) {
         const { error: saveError } = await supabase
           .from("property_extras")
@@ -348,8 +456,6 @@ export default function PropertyExtras() {
         if (saveError) throw saveError;
       }
 
-      // Delete only previously existing extras that were switched off
-      // or removed. Newly inserted extras are not included here.
       const idsToDelete = existingIds.filter(
         (id) => !retainedIds.includes(id)
       );
@@ -362,6 +468,8 @@ export default function PropertyExtras() {
 
         if (deleteError) throw deleteError;
       }
+
+      setCustomExtras(preparedCustomExtras);
 
       setMessage("Your property extras have been saved successfully.");
     } catch (error) {
@@ -631,6 +739,58 @@ export default function PropertyExtras() {
                   )
                 }
               />
+
+              <div style={{ marginTop: 16 }}>
+                <label style={labelStyle}>Package photo</label>
+
+                {extra.imagePreview && (
+                  <div style={{ marginBottom: 12 }}>
+                    <img
+                      src={extra.imagePreview}
+                      alt={`${extra.name || "Occasion package"} preview`}
+                      style={{
+                        width: "100%",
+                        maxWidth: 320,
+                        height: 200,
+                        objectFit: "cover",
+                        borderRadius: 10,
+                        display: "block",
+                      }}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => removeCustomImage(extra.localId)}
+                      style={{
+                        marginTop: 8,
+                        padding: "8px 12px",
+                        border: 0,
+                        borderRadius: 7,
+                        background: "#fee2e2",
+                        color: "#991b1b",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Remove photo
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) =>
+                    handleCustomImageChange(
+                      extra.localId,
+                      event.target.files?.[0]
+                    )
+                  }
+                />
+
+                <p style={{ color: "#6b7280", fontSize: 12 }}>
+                  Choose an image file up to 5MB.
+                </p>
+              </div>
 
               <label style={{ ...labelStyle, marginTop: 14 }}>
                 One-off package price (£) *
