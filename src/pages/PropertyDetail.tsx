@@ -1058,44 +1058,30 @@ function renderExtraCards(extras: PropertyExtra[]) {
           }}
         >
           <label
-            {extra.image_url && (
-  <img
-    src={extra.image_url}
-    alt={extra.name}
-    style={{
-      width: 82,
-      height: 82,
-      objectFit: "cover",
-      borderRadius: 9,
-      flexShrink: 0,
-    }}
-  />
-)}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    flexShrink: 0,
-    fontSize: 12,
-    color: green,
-    fontWeight: 700,
-  }}
->
-  <input
-    type="checkbox"
-    checked={selectedExtraIds.includes(extra.id)}
-    onChange={(event) => {
-      setSelectedExtraIds((current) =>
-        event.target.checked
-          ? [...current, extra.id]
-          : current.filter((id) => id !== extra.id)
-      );
-    }}
-  />
-  Add
-</label>
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              flexShrink: 0,
+              fontSize: 12,
+              color: green,
+              fontWeight: 700,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={selectedExtraIds.includes(extra.id)}
+              onChange={(event) => {
+                setSelectedExtraIds((current) =>
+                  event.target.checked
+                    ? [...current, extra.id]
+                    : current.filter((id) => id !== extra.id)
+                );
+              }}
+            />
+            Add
+          </label>
 
-{extra.image_url && (
           {extra.image_url && (
             <img
               src={extra.image_url}
@@ -1142,7 +1128,7 @@ function renderExtraCards(extras: PropertyExtra[]) {
               </strong>
 
               {Number(extra.price) > 0 && (
-             <span style={{ color: "#758078", fontSize: 12, marginLeft: 5 }}>
+                <span style={{ color: "#758078", fontSize: 12, marginLeft: 5 }}>
                   {" "}{getPricingLabel(extra.pricing_type)}
                 </span>
               )}
