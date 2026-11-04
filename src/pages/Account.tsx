@@ -174,9 +174,11 @@ if (verificationError) {
             ? booking.properties[0]
             : booking.properties;
 
-          const propertyImage = Array.isArray(property?.images)
-            ? property.images[0]
-            : property?.images;
+        const propertyImage =
+  property?.cover_image_url ||
+  (Array.isArray(property?.images)
+    ? property.images[0]
+    : property?.images);
 
           return {
             ...booking,
