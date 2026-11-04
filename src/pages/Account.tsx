@@ -168,19 +168,20 @@ const favouritesWithImages = await Promise.all(
     if (storageError) {
       console.error("Could not load property photos:", storageError);
     }
-
-    const storageImages = (files || [])
-      console.log("Maia Motel storage files:", files);
+console.log("Maia Motel storage files:", files);
 console.log("Maia Motel storage error:", storageError);
-      .filter((file: any) =>
-        /\.(jpg|jpeg|png|webp|avif)$/i.test(file.name)
-      )
-      .map((file: any) =>
-        supabase.storage
-          .from("property-images")
-          .getPublicUrl(`${folderPath}/${file.name}`)
-          .data.publicUrl
-      );
+
+const storageImages = (files || [])
+  .filter((file: any) =>
+    /\.(jpg|jpeg|png|webp|avif)$/i.test(file.name)
+  )
+  .map((file: any) =>
+    supabase.storage
+      .from("property-images")
+      .getPublicUrl(`${folderPath}/${file.name}`)
+      .data.publicUrl
+  );
+   
 const propertyImages = [
   ...(p.cover_image_url ? [p.cover_image_url] : []),
   ...storageImages,
