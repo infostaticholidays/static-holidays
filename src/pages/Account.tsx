@@ -1234,7 +1234,7 @@ const averageRating =
                           style={{
                             display: "grid",
                            gridTemplateColumns: `repeat(${Math.min(propertyImages.length, 4)}, minmax(0, 1fr))`,
-                            gap: 6,
+                          gap: 0,
                           }}
                         >
                           {propertyImages
