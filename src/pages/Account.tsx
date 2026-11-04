@@ -123,13 +123,14 @@ if (verificationError) {
         .from("favourites")
         .select(`
           id,
-          properties (
-            id,
-            title,
-            location,
-            images,
-            price_per_night
-          )
+       properties (
+  id,
+  title,
+  location,
+  images,
+  cover_image_url,
+  price_per_night
+)
         `)
         .eq("user_id", user.id);
 
