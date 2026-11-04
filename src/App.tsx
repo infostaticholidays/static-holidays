@@ -90,6 +90,10 @@ export default function App() {
             path="/my-properties"
             element={<MyProperties />}
           />
+          <Route
+  path="/property-extras/:propertyId"
+  element={<PropertyExtras />}
+/>
 
           {/* Promote Property */}
           <Route
