@@ -164,24 +164,29 @@ if (verificationError) {
         console.error("Could not load bookings:", bookingsError);
       }
 
-      if (!bookingsError) {
+         if (!bookingsError) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-console.log("Bookings returned from Supabase:", bookingsData);
-        console.log(
-  "Booking property images:",
-  (bookingsData || []).map((booking: any) => ({
-    bookingId: booking.id,
-    propertyId: booking.property_id,
-    property: booking.properties,
-    images: Array.isArray(booking.properties)
-      ? booking.properties[0]?.images
-      : booking.properties?.images,
-  }))
-);
-      
-};
-    
+
+        const confirmedTrips = (bookingsData || []).map((booking: any) => {
+          const property = Array.isArray(booking.properties)
+            ? booking.properties[0]
+            : booking.properties;
+
+          const propertyImage = Array.isArray(property?.images)
+            ? property.images[0]
+            : property?.images;
+
+          return {
+            ...booking,
+            destination:
+              property?.title ||
+              property?.location ||
+              "Your upcoming holiday",
+            propertyImage,
+            start_date: booking.check_in,
+            end_date: booking.check_out,
+          };
         });
 
         const previous = confirmedTrips.filter(
