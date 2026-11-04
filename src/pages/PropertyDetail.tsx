@@ -537,8 +537,7 @@ useEffect(() => {
     const price = Number(extra.price);
     return total + (Number.isFinite(price) ? price : 0);
   }, 0);
-
-  const estimatedTotal = stayPriceInfo.total + selectedExtrasTotal;
+const bookingTotal = stayPriceInfo.total + selectedExtrasTotal;
   // Full payment is required for stays costing £100 or less,
   // or when check-in is within 30 days.
   const daysToArrival = startDate
