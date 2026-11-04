@@ -391,17 +391,58 @@ export default function MyProperties() {
                           )}
                         </div>
 
-                        <Link to={`/property/${property.id}`} style={{
-                          display: "inline-block",
-                          padding: "13px 18px",
-                          background: "#17643b",
-                          color: "#ffffff",
-                          borderRadius: "10px",
-                          textDecoration: "none",
-                          fontWeight: 700,
+                                          <div style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "8px",
                         }}>
-                          View property →
-                        </Link>
+                          <Link to={`/edit-property/${property.id}`} style={{
+                            padding: "11px 14px",
+                            background: "#ffffff",
+                            color: "#17643b",
+                            border: "1px solid #dce7de",
+                            borderRadius: "10px",
+                            textDecoration: "none",
+                            fontWeight: 700,
+                          }}>
+                            Edit listing
+                          </Link>
+
+                          <Link to={`/property-calendar/${property.id}`} style={{
+                            padding: "11px 14px",
+                            background: "#ffffff",
+                            color: "#17643b",
+                            border: "1px solid #dce7de",
+                            borderRadius: "10px",
+                            textDecoration: "none",
+                            fontWeight: 700,
+                          }}>
+                            Calendar
+                          </Link>
+
+                          <Link to={`/property-extras/${property.id}`} style={{
+                            padding: "11px 14px",
+                            background: "#17643b",
+                            color: "#ffffff",
+                            borderRadius: "10px",
+                            textDecoration: "none",
+                            fontWeight: 700,
+                          }}>
+                            Optional Extras
+                          </Link>
+
+                          <Link to={`/property/${property.id}`} style={{
+                            padding: "11px 14px",
+                            background: "#ffffff",
+                            color: "#17643b",
+                            border: "1px solid #dce7de",
+                            borderRadius: "10px",
+                            textDecoration: "none",
+                            fontWeight: 700,
+                          }}>
+                            View property →
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </article>
