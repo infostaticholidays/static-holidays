@@ -316,7 +316,7 @@ useEffect(() => {
     const { data, error } = await supabase
       .from("property_extras")
       .select(
-        "id, extra_type, name, description, image_url, price, pricing_type, is_available"
+       "id, extra_type, name, description, image_url, price, pricing_type, payment_timing, is_available"
       )
       .eq("property_id", propertyId)
       .eq("is_available", true)
