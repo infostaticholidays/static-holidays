@@ -149,12 +149,13 @@ if (verificationError) {
     check_in,
     check_out,
     booking_status,
-    properties (
-      id,
-      title,
-      location,
-      images
-    )
+  properties (
+  id,
+  title,
+  location,
+  images,
+  cover_image_url
+)
   `)
         .eq("guest_id", user.id)
         .eq("booking_status", "confirmed")
