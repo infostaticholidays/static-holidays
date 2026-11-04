@@ -835,7 +835,8 @@ const bookingMode = String(ownerBookingMode ?? "")
         showError("A valid price is not available for this stay.");
         return;
       }
-
+// Add the selected extras to the booking total.
+const freshBookingTotal = freshTotal + selectedExtrasTotal;
       // Check occupied nights through the public-safe RPC. Do not read
       // other guests' booking records from the browser.
       const { data: occupiedRows, error: occupiedError } = await supabase.rpc(
