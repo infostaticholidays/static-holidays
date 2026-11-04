@@ -43,6 +43,7 @@ import OwnerTerms from "./pages/OwnerTerms";
 import ResetPassword from "./pages/ResetPassword";
 import AdminDocumentReview from "./pages/AdminDocumentReview";
 import CookieConsent from "./components/CookieConsent";
+import PropertyExtras from "./pages/PropertyExtras";
 
 function NotFound() {
   return (
