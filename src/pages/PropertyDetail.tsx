@@ -1427,38 +1427,67 @@ function renderExtraCards(extras: PropertyExtra[]) {
                 </section>
               )}
 
-{!extrasLoading && (
-  <>
-    {welcomeHampers.length > 0 && (
-      <section style={{ ...cardStyle, marginBottom: 18 }}>
-        <h2 style={sectionTitleStyle}>Welcome Hampers</h2>
-        <p style={{ color: "#536258", fontSize: 13, lineHeight: 1.7 }}>
-          Make your stay extra special with a welcome hamper prepared for your arrival.
-        </p>
-        {renderExtraCards(welcomeHampers)}
-      </section>
-    )}
+{!extrasLoading &&
+  (welcomeHampers.length > 0 ||
+    occasionExtras.length > 0 ||
+    standardExtras.length > 0) && (
+    <section
+      style={{
+        background: "#edf3ed",
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 18,
+      }}
+    >
+      <h2
+        style={{
+          margin: "0 0 6px",
+          color: green,
+          fontSize: 21,
+        }}
+      >
+        A little something extra
+      </h2>
 
-    {occasionExtras.length > 0 && (
-      <section style={{ ...cardStyle, marginBottom: 18 }}>
-        <h2 style={sectionTitleStyle}>
-          Special occasions and personal touches
-        </h2>
-        <p style={{ color: "#536258", fontSize: 13, lineHeight: 1.7 }}>
-          Add something special to celebrate or personalise your stay.
-        </p>
-        {renderExtraCards(occasionExtras)}
-      </section>
-    )}
+      <p
+        style={{
+          color: "#536258",
+          fontSize: 13,
+          lineHeight: 1.6,
+          margin: "0 0 18px",
+        }}
+      >
+        Thoughtful touches to make your stay special.
+      </p>
 
-    {standardExtras.length > 0 && (
-      <section style={{ ...cardStyle, marginBottom: 18 }}>
-        <h2 style={sectionTitleStyle}>Additional extras</h2>
-        {renderExtraCards(standardExtras)}
-      </section>
-    )}
-  </>
-)}
+      {welcomeHampers.length > 0 && (
+        <>
+          <h3 style={{ color: green, fontSize: 15, margin: "0 0 10px" }}>
+            Welcome Hampers
+          </h3>
+          {renderExtraCards(welcomeHampers)}
+        </>
+      )}
+
+      {occasionExtras.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <h3 style={{ color: green, fontSize: 15, margin: "0 0 10px" }}>
+            Special occasions and personal touches
+          </h3>
+          {renderExtraCards(occasionExtras)}
+        </div>
+      )}
+
+      {standardExtras.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <h3 style={{ color: green, fontSize: 15, margin: "0 0 10px" }}>
+            Additional extras
+          </h3>
+          {renderExtraCards(standardExtras)}
+        </div>
+      )}
+    </section>
+  )}
             
             {mapQuery && (
               <section style={{ ...cardStyle, marginBottom: 18 }}>
