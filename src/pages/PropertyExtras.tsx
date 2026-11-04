@@ -184,14 +184,19 @@ export default function PropertyExtras() {
 
         setStandardExtras(standardState);
         setCustomExtras(customState);
-      } catch (error) {
-        console.error("LOAD PROPERTY EXTRAS ERROR:", error);
+} catch (error) {
+  console.error("SAVE PROPERTY EXTRAS ERROR:", error);
 
-        setMessage(
-          error instanceof Error
-            ? error.message
-            : "Could not load the property extras."
-        );
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : typeof error === "object" &&
+          error !== null &&
+          "message" in error
+        ? String(error.message)
+        : String(error);
+
+  setMessage(errorMessage || "Could not save your property extras.");
       } finally {
         setLoading(false);
       }
