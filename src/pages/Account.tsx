@@ -168,8 +168,12 @@ const favouritesWithImages = await Promise.all(
     if (storageError) {
       console.error("Could not load property photos:", storageError);
     }
-console.log("Maia Motel storage files:", files);
-console.log("Maia Motel storage error:", storageError);
+alert(
+  "Storage files: " +
+  JSON.stringify(files?.map((file: any) => file.name)) +
+  "\nStorage error: " +
+  JSON.stringify(storageError)
+);
 
 const storageImages = (files || [])
   .filter((file: any) =>
