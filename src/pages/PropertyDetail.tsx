@@ -1041,65 +1041,60 @@ const bookingMode = String(ownerBookingMode ?? "")
         return "per stay";
     }
   }
+function renderExtraCards(extras: PropertyExtra[]) {
+  return (
+    <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
+      {extras.map((extra) => (
+        <article
+          key={extra.id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            padding: 14,
+            background: "#ffffff",
+            borderRadius: 12,
+          }}
+        >
+          {extra.image_url && (
+            <img
+              src={extra.image_url}
+              alt={extra.name}
+              style={{
+                width: 82,
+                height: 82,
+                objectFit: "cover",
+                borderRadius: 9,
+                flexShrink: 0,
+              }}
+            />
+          )}
 
-  function renderExtraCards(extras: PropertyExtra[]) {
-    return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))",
-          gap: 14,
-          marginTop: 18,
-        }}
-      >
-        {extras.map((extra) => (
-          <article
-            key={extra.id}
-            style={{
-              border: "1px solid #e3eae3",
-              borderRadius: 12,
-              overflow: "hidden",
-              background: "#fff",
-            }}
-          >
-            {extra.image_url && (
-              <img
-                src={extra.image_url}
-                alt={extra.name}
-                style={{
-                  width: "100%",
-                  height: 175,
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-            )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h3
+              style={{
+                margin: "0 0 5px",
+                fontSize: 15,
+                color: "#203128",
+              }}
+            >
+              {extra.name}
+            </h3>
 
-            <div style={{ padding: 16 }}>
-              <h3
+            {extra.description && (
+              <p
                 style={{
                   margin: "0 0 8px",
-                  fontSize: 16,
-                  color: "#203128",
+                  color: "#536258",
+                  fontSize: 13,
+                  lineHeight: 1.5,
                 }}
               >
-                {extra.name}
-              </h3>
+                {extra.description}
+              </p>
+            )}
 
-              {extra.description && (
-                <p
-                  style={{
-                    margin: "0 0 12px",
-                    color: "#536258",
-                    fontSize: 13,
-                    lineHeight: 1.7,
-                    whiteSpace: "pre-line",
-                  }}
-                >
-                  {extra.description}
-                </p>
-              )}
-
+            <div>
               <strong style={{ color: green, fontSize: 14 }}>
                 {Number(extra.price) === 0
                   ? "Free"
@@ -1112,11 +1107,12 @@ const bookingMode = String(ownerBookingMode ?? "")
                 </span>
               )}
             </div>
-          </article>
-        ))}
-      </div>
-    );
-  }
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
   const mapUrl = mapQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
     : "";
