@@ -182,6 +182,8 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState<Property | null>(null);
   const [images, setImages] = useState<PropertyImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [propertyExtras, setPropertyExtras] = useState<PropertyExtra[]>([]);
+const [extrasLoading, setExtrasLoading] = useState(true);
 
   const [calendarDates, setCalendarDates] = useState<
     Record<string, CalendarDate>
