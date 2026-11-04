@@ -1229,7 +1229,7 @@ const averageRating =
                     }}
                   >
                     {propertyImages.length > 0 ? (
-                      <div style={{ padding: 8, background: sage }}>
+                      <div style={{ padding: 0 }}>
                         <div
                           style={{
                             display: "grid",
