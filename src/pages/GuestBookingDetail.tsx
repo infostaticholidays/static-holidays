@@ -578,7 +578,44 @@ if (ownerReviewError) {
                   "Local information has not been added for this property yet."}
               </p>
             </section>
+<section style={cardStyle}>
+  <h2 style={headingStyle}>Your selected extras</h2>
 
+  {bookingExtras.length === 0 ? (
+    <p style={textStyle}>
+      No extras were selected for this booking.
+    </p>
+  ) : (
+    bookingExtras.map((extra) => (
+      <div
+        key={extra.id}
+        style={{
+          borderTop: `1px solid ${colors.border}`,
+          paddingTop: 14,
+          marginTop: 14,
+        }}
+      >
+        <strong style={{ color: colors.darkGreen }}>
+          {extra.extra_name}
+        </strong>
+
+        <p style={textStyle}>
+          Quantity: {extra.quantity}
+        </p>
+
+        <p style={textStyle}>
+          Total: £{Number(extra.line_total).toFixed(2)}
+        </p>
+
+        <p style={textStyle}>
+          Payment: {extra.payment_timing === "deposit"
+            ? "With deposit"
+            : "With balance"}
+        </p>
+      </div>
+    ))
+  )}
+</section>
             <section style={cardStyle}>
               <h2 style={headingStyle}>House rules and facilities</h2>
 
