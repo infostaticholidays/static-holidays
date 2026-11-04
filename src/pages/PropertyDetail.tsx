@@ -40,6 +40,7 @@ type PropertyExtra = {
   image_url: string | null;
   price: number | string;
   pricing_type: string;
+    payment_timing: "deposit" | "balance";
   is_available: boolean;
 };
 
