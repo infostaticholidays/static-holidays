@@ -1330,22 +1330,31 @@ const handleSaveDetails = async () => {
                     {property.location || property.address || "Location not added"}
                   </p>
 
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    <button
-                      type="button"
-                      style={styles.secondaryButton}
-                      onClick={() => goTo(`/edit-property/${property.id}`)}
-                    >
-                      Edit listing
-                    </button>
-                    <button
-                      type="button"
-                      style={styles.secondaryButton}
-                      onClick={() => goTo(`/property-calendar/${property.id}`)}
-                    >
-                      Calendar
-                    </button>
-                  </div>
+         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+  <button
+    type="button"
+    style={styles.secondaryButton}
+    onClick={() => goTo(`/edit-property/${property.id}`)}
+  >
+    Edit listing
+  </button>
+
+  <button
+    type="button"
+    style={styles.secondaryButton}
+    onClick={() => goTo(`/property-calendar/${property.id}`)}
+  >
+    Calendar
+  </button>
+
+  <button
+    type="button"
+    style={styles.primaryButton}
+    onClick={() => goTo(`/property-extras/${property.id}`)}
+  >
+    Optional Extras
+  </button>
+</div>
                 </article>
               ))}
             </div>
