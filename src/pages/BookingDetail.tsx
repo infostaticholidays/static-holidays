@@ -467,6 +467,45 @@ setGuestProfile(
             </div>
           )}
         </section>
+        <section
+  style={{
+    background: "#fff",
+    border: "1px solid #e7ebf0",
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 20,
+  }}
+>
+  <h2 style={{ marginTop: 0 }}>Guest's selected extras</h2>
+
+  {bookingExtras.length === 0 ? (
+    <p style={{ color: "#64748b" }}>
+      No extras were selected for this booking.
+    </p>
+  ) : (
+    bookingExtras.map((extra) => (
+      <div
+        key={extra.id}
+        style={{
+          borderTop: "1px solid #e7ebf0",
+          paddingTop: 14,
+          marginTop: 14,
+        }}
+      >
+        <strong>{extra.extra_name}</strong>
+        <p style={{ margin: "6px 0" }}>
+          Quantity: {extra.quantity}
+        </p>
+        <p style={{ margin: "6px 0" }}>
+          Total: £{Number(extra.line_total).toFixed(2)}
+        </p>
+        <p style={{ color: "#64748b", margin: "6px 0" }}>
+          Payment: {extra.payment_timing === "deposit" ? "With deposit" : "With balance"}
+        </p>
+      </div>
+    ))
+  )}
+</section>
 <section
   style={{
     background: "#fff",
