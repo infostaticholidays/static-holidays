@@ -1239,9 +1239,9 @@ const averageRating =
                                 key={`${photo}-${index}`}
                                 src={photo}
                                 alt={`${p?.title || "Favourite holiday property"} photo ${photoStart + index + 1}`}
- style={{
+style={{
   width: "100%",
-  height: 200,
+  height: 240,
   objectFit: "cover",
   objectPosition: "center",
   display: "block",
