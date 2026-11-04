@@ -230,6 +230,16 @@ properties (
 
         const currentBooking = data as unknown as BookingDetails;
         setBooking(currentBooking);
+        const { data: extrasData, error: extrasError } = await supabase
+  .from("booking_extras")
+  .select("id, extra_name, unit_price, quantity, line_total, payment_timing")
+  .eq("booking_id", currentBooking.id);
+
+if (extrasError) throw extrasError;
+
+if (!cancelled) {
+  setBookingExtras((extrasData ?? []) as BookingExtra[]);
+}
         const { data: existingReview, error: reviewCheckError } = await supabase
   .from("reviews")
   .select("id")
