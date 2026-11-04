@@ -168,6 +168,17 @@ if (verificationError) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 console.log("Bookings returned from Supabase:", bookingsData);
+        console.log(
+  "Booking property images:",
+  (bookingsData || []).map((booking: any) => ({
+    bookingId: booking.id,
+    propertyId: booking.property_id,
+    property: booking.properties,
+    images: Array.isArray(booking.properties)
+      ? booking.properties[0]?.images
+      : booking.properties?.images,
+  }))
+);
         const confirmedTrips = (bookingsData || []).map((booking: any) => {
           const property = Array.isArray(booking.properties)
             ? booking.properties[0]
