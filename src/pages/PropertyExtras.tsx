@@ -95,7 +95,6 @@ export default function PropertyExtras() {
     horse: { enabled: false, price: "0" },
     cot: { enabled: false, price: "0" },
   });
-
   const [customExtras, setCustomExtras] = useState<CustomExtra[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -158,7 +157,6 @@ export default function PropertyExtras() {
             row.extra_type === "cot"
           ) {
             const key = row.extra_type as StandardKey;
-
             standardState[key] = {
               enabled: row.is_available,
               price: String(row.price),
@@ -327,6 +325,20 @@ export default function PropertyExtras() {
         })),
       ];
 
+      // Get existing extras BEFORE saving anything.
+      const { data: currentRows, error: currentError } = await supabase
+        .from("property_extras")
+        .select("id")
+        .eq("property_id", propertyId);
+
+      if (currentError) throw currentError;
+
+      const existingIds = (currentRows || []).map((row) => row.id);
+
+      const retainedIds = rowsToSave
+        .map((row) => ("id" in row ? row.id : undefined))
+        .filter((id): id is string => Boolean(id));
+
       // Save enabled extras and update existing ones.
       if (rowsToSave.length > 0) {
         const { error: saveError } = await supabase
@@ -336,21 +348,11 @@ export default function PropertyExtras() {
         if (saveError) throw saveError;
       }
 
-      // Remove extras that the owner has switched off or deleted.
-      const retainedIds = rowsToSave
-        .map((row) => "id" in row ? row.id : undefined)
-        .filter((id): id is string => Boolean(id));
-
-      const { data: currentRows, error: currentError } = await supabase
-        .from("property_extras")
-        .select("id")
-        .eq("property_id", propertyId);
-
-      if (currentError) throw currentError;
-
-      const idsToDelete = (currentRows || [])
-        .map((row) => row.id)
-        .filter((id) => !retainedIds.includes(id));
+      // Delete only previously existing extras that were switched off
+      // or removed. Newly inserted extras are not included here.
+      const idsToDelete = existingIds.filter(
+        (id) => !retainedIds.includes(id)
+      );
 
       if (idsToDelete.length > 0) {
         const { error: deleteError } = await supabase
@@ -364,6 +366,7 @@ export default function PropertyExtras() {
       setMessage("Your property extras have been saved successfully.");
     } catch (error) {
       console.error("SAVE PROPERTY EXTRAS ERROR:", error);
+
       setMessage(
         error instanceof Error
           ? error.message
@@ -598,6 +601,7 @@ export default function PropertyExtras() {
               </div>
 
               <label style={labelStyle}>Package name *</label>
+
               <input
                 style={inputStyle}
                 placeholder="e.g. Birthday surprise"
@@ -614,6 +618,7 @@ export default function PropertyExtras() {
               <label style={{ ...labelStyle, marginTop: 14 }}>
                 What is included? *
               </label>
+
               <textarea
                 style={{ ...inputStyle, minHeight: 90, resize: "vertical" }}
                 placeholder="Describe the decorations, treats or other items included..."
@@ -630,6 +635,7 @@ export default function PropertyExtras() {
               <label style={{ ...labelStyle, marginTop: 14 }}>
                 One-off package price (£) *
               </label>
+
               <input
                 style={inputStyle}
                 type="number"
@@ -645,6 +651,7 @@ export default function PropertyExtras() {
                   )
                 }
               />
+
               <p style={{ color: "#6b7280", fontSize: 12 }}>
                 You choose the price. This is charged once per booking.
               </p>
@@ -701,9 +708,9 @@ export default function PropertyExtras() {
             {saving ? "Saving extras..." : "Save Optional Extras"}
           </button>
 
-                   <button
+          <button
             type="button"
-            onClick={() => navigate(`/property-calendar/${propertyId}`)}
+            onClick={() => navigate("/host-dashboard")}
             style={{
               width: "100%",
               padding: "13px 20px",
@@ -717,10 +724,11 @@ export default function PropertyExtras() {
               cursor: "pointer",
             }}
           >
-            Continue to property calendar
+            Back to owner dashboard
           </button>
         </div>
       </div>
     </div>
   );
 }
+
