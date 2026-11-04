@@ -35,7 +35,14 @@ type GuestReview = {
   created_at: string | null;
   would_host_again: boolean | null;
 };
-
+type BookingExtra = {
+  id: string;
+  extra_name: string;
+  unit_price: number | string;
+  quantity: number;
+  line_total: number | string;
+  payment_timing: "deposit" | "balance";
+};
 
 function formatDate(value: string | null | undefined): string {
   if (!value) return "Not set";
