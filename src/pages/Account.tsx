@@ -1166,11 +1166,11 @@ const averageRating =
                         src={image}
                         alt={p?.title || "Favourite holiday property"}
                         style={{
-                      
   width: "100%",
   height: 200,
-  objectFit: "cover",
+  objectFit: "contain",
   objectPosition: "center",
+  background: "#f5f5f5",
   display: "block",
 }}
                       />
