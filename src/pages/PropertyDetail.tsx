@@ -184,6 +184,7 @@ export default function PropertyDetail() {
   const [loading, setLoading] = useState(true);
   const [propertyExtras, setPropertyExtras] = useState<PropertyExtra[]>([]);
 const [extrasLoading, setExtrasLoading] = useState(true);
+  const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
 
   const [calendarDates, setCalendarDates] = useState<
     Record<string, CalendarDate>
