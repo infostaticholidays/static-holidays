@@ -1095,7 +1095,7 @@ function renderExtraCards(extras: PropertyExtra[]) {
             )}
 
             <div>
-              <strong style={{ color: green, fontSize: 14 }}>
+              <strong style={{ color: green, fontSize: 18, fontWeight: 700 }}>
                 {Number(extra.price) === 0
                   ? "Free"
                   : formatPrice(Number(extra.price))}
