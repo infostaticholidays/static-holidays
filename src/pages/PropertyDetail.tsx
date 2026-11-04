@@ -1016,6 +1016,107 @@ const bookingMode = String(ownerBookingMode ?? "")
   }
 
   const mapQuery = property.location?.trim() ?? "";
+    const welcomeHampers = propertyExtras.filter(
+    (extra) => extra.extra_type === "welcome"
+  );
+
+  const occasionExtras = propertyExtras.filter(
+    (extra) => extra.extra_type === "custom"
+  );
+
+  const standardExtras = propertyExtras.filter(
+    (extra) => extra.extra_type !== "welcome" &&
+      extra.extra_type !== "custom"
+  );
+
+  function getPricingLabel(pricingType: string) {
+    switch (pricingType) {
+      case "per_night":
+        return "per night";
+      case "per_person":
+        return "per person";
+      case "per_item":
+        return "per item";
+      default:
+        return "per stay";
+    }
+  }
+
+  function renderExtraCards(extras: PropertyExtra[]) {
+    return (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))",
+          gap: 14,
+          marginTop: 18,
+        }}
+      >
+        {extras.map((extra) => (
+          <article
+            key={extra.id}
+            style={{
+              border: "1px solid #e3eae3",
+              borderRadius: 12,
+              overflow: "hidden",
+              background: "#fff",
+            }}
+          >
+            {extra.image_url && (
+              <img
+                src={extra.image_url}
+                alt={extra.name}
+                style={{
+                  width: "100%",
+                  height: 175,
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            )}
+
+            <div style={{ padding: 16 }}>
+              <h3
+                style={{
+                  margin: "0 0 8px",
+                  fontSize: 16,
+                  color: "#203128",
+                }}
+              >
+                {extra.name}
+              </h3>
+
+              {extra.description && (
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    color: "#536258",
+                    fontSize: 13,
+                    lineHeight: 1.7,
+                    whiteSpace: "pre-line",
+                  }}
+                >
+                  {extra.description}
+                </p>
+              )}
+
+              <strong style={{ color: green, fontSize: 14 }}>
+                {Number(extra.price) === 0
+                  ? "Free"
+                  : formatPrice(Number(extra.price))}
+              </strong>
+
+              {Number(extra.price) > 0 && (
+                <span style={{ color: "#758078", fontSize: 12 }}>
+                  {" "}{getPricingLabel(extra.pricing_type)}
+                </span>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    );
+  }
   const mapUrl = mapQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
     : "";
