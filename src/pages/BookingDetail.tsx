@@ -111,7 +111,16 @@ const [guestReviews, setGuestReviews] = useState<GuestReview[]>([]);
       }
 
       const currentBooking = result.data as Booking;
-      setBooking(currentBooking);
+      const extrasResult = await supabase
+  .from("booking_extras")
+  .select("id, extra_name, unit_price, quantity, line_total, payment_timing")
+  .eq("booking_id", currentBooking.id);
+
+if (extrasResult.error) throw extrasResult.error;
+
+setBookingExtras((extrasResult.data ?? []) as BookingExtra[]);
+      
+   setBooking(currentBooking);
 
       if (!currentBooking.property_id) {
         setProperty(null);
