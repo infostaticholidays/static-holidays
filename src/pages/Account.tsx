@@ -1170,7 +1170,7 @@ const averageRating =
   height: 200,
   objectFit: "contain",
   objectPosition: "center",
-  background: "#f5f5f5",
+ background: sage,
   display: "block",
 }}
                       />
