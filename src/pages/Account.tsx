@@ -1144,9 +1144,11 @@ const averageRating =
                   ? fav.properties[0]
                   : fav.properties;
 
-                const image = Array.isArray(p?.images)
-                  ? p.images[0]
-                  : p?.images;
+               const image =
+  p?.cover_image_url ||
+  (Array.isArray(p?.images)
+    ? p.images[0]
+    : p?.images);
 
                 return (
                   <article
