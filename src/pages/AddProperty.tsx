@@ -302,7 +302,7 @@ if (
         }
       }
 
-      navigate(`/property-calendar/${property.id}`);
+     navigate(`/property-extras/${property.id}`);
     } catch (error) {
       console.error("ADD PROPERTY ERROR:", error);
       setMessage(
