@@ -28,7 +28,14 @@ type GuestInfo = {
   house_rules: string | null;
   hot_tub_instructions: string | null;
 };
-
+type BookingExtra = {
+  id: string;
+  extra_name: string;
+  unit_price: number | string;
+  quantity: number;
+  line_total: number | string;
+  payment_timing: "deposit" | "balance";
+};
 type ArrivalInfo = {
   check_in_instructions: string | null;
   key_safe_location: string | null;
