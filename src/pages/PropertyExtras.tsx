@@ -32,7 +32,7 @@ type StandardExtra = {
   id?: string;
 };
 
-type CustomExtra = {
+type ExtraItem = {
   localId: number;
   id?: string;
   name: string;
@@ -101,7 +101,10 @@ export default function PropertyExtras() {
     cot: { enabled: false, price: "0" },
   });
 
-  const [customExtras, setCustomExtras] = useState<CustomExtra[]>([]);
+  const [customExtras, setCustomExtras] = useState<ExtraItem[]>([]);
+  const [welcomeHampers, setWelcomeHampers] = useState<ExtraItem[]>([]);
+  const [otherRows, setOtherRows] = useState<ExtraRow[]>([]);
+
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -154,7 +157,9 @@ export default function PropertyExtras() {
           cot: { enabled: false, price: "0" },
         };
 
-        const customState: CustomExtra[] = [];
+        const customState: ExtraItem[] = [];
+        const hamperState: ExtraItem[] = [];
+        const preservedRows: ExtraRow[] = [];
 
         loadedRows.forEach((row, index) => {
           if (
@@ -169,8 +174,11 @@ export default function PropertyExtras() {
               price: String(row.price),
               id: row.id,
             };
-          } else if (row.extra_type === "custom") {
-            customState.push({
+          } else if (
+            row.extra_type === "custom" ||
+            row.extra_type === "welcome"
+          ) {
+            const item: ExtraItem = {
               localId: Date.now() + index,
               id: row.id,
               name: row.name,
@@ -178,25 +186,36 @@ export default function PropertyExtras() {
               price: String(row.price),
               imageUrl: row.image_url || "",
               imagePreview: row.image_url || "",
-            });
+            };
+
+            if (row.extra_type === "custom") {
+              customState.push(item);
+            } else {
+              hamperState.push(item);
+            }
+          } else {
+            // Keep other existing extra types intact.
+            preservedRows.push(row);
           }
         });
 
         setStandardExtras(standardState);
         setCustomExtras(customState);
-} catch (error) {
-  console.error("SAVE PROPERTY EXTRAS ERROR:", error);
+        setWelcomeHampers(hamperState);
+        setOtherRows(preservedRows);
+      } catch (error) {
+        console.error("LOAD PROPERTY EXTRAS ERROR:", error);
 
-  const errorMessage =
-    error instanceof Error
-      ? error.message
-      : typeof error === "object" &&
-          error !== null &&
-          "message" in error
-        ? String(error.message)
-        : String(error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : typeof error === "object" &&
+                error !== null &&
+                "message" in error
+              ? String(error.message)
+              : String(error);
 
-  setMessage(errorMessage || "Could not save your property extras.");
+        setMessage(errorMessage || "Could not load your property extras.");
       } finally {
         setLoading(false);
       }
@@ -219,8 +238,8 @@ export default function PropertyExtras() {
     }));
   }
 
-  function addCustomExtra() {
-    setCustomExtras((current) => [
+  function addItem(setItems: React.Dispatch<React.SetStateAction<ExtraItem[]>>) {
+    setItems((current) => [
       ...current,
       {
         localId: Date.now() + Math.random(),
@@ -233,27 +252,33 @@ export default function PropertyExtras() {
     ]);
   }
 
-  function updateCustomExtra(
+  function updateItem(
+    setItems: React.Dispatch<React.SetStateAction<ExtraItem[]>>,
     localId: number,
     field: "name" | "description" | "price",
     value: string
   ) {
-    setCustomExtras((current) =>
-      current.map((extra) =>
-        extra.localId === localId
-          ? { ...extra, [field]: value }
-          : extra
+    setItems((current) =>
+      current.map((item) =>
+        item.localId === localId ? { ...item, [field]: value } : item
       )
     );
   }
 
-  function removeCustomExtra(localId: number) {
-    setCustomExtras((current) =>
-      current.filter((extra) => extra.localId !== localId)
+  function removeItem(
+    setItems: React.Dispatch<React.SetStateAction<ExtraItem[]>>,
+    localId: number
+  ) {
+    setItems((current) =>
+      current.filter((item) => item.localId !== localId)
     );
   }
 
-  function handleCustomImageChange(localId: number, file?: File) {
+  function handleImageChange(
+    setItems: React.Dispatch<React.SetStateAction<ExtraItem[]>>,
+    localId: number,
+    file?: File
+  ) {
     if (!file) return;
 
     setMessage("");
@@ -271,15 +296,15 @@ export default function PropertyExtras() {
     const reader = new FileReader();
 
     reader.onload = () => {
-      setCustomExtras((current) =>
-        current.map((extra) =>
-          extra.localId === localId
+      setItems((current) =>
+        current.map((item) =>
+          item.localId === localId
             ? {
-                ...extra,
+                ...item,
                 imageFile: file,
                 imagePreview: String(reader.result),
               }
-            : extra
+            : item
         )
       );
     };
@@ -291,18 +316,91 @@ export default function PropertyExtras() {
     reader.readAsDataURL(file);
   }
 
-  function removeCustomImage(localId: number) {
-    setCustomExtras((current) =>
-      current.map((extra) =>
-        extra.localId === localId
+  function removeImage(
+    setItems: React.Dispatch<React.SetStateAction<ExtraItem[]>>,
+    localId: number
+  ) {
+    setItems((current) =>
+      current.map((item) =>
+        item.localId === localId
           ? {
-              ...extra,
+              ...item,
               imageUrl: "",
               imageFile: undefined,
               imagePreview: "",
             }
-          : extra
+          : item
       )
+    );
+  }
+
+  function validateItems(items: ExtraItem[], sectionName: string) {
+    for (const item of items) {
+      if (!item.name.trim() || !item.description.trim()) {
+        setMessage(
+          `Please enter a name and description for every ${sectionName}.`
+        );
+        return false;
+      }
+
+      const amount = Number(item.price);
+
+      if (
+        item.price.trim() === "" ||
+        !Number.isFinite(amount) ||
+        amount < 0 ||
+        Math.round(amount * 100) !== amount * 100
+      ) {
+        setMessage(
+          `Please enter a valid price for every ${sectionName}.`
+        );
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  async function prepareItems(
+    items: ExtraItem[],
+    userId: string
+  ): Promise<ExtraItem[]> {
+    return Promise.all(
+      items.map(async (item) => {
+        let imageUrl = item.imageUrl || "";
+
+        if (item.imageFile) {
+          const safeName = item.imageFile.name.replace(
+            /[^a-zA-Z0-9.-]/g,
+            "-"
+          );
+
+          const filePath =
+            `${userId}/${propertyId}/extras/${Date.now()}-${safeName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("property-images")
+            .upload(filePath, item.imageFile, {
+              contentType: item.imageFile.type,
+              upsert: false,
+            });
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicUrlData } = supabase.storage
+            .from("property-images")
+            .getPublicUrl(filePath);
+
+          imageUrl = publicUrlData.publicUrl;
+        }
+
+        return {
+          ...item,
+          imageUrl,
+          imageFile: undefined,
+          imagePreview: imageUrl,
+        };
+      })
     );
   }
 
@@ -335,28 +433,8 @@ export default function PropertyExtras() {
       }
     }
 
-    for (const extra of customExtras) {
-      if (!extra.name.trim() || !extra.description.trim()) {
-        setMessage(
-          "Please enter a name and description for every occasion package."
-        );
-        return;
-      }
-
-      const amount = Number(extra.price);
-
-      if (
-        extra.price.trim() === "" ||
-        !Number.isFinite(amount) ||
-        amount < 0 ||
-        Math.round(amount * 100) !== amount * 100
-      ) {
-        setMessage(
-          "Please enter a valid price for every occasion package."
-        );
-        return;
-      }
-    }
+    if (!validateItems(customExtras, "occasion packages")) return;
+    if (!validateItems(welcomeHampers, "welcome hampers")) return;
 
     setSaving(true);
 
@@ -369,75 +447,64 @@ export default function PropertyExtras() {
       if (userError) throw userError;
       if (!user) throw new Error("Please log in again.");
 
-      const preparedCustomExtras = await Promise.all(
-        customExtras.map(async (extra) => {
-          let imageUrl = extra.imageUrl || "";
-
-          if (extra.imageFile) {
-            const safeName = extra.imageFile.name.replace(
-              /[^a-zA-Z0-9.-]/g,
-              "-"
-            );
-
-            const filePath =
-              `${user.id}/${propertyId}/extras/${Date.now()}-${safeName}`;
-
-            const { error: uploadError } = await supabase.storage
-              .from("property-images")
-              .upload(filePath, extra.imageFile, {
-                contentType: extra.imageFile.type,
-                upsert: false,
-              });
-
-            if (uploadError) throw uploadError;
-
-            const { data: publicUrlData } = supabase.storage
-              .from("property-images")
-              .getPublicUrl(filePath);
-
-            imageUrl = publicUrlData.publicUrl;
-          }
-
-          return {
-            ...extra,
-            imageUrl,
-          };
-        })
+      const preparedCustomExtras = await prepareItems(customExtras, user.id);
+      const preparedWelcomeHampers = await prepareItems(
+        welcomeHampers,
+        user.id
       );
 
+      const standardRows = standardDefinitions
+        .filter((definition) => standardExtras[definition.key].enabled)
+        .map((definition) => {
+          const extra = standardExtras[definition.key];
+
+          return {
+            ...(extra.id ? { id: extra.id } : {}),
+            property_id: propertyId,
+            extra_type: definition.extraType,
+            name: definition.name,
+            description: definition.description,
+            price: Number(extra.price),
+            pricing_type: "per_stay",
+            is_available: true,
+            requires_approval: false,
+            sort_order: definition.sortOrder,
+          };
+        });
+
+      const customRows = preparedCustomExtras.map((extra, index) => ({
+        ...(extra.id ? { id: extra.id } : {}),
+        property_id: propertyId,
+        extra_type: "custom",
+        name: extra.name.trim(),
+        description: extra.description.trim(),
+        image_url: extra.imageUrl || null,
+        price: Number(extra.price),
+        pricing_type: "per_stay",
+        is_available: true,
+        requires_approval: false,
+        sort_order: index + 4,
+      }));
+
+      const hamperRows = preparedWelcomeHampers.map((extra, index) => ({
+        ...(extra.id ? { id: extra.id } : {}),
+        property_id: propertyId,
+        extra_type: "welcome",
+        name: extra.name.trim(),
+        description: extra.description.trim(),
+        image_url: extra.imageUrl || null,
+        price: Number(extra.price),
+        pricing_type: "per_stay",
+        is_available: true,
+        requires_approval: false,
+        sort_order: index + 20,
+      }));
+
       const rowsToSave = [
-        ...standardDefinitions
-          .filter((definition) => standardExtras[definition.key].enabled)
-          .map((definition) => {
-            const extra = standardExtras[definition.key];
-
-            return {
-              ...(extra.id ? { id: extra.id } : {}),
-              property_id: propertyId,
-              extra_type: definition.extraType,
-              name: definition.name,
-              description: definition.description,
-              price: Number(extra.price),
-              pricing_type: "per_stay",
-              is_available: true,
-              requires_approval: false,
-              sort_order: definition.sortOrder,
-            };
-          }),
-
-        ...preparedCustomExtras.map((extra, index) => ({
-          ...(extra.id ? { id: extra.id } : {}),
-          property_id: propertyId,
-          extra_type: "custom",
-          name: extra.name.trim(),
-          description: extra.description.trim(),
-          image_url: extra.imageUrl || null,
-          price: Number(extra.price),
-          pricing_type: "per_stay",
-          is_available: true,
-          requires_approval: false,
-          sort_order: index + 4,
-        })),
+        ...otherRows,
+        ...standardRows,
+        ...customRows,
+        ...hamperRows,
       ];
 
       const { data: currentRows, error: currentError } = await supabase
@@ -475,19 +542,219 @@ export default function PropertyExtras() {
       }
 
       setCustomExtras(preparedCustomExtras);
+      setWelcomeHampers(preparedWelcomeHampers);
 
       setMessage("Your property extras have been saved successfully.");
     } catch (error) {
       console.error("SAVE PROPERTY EXTRAS ERROR:", error);
 
-      setMessage(
+      const errorMessage =
         error instanceof Error
           ? error.message
-          : "Could not save your property extras."
-      );
+          : typeof error === "object" &&
+              error !== null &&
+              "message" in error
+            ? String(error.message)
+            : String(error);
+
+      setMessage(errorMessage || "Could not save your property extras.");
     } finally {
       setSaving(false);
     }
+  }
+
+  function renderItemSection(
+    heading: string,
+    explanation: string,
+    items: ExtraItem[],
+    setItems: React.Dispatch<React.SetStateAction<ExtraItem[]>>,
+    itemLabel: string,
+    nameLabel: string,
+    namePlaceholder: string,
+    descriptionPlaceholder: string,
+    addLabel: string
+  ) {
+    return (
+      <section
+        style={{
+          background: "#ffffff",
+          border: "1px solid #e5e7eb",
+          borderRadius: 14,
+          padding: 24,
+          marginBottom: 20,
+        }}
+      >
+        <h2 style={{ fontSize: 20, color: green, marginTop: 0 }}>
+          {heading}
+        </h2>
+
+        <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.6 }}>
+          {explanation}
+        </p>
+
+        {items.map((item, index) => (
+          <div
+            key={item.localId}
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: 10,
+              padding: 16,
+              marginBottom: 14,
+              background: "#f9faf9",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 14,
+              }}
+            >
+              <strong style={{ color: green }}>
+                {itemLabel} {index + 1}
+              </strong>
+
+              <button
+                type="button"
+                onClick={() => removeItem(setItems, item.localId)}
+                style={{
+                  border: 0,
+                  background: "#fee2e2",
+                  color: "#991b1b",
+                  borderRadius: 6,
+                  padding: "7px 10px",
+                  cursor: "pointer",
+                }}
+              >
+                Remove
+              </button>
+            </div>
+
+            <label style={labelStyle}>{nameLabel} *</label>
+
+            <input
+              style={inputStyle}
+              placeholder={namePlaceholder}
+              value={item.name}
+              onChange={(event) =>
+                updateItem(setItems, item.localId, "name", event.target.value)
+              }
+            />
+
+            <label style={{ ...labelStyle, marginTop: 14 }}>
+              Description *
+            </label>
+
+            <textarea
+              style={{ ...inputStyle, minHeight: 90, resize: "vertical" }}
+              placeholder={descriptionPlaceholder}
+              value={item.description}
+              onChange={(event) =>
+                updateItem(
+                  setItems,
+                  item.localId,
+                  "description",
+                  event.target.value
+                )
+              }
+            />
+
+            <div style={{ marginTop: 16 }}>
+              <label style={labelStyle}>Photo</label>
+
+              {item.imagePreview && (
+                <div style={{ marginBottom: 12 }}>
+                  <img
+                    src={item.imagePreview}
+                    alt={`${item.name || itemLabel} preview`}
+                    style={{
+                      width: "100%",
+                      maxWidth: 320,
+                      height: 200,
+                      objectFit: "cover",
+                      borderRadius: 10,
+                      display: "block",
+                    }}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeImage(setItems, item.localId)}
+                    style={{
+                      marginTop: 8,
+                      padding: "8px 12px",
+                      border: 0,
+                      borderRadius: 7,
+                      background: "#fee2e2",
+                      color: "#991b1b",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Remove photo
+                  </button>
+                </div>
+              )}
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) =>
+                  handleImageChange(
+                    setItems,
+                    item.localId,
+                    event.target.files?.[0]
+                  )
+                }
+              />
+
+              <p style={{ color: "#6b7280", fontSize: 12 }}>
+                Choose an image file up to 5MB.
+              </p>
+            </div>
+
+            <label style={{ ...labelStyle, marginTop: 14 }}>
+              One-off price (£) *
+            </label>
+
+            <input
+              style={inputStyle}
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="e.g. 25"
+              value={item.price}
+              onChange={(event) =>
+                updateItem(setItems, item.localId, "price", event.target.value)
+              }
+            />
+
+            <p style={{ color: "#6b7280", fontSize: 12 }}>
+              Enter 0 if this {itemLabel.toLowerCase()} is free. The price is
+              charged once per booking.
+            </p>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={() => addItem(setItems)}
+          style={{
+            width: "100%",
+            padding: 13,
+            border: "1px dashed #39834b",
+            borderRadius: 9,
+            background: "#f0fdf4",
+            color: green,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          {addLabel}
+        </button>
+      </section>
+    );
   }
 
   if (loading) {
@@ -544,9 +811,7 @@ export default function PropertyExtras() {
               border: `1px solid ${
                 message.includes("successfully") ? "#bbf7d0" : "#fed7aa"
               }`,
-              color: message.includes("successfully")
-                ? green
-                : "#9a3412",
+              color: message.includes("successfully") ? green : "#9a3412",
               padding: 14,
               borderRadius: 8,
               marginBottom: 20,
@@ -654,192 +919,29 @@ export default function PropertyExtras() {
           })}
         </section>
 
-        <section
-          style={{
-            background: "#ffffff",
-            border: "1px solid #e5e7eb",
-            borderRadius: 14,
-            padding: 24,
-            marginBottom: 20,
-          }}
-        >
-          <h2 style={{ fontSize: 20, color: green, marginTop: 0 }}>
-            Special occasions and personal touches
-          </h2>
+        {renderItemSection(
+          "Special occasions and personal touches",
+          "Create packages for birthdays, anniversaries, romantic breaks, Christmas, Halloween or other special occasions. Set your own price and explain exactly what is included.",
+          customExtras,
+          setCustomExtras,
+          "Occasion package",
+          "Package name",
+          "e.g. Birthday surprise",
+          "Describe the decorations, treats or other items included...",
+          "+ Add a special occasion package"
+        )}
 
-          <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.6 }}>
-            Create packages for birthdays, anniversaries, romantic breaks,
-            Christmas, Halloween or other special occasions. Set your own
-            price and explain exactly what is included.
-          </p>
-
-          {customExtras.map((extra, index) => (
-            <div
-              key={extra.localId}
-              style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: 10,
-                padding: 16,
-                marginBottom: 14,
-                background: "#f9faf9",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 12,
-                  marginBottom: 14,
-                }}
-              >
-                <strong style={{ color: green }}>
-                  Occasion package {index + 1}
-                </strong>
-
-                <button
-                  type="button"
-                  onClick={() => removeCustomExtra(extra.localId)}
-                  style={{
-                    border: 0,
-                    background: "#fee2e2",
-                    color: "#991b1b",
-                    borderRadius: 6,
-                    padding: "7px 10px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Remove
-                </button>
-              </div>
-
-              <label style={labelStyle}>Package name *</label>
-
-              <input
-                style={inputStyle}
-                placeholder="e.g. Birthday surprise"
-                value={extra.name}
-                onChange={(event) =>
-                  updateCustomExtra(
-                    extra.localId,
-                    "name",
-                    event.target.value
-                  )
-                }
-              />
-
-              <label style={{ ...labelStyle, marginTop: 14 }}>
-                What is included? *
-              </label>
-
-              <textarea
-                style={{ ...inputStyle, minHeight: 90, resize: "vertical" }}
-                placeholder="Describe the decorations, treats or other items included..."
-                value={extra.description}
-                onChange={(event) =>
-                  updateCustomExtra(
-                    extra.localId,
-                    "description",
-                    event.target.value
-                  )
-                }
-              />
-
-              <div style={{ marginTop: 16 }}>
-                <label style={labelStyle}>Package photo</label>
-
-                {extra.imagePreview && (
-                  <div style={{ marginBottom: 12 }}>
-                    <img
-                      src={extra.imagePreview}
-                      alt={`${extra.name || "Occasion package"} preview`}
-                      style={{
-                        width: "100%",
-                        maxWidth: 320,
-                        height: 200,
-                        objectFit: "cover",
-                        borderRadius: 10,
-                        display: "block",
-                      }}
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => removeCustomImage(extra.localId)}
-                      style={{
-                        marginTop: 8,
-                        padding: "8px 12px",
-                        border: 0,
-                        borderRadius: 7,
-                        background: "#fee2e2",
-                        color: "#991b1b",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Remove photo
-                    </button>
-                  </div>
-                )}
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) =>
-                    handleCustomImageChange(
-                      extra.localId,
-                      event.target.files?.[0]
-                    )
-                  }
-                />
-
-                <p style={{ color: "#6b7280", fontSize: 12 }}>
-                  Choose an image file up to 5MB.
-                </p>
-              </div>
-
-              <label style={{ ...labelStyle, marginTop: 14 }}>
-                One-off package price (£) *
-              </label>
-
-              <input
-                style={inputStyle}
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="e.g. 35"
-                value={extra.price}
-                onChange={(event) =>
-                  updateCustomExtra(
-                    extra.localId,
-                    "price",
-                    event.target.value
-                  )
-                }
-              />
-
-              <p style={{ color: "#6b7280", fontSize: 12 }}>
-                You choose the price. This is charged once per booking.
-              </p>
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={addCustomExtra}
-            style={{
-              width: "100%",
-              padding: 13,
-              border: "1px dashed #39834b",
-              borderRadius: 9,
-              background: "#f0fdf4",
-              color: green,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            + Add a special occasion package
-          </button>
-        </section>
+        {renderItemSection(
+          "Welcome Hampers",
+          "Offer guests a choice of welcome hampers for their stay. You can create several options, add a photo and set a separate price for each one.",
+          welcomeHampers,
+          setWelcomeHampers,
+          "Welcome hamper",
+          "Hamper name",
+          "e.g. Luxury welcome hamper",
+          "Describe the food, drinks, treats or other items included...",
+          "+ Add a welcome hamper"
+        )}
 
         <div
           style={{
