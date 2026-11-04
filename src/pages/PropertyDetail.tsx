@@ -2189,7 +2189,7 @@ const fg = selected
                     <strong style={{ fontSize: 13 }}>Estimated total</strong>
                     <strong style={{ fontSize: 18, color: green }}>
                       {stayPriceInfo.valid
-                        ? formatPrice(stayPriceInfo.total)
+                       ? formatPrice(bookingTotal)
                         : "Not available"}
                     </strong>
                   </div>
