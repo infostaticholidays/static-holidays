@@ -138,7 +138,65 @@ if (verificationError) {
         console.error("Could not load favourites:", favError);
       }
 
-      setFavourites(favData || []);
+   
+const favouritesWithImages = await Promise.all(
+  (favData || []).map(async (fav: any) => {
+    const p = Array.isArray(fav.properties)
+      ? fav.properties[0]
+      : fav.properties;
+
+    if (!p?.owner_id || !p?.id) {
+      return {
+        ...fav,
+        propertyImages: p?.cover_image_url
+          ? [p.cover_image_url]
+          : [],
+      };
+    }
+
+    const folderPath = `${p.owner_id}/${p.id}`;
+
+    const { data: files, error: storageError } =
+      await supabase.storage
+        .from("property-images")
+        .list(folderPath, {
+          limit: 100,
+          sortBy: { column: "name", order: "asc" },
+        });
+
+    if (storageError) {
+      console.error("Could not load property photos:", storageError);
+    }
+
+    const storageImages = (files || [])
+      .filter((file: any) =>
+        /\.(jpg|jpeg|png|webp|avif)$/i.test(file.name)
+      )
+      .map((file: any) =>
+        supabase.storage
+          .from("property-images")
+          .getPublicUrl(`${folderPath}/${file.name}`)
+          .data.publicUrl
+      );
+
+    const propertyImages = [
+      ...(p.cover_image_url ? [p.cover_image_url] : []),
+      ...storageImages,
+    ].filter(
+      (photo, index, photos) =>
+        photo && photos.indexOf(photo) === index
+    );
+
+    return {
+      ...fav,
+      propertyImages,
+      photoPage: 0,
+    };
+  })
+);
+
+setFavourites(favouritesWithImages);
+
 
       
    const { data: bookingsData, error: bookingsError } = await supabase
