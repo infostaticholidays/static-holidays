@@ -701,7 +701,7 @@ export default function PropertyExtras() {
             {saving ? "Saving extras..." : "Save Optional Extras"}
           </button>
 
-          <button
+                   <button
             type="button"
             onClick={() => navigate(`/property-calendar/${propertyId}`)}
             style={{
