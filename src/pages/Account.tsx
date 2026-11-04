@@ -170,6 +170,8 @@ const favouritesWithImages = await Promise.all(
     }
 
     const storageImages = (files || [])
+      console.log("Maia Motel storage files:", files);
+console.log("Maia Motel storage error:", storageError);
       .filter((file: any) =>
         /\.(jpg|jpeg|png|webp|avif)$/i.test(file.name)
       )
