@@ -168,12 +168,7 @@ const favouritesWithImages = await Promise.all(
     if (storageError) {
       console.error("Could not load property photos:", storageError);
     }
-alert(
-  "Storage files: " +
-  JSON.stringify(files?.map((file: any) => file.name)) +
-  "\nStorage error: " +
-  JSON.stringify(storageError)
-);
+
 
 const storageImages = (files || [])
   .filter((file: any) =>
