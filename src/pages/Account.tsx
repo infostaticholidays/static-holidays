@@ -140,20 +140,22 @@ if (verificationError) {
       setFavourites(favData || []);
 
       
-      const { data: bookingsData, error: bookingsError } = await supabase
-        .from("bookings")
-        .select(`
-          id,
-          guest_id,
-          property_id,
-          check_in,
-          check_out,
-          booking_status,
-          properties (
-            title,
-            location
-          )
-        `)
+   const { data: bookingsData, error: bookingsError } = await supabase
+  .from("bookings")
+  .select(`
+    id,
+    guest_id,
+    property_id,
+    check_in,
+    check_out,
+    booking_status,
+    properties (
+      id,
+      title,
+      location,
+      images
+    )
+  `)
         .eq("guest_id", user.id)
         .eq("booking_status", "confirmed")
         .order("check_in", { ascending: true });
