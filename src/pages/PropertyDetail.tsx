@@ -880,7 +880,7 @@ const freshBookingTotal = freshTotal + selectedExtrasTotal;
           guest_id: user.id,
           check_in: startDate,
           check_out: endDate,
-          total_price: Number(freshTotal.toFixed(2)),
+        total_price: Number(freshBookingTotal.toFixed(2)),
           deposit_amount: bookingDeposit,
           status: "pending",
           booking_status: "pending",
