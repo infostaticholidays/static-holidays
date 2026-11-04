@@ -1197,15 +1197,7 @@ const averageRating =
                 gap: 20,
               }}
             >
-              {favourites.map((fav) => {
-                const p = Array.isArray(fav.properties)
-                  ? fav.properties[0]
-                  : fav.properties;
-const propertyImages = fav.propertyImages || [];
-   
-                return (
-                  <article
-                    key={fav.id}
+              const propertyImages = fav.propertyImages || [];
                     style={{
                       background: "#ffffff",
                       border: `1px solid ${border}`,
