@@ -77,6 +77,7 @@ export default function BookingDetail() {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [property, setProperty] = useState<Property | null>(null);
   const [guestProfile, setGuestProfile] = useState<GuestProfile | null>(null);
+  const [bookingExtras, setBookingExtras] = useState<BookingExtra[]>([]);
 const [guestReviews, setGuestReviews] = useState<GuestReview[]>([]);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [loading, setLoading] = useState(true);
