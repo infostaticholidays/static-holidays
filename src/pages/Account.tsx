@@ -123,8 +123,9 @@ if (verificationError) {
         .from("favourites")
         .select(`
           id,
-       properties (
+     properties (
   id,
+  owner_id,
   title,
   location,
   images,
