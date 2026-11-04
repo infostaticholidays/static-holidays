@@ -1431,6 +1431,39 @@ const bookingMode = String(ownerBookingMode ?? "")
                 </section>
               )}
 
+{!extrasLoading && (
+  <>
+    {welcomeHampers.length > 0 && (
+      <section style={{ ...cardStyle, marginBottom: 18 }}>
+        <h2 style={sectionTitleStyle}>Welcome Hampers</h2>
+        <p style={{ color: "#536258", fontSize: 13, lineHeight: 1.7 }}>
+          Make your stay extra special with a welcome hamper prepared for your arrival.
+        </p>
+        {renderExtraCards(welcomeHampers)}
+      </section>
+    )}
+
+    {occasionExtras.length > 0 && (
+      <section style={{ ...cardStyle, marginBottom: 18 }}>
+        <h2 style={sectionTitleStyle}>
+          Special occasions and personal touches
+        </h2>
+        <p style={{ color: "#536258", fontSize: 13, lineHeight: 1.7 }}>
+          Add something special to celebrate or personalise your stay.
+        </p>
+        {renderExtraCards(occasionExtras)}
+      </section>
+    )}
+
+    {standardExtras.length > 0 && (
+      <section style={{ ...cardStyle, marginBottom: 18 }}>
+        <h2 style={sectionTitleStyle}>Additional extras</h2>
+        {renderExtraCards(standardExtras)}
+      </section>
+    )}
+  </>
+)}
+            
             {mapQuery && (
               <section style={{ ...cardStyle, marginBottom: 18 }}>
                 <h2 style={sectionTitleStyle}>Location</h2>
