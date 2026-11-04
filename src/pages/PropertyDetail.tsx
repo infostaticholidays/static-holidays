@@ -529,7 +529,16 @@ useEffect(() => {
     };
  
   }, [stayDates, calendarDates, basePrice]);
+  // Add the prices of all extras selected by the guest.
+  // Each extra is charged once for the whole booking.
+  const selectedExtrasTotal = propertyExtras.reduce((total, extra) => {
+    if (!selectedExtraIds.includes(extra.id)) return total;
 
+    const price = Number(extra.price);
+    return total + (Number.isFinite(price) ? price : 0);
+  }, 0);
+
+  const estimatedTotal = stayPriceInfo.total + selectedExtrasTotal;
   // Full payment is required for stays costing £100 or less,
   // or when check-in is within 30 days.
   const daysToArrival = startDate
