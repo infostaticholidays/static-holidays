@@ -552,7 +552,7 @@ export default function PropertyExtras() {
         ...customRows,
         ...hamperRows,
       ];
-
+console.log("EXTRAS BEING SAVED:", rowsToSave);
       const { data: currentRows, error: currentError } = await supabase
         .from("property_extras")
         .select("id")
