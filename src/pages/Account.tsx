@@ -1063,6 +1063,19 @@ const averageRating =
                     >
                       View booking details →
                     </Link>
+                                        <Link
+                      to={`/my-holiday/${holiday.id}`}
+                      style={{
+                        ...buttonStyle,
+                        background: "#ffffff",
+                        color: darkGreen,
+                        border: `1px solid ${border}`,
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      My Holiday & Payments →
+                    </Link>
                   </div>
 
                 </div>
