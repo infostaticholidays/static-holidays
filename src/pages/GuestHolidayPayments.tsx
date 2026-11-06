@@ -115,6 +115,7 @@ export default function GuestHolidayPayments() {
   const [payments, setPayments] = useState<BookingPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [payingBalance, setPayingBalance] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
