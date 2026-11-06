@@ -300,7 +300,16 @@ export default function GuestHolidayPayments() {
   }
 
   const total = Number(booking.total_price || 0);
+const balanceDueDate = new Date(
+  `${booking.check_in.slice(0, 10)}T12:00:00`
+);
+balanceDueDate.setDate(balanceDueDate.getDate() - 30);
 
+const balanceDueDateLabel = balanceDueDate.toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
   // Only confirmed, paid payment records count as money received.
   const paidPayments = payments.filter(
     (payment) => payment.status === "paid"
