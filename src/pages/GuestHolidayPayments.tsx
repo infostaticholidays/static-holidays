@@ -706,6 +706,39 @@ const balanceDueDateLabel = balanceDueDate.toLocaleDateString("en-GB", {
 You can pay the outstanding amount securely by card using Stripe.
               </p>
 
+              <div style={{ marginTop: 16 }}>
+  <label
+    htmlFor="custom-payment-amount"
+    style={{
+      display: "block",
+      marginBottom: 8,
+      color: colors.text,
+      fontWeight: 600,
+    }}
+  >
+    Or enter an amount to pay (£)
+  </label>
+
+  <input
+    id="custom-payment-amount"
+    type="number"
+    min="1"
+    max={remaining.toFixed(2)}
+    step="0.01"
+    value={customAmount}
+    onChange={(event) => setCustomAmount(event.target.value)}
+    placeholder="Enter amount"
+    style={{
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "13px",
+      border: `1px solid ${colors.border}`,
+      borderRadius: 10,
+      fontSize: 16,
+    }}
+  />
+</div>
+
               <p style={{
   ...textStyle,
   fontWeight: 700,
