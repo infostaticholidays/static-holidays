@@ -117,6 +117,7 @@ export default function GuestHolidayPayments() {
   const [errorMessage, setErrorMessage] = useState("");
   const [payingBalance, setPayingBalance] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
+  const [payingCustom, setPayingCustom] = useState(false);
   async function handlePayBalance() {
   if (!booking || payingBalance) return;
 
