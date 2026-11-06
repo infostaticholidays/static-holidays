@@ -137,8 +137,7 @@ export default function GuestHolidayPayments() {
 if (!data?.checkout_url) {
       throw new Error("Stripe did not return a checkout link.");
     }
-
-    window.location.href = data.url;
+window.location.href = data.checkout_url;
   } catch (error) {
     console.error("Could not start balance payment:", error);
     setErrorMessage(
