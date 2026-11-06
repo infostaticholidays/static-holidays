@@ -670,6 +670,19 @@ You can pay the outstanding amount securely by card using Stripe.
 }}>
   Balance payment due by: {balanceDueDateLabel}
 </p>
+
+<p style={{
+  ...textStyle,
+  color: colors.orange,
+  background: colors.paleOrange,
+  padding: 12,
+  borderRadius: 10,
+}}>
+  Important: Your remaining balance must be paid by the due date.
+  If payment is not received by then, your holiday booking may be
+  cancelled in accordance with our cancellation terms.
+</p>
+
 <button
   type="button"
   onClick={handlePayBalance}
