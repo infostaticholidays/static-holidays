@@ -256,48 +256,7 @@ window.location.href = data.checkout_url;
       }
     }
 
-    async function handlePayCustom() {
-  if (!booking || payingCustom || !customAmount.trim()) return;
-
-  const amount = Number(customAmount);
-
-  if (!Number.isFinite(amount) || amount < 1) {
-    setErrorMessage("Please enter an amount of at least £1.");
-    return;
-  }
-
-  setPayingCustom(true);
-  setErrorMessage("");
-
-  try {
-    const { data, error } = await supabase.functions.invoke(
-      "create-checkout-session",
-      {
-        body: {
-          booking_id: booking.id,
-          payment_choice: "custom",
-          custom_amount: amount,
-        },
-      }
-    );
-
-    if (error) throw error;
-
-    if (!data?.checkout_url) {
-      throw new Error("Stripe did not return a checkout link.");
-    }
-
-    window.location.href = data.checkout_url;
-  } catch (error) {
-    console.error("Could not start custom payment:", error);
-    setErrorMessage(
-      error instanceof Error
-        ? error.message
-        : "We couldn't start your payment. Please try again."
-    );
-    setPayingCustom(false);
-  }
-}
+  
 
     void loadHoliday();
 
