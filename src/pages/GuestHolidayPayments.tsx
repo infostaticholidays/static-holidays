@@ -758,7 +758,33 @@ You can pay the outstanding amount securely by card using Stripe.
   If payment is not received by then, your holiday booking may be
   cancelled in accordance with our cancellation terms.
 </p>
-
+<button
+  type="button"
+  onClick={handlePayCustom}
+  disabled={
+    payingCustom ||
+    payingBalance ||
+    remaining <= 0 ||
+    !customAmount.trim() ||
+    Number(customAmount) < 1 ||
+    Number(customAmount) > remaining
+  }
+  style={{
+    width: "100%",
+    marginTop: 12,
+    padding: "14px 20px",
+    border: `1px solid ${colors.green}`,
+    borderRadius: 10,
+    background: colors.white,
+    color: colors.green,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: payingCustom ? "wait" : "pointer",
+    opacity: payingCustom ? 0.7 : 1,
+  }}
+>
+  {payingCustom ? "Connecting to secure payment…" : "Pay custom amount"}
+</button>
 <button
   type="button"
   onClick={handlePayBalance}
