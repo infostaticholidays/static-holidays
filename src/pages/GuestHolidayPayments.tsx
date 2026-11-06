@@ -651,8 +651,7 @@ export default function GuestHolidayPayments() {
             <>
               <p style={textStyle}>
                 Your remaining balance is {money(remaining)}.
-                We will add secure online balance payment here once the
-                balance checkout is connected and tested.
+You can pay the outstanding amount securely by card using Stripe.
               </p>
 
               <div style={{
