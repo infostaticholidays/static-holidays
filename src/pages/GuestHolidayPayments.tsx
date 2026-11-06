@@ -116,6 +116,40 @@ export default function GuestHolidayPayments() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [payingBalance, setPayingBalance] = useState(false);
+  async function handlePayBalance() {
+  if (!booking || payingBalance) return;
+
+  setPayingBalance(true);
+  setErrorMessage("");
+
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      "create-checkout-session",
+      {
+        body: {
+          booking_id: booking.id,
+          payment_choice: "balance",
+        },
+      }
+    );
+
+    if (error) throw error;
+
+    if (!data?.url) {
+      throw new Error("Stripe did not return a checkout link.");
+    }
+
+    window.location.href = data.url;
+  } catch (error) {
+    console.error("Could not start balance payment:", error);
+    setErrorMessage(
+      error instanceof Error
+        ? error.message
+        : "We couldn't start your balance payment. Please try again."
+    );
+    setPayingBalance(false);
+  }
+}
 
   useEffect(() => {
     let cancelled = false;
