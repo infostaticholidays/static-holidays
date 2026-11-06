@@ -653,7 +653,28 @@ export default function GuestHolidayPayments() {
                 Your remaining balance is {money(remaining)}.
 You can pay the outstanding amount securely by card using Stripe.
               </p>
-
+<button
+  type="button"
+  onClick={handlePayBalance}
+  disabled={payingBalance || remaining <= 0}
+  style={{
+    width: "100%",
+    marginTop: 16,
+    padding: "14px 20px",
+    border: "none",
+    borderRadius: 10,
+    background: colors.green,
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: payingBalance ? "wait" : "pointer",
+    opacity: payingBalance ? 0.7 : 1,
+  }}
+>
+  {payingBalance
+    ? "Connecting to secure payment…"
+    : `Pay remaining balance — ${money(remaining)}`}
+</button>
               <div style={{
                 background: "#f3f7f2",
                 borderRadius: 12,
