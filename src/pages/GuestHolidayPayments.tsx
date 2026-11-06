@@ -701,12 +701,32 @@ const balanceDueDateLabel = balanceDueDate.toLocaleDateString("en-GB", {
             </p>
           ) : (
             <>
-              <p style={textStyle}>
-                Your remaining balance is {money(remaining)}.
-You can pay the outstanding amount securely by card using Stripe.
-              </p>
 
-              <div style={{ marginTop: 16 }}>
+<p style={textStyle}>
+  Your remaining balance is {money(remaining)}. You can pay the outstanding amount securely by card using Stripe.
+</p>
+
+<p style={{
+  ...textStyle,
+  fontWeight: 700,
+  color: colors.dark,
+}}>
+  Balance payment due by: {balanceDueDateLabel}
+</p>
+
+<p style={{
+  ...textStyle,
+  color: colors.orange,
+  background: colors.paleOrange,
+  padding: 12,
+  borderRadius: 10,
+}}>
+  Important: Your remaining balance must be paid by the due date.
+  If payment is not received by then, your holiday booking may be
+  cancelled in accordance with our cancellation terms.
+</p>
+
+<div style={{ marginTop: 16 }}>
   <label
     htmlFor="custom-payment-amount"
     style={{
@@ -739,25 +759,6 @@ You can pay the outstanding amount securely by card using Stripe.
   />
 </div>
 
-              <p style={{
-  ...textStyle,
-  fontWeight: 700,
-  color: colors.dark,
-}}>
-  Balance payment due by: {balanceDueDateLabel}
-</p>
-
-<p style={{
-  ...textStyle,
-  color: colors.orange,
-  background: colors.paleOrange,
-  padding: 12,
-  borderRadius: 10,
-}}>
-  Important: Your remaining balance must be paid by the due date.
-  If payment is not received by then, your holiday booking may be
-  cancelled in accordance with our cancellation terms.
-</p>
 <button
   type="button"
   onClick={handlePayCustom}
@@ -785,10 +786,11 @@ You can pay the outstanding amount securely by card using Stripe.
 >
   {payingCustom ? "Connecting to secure payment…" : "Pay custom amount"}
 </button>
+
 <button
   type="button"
   onClick={handlePayBalance}
-  disabled={payingBalance || remaining <= 0}
+  disabled={payingBalance || payingCustom || remaining <= 0}
   style={{
     width: "100%",
     marginTop: 16,
@@ -807,6 +809,7 @@ You can pay the outstanding amount securely by card using Stripe.
     ? "Connecting to secure payment…"
     : `Pay remaining balance — ${money(remaining)}`}
 </button>
+
               <div style={{
                 background: "#f3f7f2",
                 borderRadius: 12,
