@@ -134,8 +134,7 @@ export default function GuestHolidayPayments() {
     );
 
     if (error) throw error;
-
-    if (!data?.url) {
+if (!data?.checkout_url) {
       throw new Error("Stripe did not return a checkout link.");
     }
 
