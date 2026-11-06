@@ -662,6 +662,14 @@ const balanceDueDateLabel = balanceDueDate.toLocaleDateString("en-GB", {
                 Your remaining balance is {money(remaining)}.
 You can pay the outstanding amount securely by card using Stripe.
               </p>
+
+              <p style={{
+  ...textStyle,
+  fontWeight: 700,
+  color: colors.dark,
+}}>
+  Balance payment due by: {balanceDueDateLabel}
+</p>
 <button
   type="button"
   onClick={handlePayBalance}
